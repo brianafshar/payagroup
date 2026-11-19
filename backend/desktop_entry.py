@@ -23,6 +23,8 @@ def bundle_dir() -> Path:
 
 
 def main() -> None:
+    # autobahn (via daphne) would compile an optional C accelerator with cffi at import — not possible in the bundle.
+    os.environ["AUTOBAHN_USE_NVX"] = "0"
     port = sys.argv[1] if len(sys.argv) > 1 else "8765"
     data = data_dir()
     key_file = data / "secret.key"

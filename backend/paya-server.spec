@@ -4,7 +4,7 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 
 datas, binaries, hidden = [], [], []
 for pkg in ["django", "rest_framework", "rest_framework_simplejwt", "corsheaders", "django_filters", "drf_spectacular",
-            "channels", "daphne", "weasyprint", "pyphen", "cssselect2", "tinycss2", "pydyf", "fontTools"]:
+            "channels", "daphne", "autobahn", "twisted", "zope.interface", "weasyprint", "pyphen", "cssselect2", "tinycss2", "pydyf", "fontTools"]:
     d, b, h = collect_all(pkg)
     datas += d; binaries += b; hidden += h
 for app in ["config", "accounts", "coaching", "core", "messaging", "tracking", "training"]:
