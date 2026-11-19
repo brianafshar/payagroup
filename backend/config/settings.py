@@ -37,6 +37,11 @@ def env_list(key: str, default: str = "") -> list[str]:
     return [x.strip() for x in env(key, default).split(",") if x.strip()]
 
 
+# Windows desktop build: one local server per gym PC (data in PAYA_DATA_DIR, the built panel served from PAYA_WEB_DIR).
+DESKTOP = env_bool("PAYA_DESKTOP", False)
+DATA_DIR = Path(env("PAYA_DATA_DIR", str(BASE_DIR)))
+WEB_DIR = env("PAYA_WEB_DIR")
+
 DEBUG = env_bool("DJANGO_DEBUG", True)
 SECRET_KEY = env("DJANGO_SECRET_KEY", "dev-only-insecure-key-change-me-in-production" if DEBUG else "")
 if not SECRET_KEY:
@@ -125,7 +130,7 @@ TEMPLATES = [
     }
 ]
 
-DATABASES = {"default": dj_database_url.parse(env("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"), conn_max_age=60)}
+DATABASES = {"default": dj_database_url.parse(env("DATABASE_URL", f"sqlite:///{DATA_DIR / 'db.sqlite3'}"), conn_max_age=60)}
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.User"
 
@@ -141,7 +146,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = DATA_DIR / "media"
 
 # --- API ---
 REST_FRAMEWORK = {

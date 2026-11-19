@@ -112,3 +112,14 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif settings.DESKTOP:
+    from django.urls import re_path
+    from django.views.static import serve as _serve
+
+    urlpatterns += [re_path(r"^media/(?P<path>.*)$", _serve, {"document_root": settings.MEDIA_ROOT})]
+
+if settings.WEB_DIR:
+    from core.spa import spa
+
+    # The built panel: any other path is a client-side route of the single-page app.
+    urlpatterns += [re_path(r"^(?!api/|media/|ws/|django-admin/|static/|healthz).*$", spa)]

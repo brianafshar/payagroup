@@ -10,3 +10,10 @@ dist-web/
 deploy/.env
 deploy/backups/
 deploy/download/*.apk
+
+# Windows desktop build
+desktop/server-dist/
+desktop/dist-installer/
+backend/build/
+backend/dist/
+backend/db.sqlite3

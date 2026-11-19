@@ -1,0 +1,52 @@
+name: Windows installer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/windows-desktop-app]
+    paths: [desktop/**, backend/**, apps/web/**, .github/workflows/windows-installer.yml]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+
+      - name: Build the panel
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter @baseline/web exec vite build
+
+      # WeasyPrint (program PDF) needs the GTK/Pango DLLs on Windows.
+      - name: Install GTK runtime for WeasyPrint
+        shell: pwsh
+        run: |
+          choco install msys2 -y --no-progress
+          C:\tools\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pango"
+          "C:\tools\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Bundle the server (PyInstaller)
+        working-directory: backend
+        run: |
+          pip install -r requirements.txt pyinstaller
+          pyinstaller paya-server.spec --noconfirm
+          # the Pango/GTK DLLs next to the executable so WeasyPrint finds them
+          Copy-Item C:\tools\msys64\mingw64\bin\*.dll dist\paya-server\ -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force ..\desktop\server-dist | Out-Null
+          Copy-Item dist\paya-server ..\desktop\server-dist\paya-server -Recurse
+
+      - name: Build the installer (Electron + NSIS)
+        working-directory: desktop
+        run: |
+          npm install
+          npm run dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PAYA-Group-Setup
+          path: desktop/dist-installer/*.exe
