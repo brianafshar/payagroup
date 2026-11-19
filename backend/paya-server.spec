@@ -9,7 +9,15 @@ for pkg in ["django", "rest_framework", "rest_framework_simplejwt", "corsheaders
     datas += d; binaries += b; hidden += h
 for app in ["config", "accounts", "coaching", "core", "messaging", "tracking", "training"]:
     hidden += collect_submodules(app)
-datas += [("../apps/web/dist", "web"), ("training/library", "training/library"), ("core/templates", "core/templates"), ("core/pdf", "core/pdf")]
+datas += [("../apps/web/dist", "web")]
+# every non-Python file of the project's apps (JSON data loaded by migrations, PDF templates/fonts, library photos…)
+import os
+for app in ["config", "accounts", "coaching", "core", "messaging", "tracking", "training"]:
+    for root, dirs, files in os.walk(app):
+        dirs[:] = [d for d in dirs if d != "__pycache__"]
+        for f in files:
+            if not f.endswith((".py", ".pyc")):
+                datas.append((os.path.join(root, f), root))
 hidden += ["twisted.internet.asyncioreactor", "channels.layers", "daphne.cli", "psycopg"]
 
 a = Analysis(["desktop_entry.py"], pathex=["."], binaries=binaries, datas=datas, hiddenimports=hidden, noarchive=False)
