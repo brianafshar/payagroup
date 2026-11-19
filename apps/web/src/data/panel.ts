@@ -4,7 +4,6 @@
  */
 import { useEffect, useState } from 'react';
 import { http } from './http';
-import { useSessionUser } from './session';
 import { getVersion, subscribe } from './store';
 
 let athleteCount: number | null = null;
@@ -37,10 +36,9 @@ export function useLiveAthleteCount(enabled: boolean): number | null {
   return enabled ? n : null;
 }
 
-/** The signed-in coach's white-label brand (null for admins). */
-export function useCoachBrand() {
-  const u = useSessionUser();
-  return u?.role === 'coach' ? u.branding : null;
+/** White-label is removed for PAYA Group: always null, so the fixed PAYA brand is used everywhere. */
+export function useCoachBrand(): { appName: string; initials: string; theme?: string } | null {
+  return null;
 }
 
 /* ---------------------------------------------------------------- top bar: search & notifications */

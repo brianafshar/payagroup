@@ -1,5 +1,4 @@
 import { useEffect, type CSSProperties, type ReactNode } from 'react';
-import { useCoachBrand } from '@/data/panel';
 import { setNavOpen, useNavOpen } from '@/lib/navDrawer';
 import { CoachGuide } from './CoachGuide';
 
@@ -32,9 +31,8 @@ const rootStyle: CSSProperties = {
  * On a phone (app/responsive.css) the sidebar becomes a drawer opened from the top bar's menu button.
  */
 export function PanelLayout({ theme = 'brand', sidebar, topBar, overlays, fullHeight, children }: PanelLayoutProps) {
-  // Live coach panel: the coach's own white-label theme.
-  const coachBrand = useCoachBrand();
-  if (coachBrand?.theme) theme = coachBrand.theme;
+  // PAYA Group has a single fixed brand (no per-coach white-label themes).
+  theme = 'brand';
   const navOpen = useNavOpen();
   useEffect(() => {
     if (!navOpen) return;

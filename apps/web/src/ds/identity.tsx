@@ -60,8 +60,8 @@ export function IndowLogo({
   height?: number;
   className?: string;
 }) {
-  const src = (t: string) => `/brand/indow-${kind}-${t}.svg`;
-  const img = (t: string, cls?: string) => <img className={cls} src={src(t)} alt="indow" style={{ height, width: 'auto', display: 'block' }} />;
+  const src = (t: string) => `/brand/paya-${kind}-${t}.svg`;
+  const img = (t: string, cls?: string) => <img className={cls} src={src(t)} alt="PAYA Group" style={{ height, width: 'auto', display: 'block' }} />;
   if (tone !== 'auto') return <span className={cx('bl-indow', className)}>{img(tone)}</span>;
   return (
     <span className={cx('bl-indow', className)}>

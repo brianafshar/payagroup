@@ -132,11 +132,11 @@ export function Sidebar(p: SidebarProps) {
       <div className="bl-sidebar-brand">
         <div className="bl-grow bl-minw0">
           <BrandMark
-            name={p.brandName || 'indow'}
-            initials={p.brandInitials || (app === 'admin' ? 'i' : 'AF')}
+            name={p.brandName || 'PAYA Group'}
+            initials={p.brandInitials || 'PG'}
             sub={p.brandSub || (app === 'admin' ? 'مدیریت پلتفرم' : 'فضای کاری مربی')}
             variant={rail ? 'mark' : 'full'}
-            src={p.brandSrc || (app === 'admin' ? '/brand/indow-app-icon-orange.svg' : undefined)}
+            src={p.brandSrc || '/brand/paya-app-icon-orange.svg'}
             size="sm"
           />
         </div>

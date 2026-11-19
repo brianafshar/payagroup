@@ -6,8 +6,7 @@
     "dev": "pnpm --filter @baseline/web dev",
     "build": "pnpm --filter @baseline/web build",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r --if-present test",
-    "mobile": "pnpm --filter @baseline/mobile start"
+    "test": "pnpm -r --if-present test"
   },
   "devDependencies": {
     "domhandler": "^5.0.3",
