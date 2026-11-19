@@ -33,6 +33,7 @@ class MeSerializer(serializers.ModelSerializer):
 
     admin_role = serializers.CharField(read_only=True)
     coach_id = serializers.SerializerMethodField()
+    is_head_coach = serializers.SerializerMethodField()
     athlete_id = serializers.SerializerMethodField()
     branding = serializers.SerializerMethodField()
     pending = serializers.BooleanField(read_only=True)
@@ -56,6 +57,7 @@ class MeSerializer(serializers.ModelSerializer):
             "force_password_change",
             "pending",
             "coach_id",
+            "is_head_coach",
             "athlete_id",
             "branding",
             "last_login",
@@ -76,6 +78,9 @@ class MeSerializer(serializers.ModelSerializer):
 
     def get_coach_id(self, user) -> int | None:
         return user.coach.pk if user.role == "coach" and hasattr(user, "coach") else None
+
+    def get_is_head_coach(self, user) -> bool:
+        return bool(user.role == "coach" and hasattr(user, "coach") and user.coach.is_head)
 
     def get_athlete_id(self, user) -> int | None:
         return user.athlete.pk if user.role == "athlete" and hasattr(user, "athlete") else None

@@ -46,7 +46,7 @@ class CoachSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coach
         fields = [
-            "id", "user_id", "name", "email", "status", "branding", "sport", "athlete_cap", "athlete_count", "validity",
+            "id", "user_id", "name", "email", "status", "is_head", "branding", "sport", "athlete_cap", "athlete_count", "validity",
             "days_left", "reminder_days", "cadence", "custom_tests", "last_login_at", "has_account", "created_at",
             # write-only branding fields
             "app_name", "initials", "primary", "secondary", "theme", "logo", "remove_logo",
@@ -152,6 +152,7 @@ class CoachProfileSerializer(serializers.ModelSerializer):
             "status",
             "sport",
             "bio",
+            "is_head",
             "branding",
             "athlete_cap",
             "athlete_count",
@@ -164,7 +165,7 @@ class CoachProfileSerializer(serializers.ModelSerializer):
             "preferences",
             "custom_tests",
         ]
-        read_only_fields = ["athlete_cap", "reminder_days"]
+        read_only_fields = ["athlete_cap", "reminder_days", "is_head"]
 
     def get_branding(self, coach) -> dict:
         return BrandingSerializer(coach, context=self.context).data
@@ -235,7 +236,7 @@ class AthleteSerializer(serializers.ModelSerializer):
         ids = list(dict.fromkeys(value))
         user = self.context["request"].user
         coach = user.coach if getattr(user, "role", "") == "coach" else None
-        ok = set(Exercise.objects.filter(pk__in=ids, coach=coach, unit="kg").values_list("pk", flat=True)) if coach else set()
+        ok = set(Exercise.objects.filter(pk__in=ids, coach__in=coach.gym_ids(), unit="kg").values_list("pk", flat=True)) if coach else set()
         if set(ids) - ok:
             raise serializers.ValidationError("Unknown exercise.")
         return ids
@@ -305,7 +306,7 @@ class OwnAthleteField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         user = self.context["request"].user
         if user.role == "coach" and hasattr(user, "coach"):
-            return Athlete.objects.filter(coach=user.coach)
+            return Athlete.objects.filter(coach__in=user.coach.athlete_scope_ids())
         if user.role == "athlete" and hasattr(user, "athlete"):
             return Athlete.objects.filter(pk=user.athlete.pk)
         return Athlete.objects.none()

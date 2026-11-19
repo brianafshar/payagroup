@@ -41,6 +41,11 @@ class Coach(models.Model):
     sport = models.CharField(max_length=40, default="fitness")
     bio = models.TextField(blank=True)
 
+    # Head coach (سرمربی): a coach who also supervises other coaches. Coaches of one gym share the exercise
+    # library, program templates and tests; a head coach also sees every athlete of the coaches under them.
+    is_head = models.BooleanField(default=False)
+    head = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="team")
+
     # Branding (white-label)
     app_name = models.CharField(max_length=60)
     initials = models.CharField(max_length=3, blank=True)
@@ -120,6 +125,21 @@ class Coach(models.Model):
     def in_quiet_hours(self, now=None) -> bool:
         hour = timezone.localtime(now).hour
         return self.quiet_hours and (hour >= 22 or hour < 7)
+
+    @property
+    def gym_head(self) -> "Coach":
+        return self if self.is_head or self.head_id is None else self.head
+
+    def gym_ids(self) -> list[int]:
+        """Coaches sharing this coach's library: the head coach and everyone under them (just self if standalone)."""
+        h = self.gym_head
+        if not h.is_head:
+            return [self.pk]
+        return [h.pk, *h.team.values_list("pk", flat=True)]
+
+    def athlete_scope_ids(self) -> list[int]:
+        """Coaches whose athletes this coach may open: a head coach sees the whole team, a coach only their own."""
+        return self.gym_ids() if self.is_head else [self.pk]
 
     @property
     def athlete_count(self) -> int:

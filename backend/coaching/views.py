@@ -240,7 +240,7 @@ class TestDefinitionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return TestDefinition.objects.none()
-        return TestDefinition.objects.filter(coach=self.request.user.coach)
+        return TestDefinition.objects.filter(coach__in=self.request.user.coach.gym_ids())
 
     def perform_create(self, serializer):
         if TestDefinition.objects.filter(coach=self.request.user.coach, name=serializer.validated_data["name"]).exists():
@@ -306,7 +306,7 @@ class AthleteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Cr
         qs = Athlete.objects.select_related("coach__user", "user", "program")
         user = self.request.user
         if is_coach(user):
-            return qs.filter(coach=user.coach)
+            return qs.filter(coach__in=user.coach.athlete_scope_ids())
         return qs if is_admin(user) else qs.none()
 
     def get_serializer_class(self):
@@ -616,7 +616,8 @@ class CoachDashboardView(APIView):
 
         coach = request.user.coach
         today = timezone.localdate()
-        athletes = list(Athlete.objects.filter(coach=coach, status=AccountStatus.ACTIVE).select_related("program"))
+        scope = coach.athlete_scope_ids()
+        athletes = list(Athlete.objects.filter(coach__in=scope, status=AccountStatus.ACTIVE).select_related("program"))
         attention, adherence = [], []
         for a in athletes:
             flag, value = stats.attention(a, today)
@@ -627,11 +628,11 @@ class CoachDashboardView(APIView):
                 adherence.append(pct)
         order = {"missed": 0, "down": 1, "soreness": 2, "nutrition": 3, "pr": 4}
         attention.sort(key=lambda x: order.get(x["flag"], 9))
-        todays = WorkoutLog.objects.filter(athlete__coach=coach, date=today)
-        done = WorkoutLog.objects.filter(athlete__coach=coach, status__in=["completed", "partial"])
+        todays = WorkoutLog.objects.filter(athlete__coach__in=scope, date=today)
+        done = WorkoutLog.objects.filter(athlete__coach__in=scope, status__in=["completed", "partial"])
         scheduled = sum(1 for a in athletes if stats.expected_sessions(a, today, today))
         counts = {s: todays.filter(status=s).count() for s in ["completed", "partial", "missed", "in-progress"]}
-        invited = Athlete.objects.filter(coach=coach, status=AccountStatus.INVITED)
+        invited = Athlete.objects.filter(coach__in=scope, status=AccountStatus.INVITED)
         last_invite = {i.athlete_id: i.created_at for i in Invite.objects.filter(athlete__in=invited).order_by("created_at")}
         ending = [
             {"athlete_id": a.pk, "name": a.name, "program": a.program.name, "ends": a.program_start + timedelta(weeks=a.program.duration_weeks)}
@@ -736,3 +737,85 @@ class AdminStatsView(APIView):
                 "platform": {"version": settings.PLATFORM_VERSION, "region": settings.PLATFORM_REGION, "support_email": settings.SUPPORT_EMAIL},
             }
         )
+
+
+class TeamSerializer(serializers.Serializer):
+    """Head coach creates a coach under them: a password is set directly (no invite e-mail needed)."""
+
+    name = serializers.CharField(max_length=120)
+    email = serializers.EmailField()
+    phone = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
+    password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=False)
+
+    def validate_email(self, value):
+        from accounts.models import User
+
+        if User.objects.filter(email=value.lower()).exists():
+            raise serializers.ValidationError("Email already in use.", code="conflict")
+        return value.lower()
+
+
+class HeadCoachOnly(IsCoach):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) and request.user.coach.is_head
+
+
+class TeamViewSet(viewsets.GenericViewSet):
+    """Head coach (سرمربی): the coaches under them — create, list, activate / deactivate."""
+
+    permission_classes = [HeadCoachOnly]
+    serializer_class = TeamSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Coach.objects.none()
+        return self.request.user.coach.team.select_related("user")
+
+    def _row(self, c: Coach) -> dict:
+        return {
+            "id": c.pk,
+            "name": c.user.name,
+            "email": c.user.email,
+            "phone": c.user.phone,
+            "status": c.status,
+            "athlete_count": c.athlete_count,
+            "last_login_at": c.user.last_login,
+        }
+
+    @extend_schema(responses={200: dict})
+    def list(self, request):
+        return Response([self._row(c) for c in self.get_queryset()])
+
+    @extend_schema(request=TeamSerializer, responses={201: dict})
+    def create(self, request):
+        from accounts.models import User
+        s = TeamSerializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        d = s.validated_data
+        head = request.user.coach
+        with transaction.atomic():
+            user = User.objects.create_user(d["email"], password=d["password"], name=d["name"], role=User.Role.COACH, phone=d["phone"])
+            coach = Coach.objects.create(
+                user=user, head=head, app_name=head.app_name, sport=head.sport, primary=head.primary, secondary=head.secondary,
+                status=AccountStatus.ACTIVE, activated_at=timezone.now(),
+            )  # fmt: skip
+            # no library.install: the library and templates are shared with the head coach
+            audit(request.user, "coach.team_create", coach)
+        return Response(self._row(coach), status=status.HTTP_201_CREATED)
+
+    @extend_schema(request=StatusSerializer, responses={200: dict})
+    @action(detail=True, methods=["post"])
+    def set_status(self, request, pk=None):
+        coach = get_object_or_404(self.get_queryset(), pk=pk)
+        s = StatusSerializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        new = s.validated_data["status"]
+        if new == AccountStatus.ACTIVE:
+            coach.status = AccountStatus.ACTIVE
+        else:
+            coach.status = new
+            coach.user.end_sessions()
+        coach.save()
+        audit(request.user, "coach.team_status", coach, status=new)
+        return Response(self._row(coach))

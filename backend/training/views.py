@@ -45,7 +45,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
             return Exercise.objects.none()
         user = self.request.user
         coach = user.coach if is_coach(user) else user.athlete.coach
-        return Exercise.objects.filter(coach=coach).annotate(used=Count("programs", filter=Q(programs__archived=False), distinct=True))
+        return Exercise.objects.filter(coach__in=coach.gym_ids()).annotate(used=Count("programs", filter=Q(programs__archived=False), distinct=True))
 
     def perform_create(self, serializer):
         serializer.save(coach=self.request.user.coach)
@@ -99,7 +99,9 @@ class ProgramViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if is_athlete(user):
             return Program.objects.filter(athlete=user.athlete)
-        qs = Program.objects.filter(coach=user.coach).select_related("athlete", "template")
+        qs = Program.objects.filter(
+            Q(kind=Program.Kind.TEMPLATE, coach__in=user.coach.gym_ids()) | Q(athlete__coach__in=user.coach.athlete_scope_ids())
+        ).select_related("athlete", "template")
         # Athletes following a copy of this one now (as their main program or alongside others).
         return qs.annotate(
             assigned_count=Count("copies__athlete", filter=Q(copies__active=True) | Q(copies__athlete__program_id=F("copies__id")), distinct=True),
@@ -116,7 +118,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
         if not athlete_id:
             serializer.save(coach=coach, kind=Program.Kind.TEMPLATE)
             return
-        athlete = Athlete.objects.filter(coach=coach, pk=athlete_id).first()
+        athlete = Athlete.objects.filter(coach__in=coach.athlete_scope_ids(), pk=athlete_id).first()
         if athlete is None:
             raise ValidationError({"for_athlete": "Unknown athlete."})
         program = serializer.save(coach=coach, kind=Program.Kind.CUSTOMIZED, athlete=athlete)
@@ -149,7 +151,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
         s = AssignSerializer(data=request.data)
         s.is_valid(raise_exception=True)
         ids = set(s.validated_data["athlete_ids"])
-        athletes = list(Athlete.objects.filter(coach=request.user.coach, pk__in=ids))
+        athletes = list(Athlete.objects.filter(coach__in=request.user.coach.athlete_scope_ids(), pk__in=ids))
         if len(athletes) != len(ids):
             raise ValidationError({"athlete_ids": "Unknown athletes."})
         copies = services.assign(program, athletes, s.validated_data.get("start_date") or timezone.localdate(), replace=s.validated_data["replace"])

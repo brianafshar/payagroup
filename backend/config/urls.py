@@ -23,6 +23,7 @@ router.register("admin/admins", accounts.AdminAccountViewSet, basename="admin-ac
 router.register("admin/audit-events", accounts.AuditEventViewSet, basename="audit-event")
 router.register("coaches", coaching.CoachViewSet, basename="coach")
 # coach & athlete
+router.register("coach/team", coaching.TeamViewSet, basename="coach-team")
 router.register("athletes", coaching.AthleteViewSet, basename="athlete")
 router.register("tests", coaching.TestDefinitionViewSet, basename="test")
 router.register("coach/documents", coaching.CoachDocumentViewSet, basename="coach-document")

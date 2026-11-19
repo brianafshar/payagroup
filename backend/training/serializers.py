@@ -216,7 +216,7 @@ class ProgramSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Week indexes must be unique.")
         ids = {ex["exercise_id"] for w in weeks for d in w["days"] for ex in d["exercises"]}
         coach = self.context["request"].user.coach
-        known = set(Exercise.objects.filter(coach=coach, pk__in=ids).values_list("pk", flat=True))
+        known = set(Exercise.objects.filter(coach__in=coach.gym_ids(), pk__in=ids).values_list("pk", flat=True))
         if ids - known:
             raise serializers.ValidationError(f"Unknown exercises: {sorted(ids - known)}")
         return sorted(weeks, key=lambda w: w["index"])
@@ -387,6 +387,6 @@ class PersonalRecordSerializer(serializers.ModelSerializer):
 
     def validate_exercise_id(self, ex):
         user = self.context["request"].user
-        if user.role != "coach" or ex.coach_id != user.coach.pk:
+        if user.role != "coach" or ex.coach_id not in user.coach.gym_ids():
             raise serializers.ValidationError("Unknown exercise.")
         return ex

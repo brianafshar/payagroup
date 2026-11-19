@@ -762,7 +762,7 @@ def test_board(a: Athlete) -> list[dict]:
     for r in TestResult.objects.filter(athlete=a).order_by("date", "id"):
         by_test[r.test_id].append(r)
     board = []
-    for t in TestDefinition.objects.filter(coach=a.coach).order_by("category", "name"):
+    for t in TestDefinition.objects.filter(coach__in=a.coach.gym_ids()).order_by("category", "name"):
         rs = by_test.get(t.id, [])
         lower = t.better == TestDefinition.Better.LOWER
         best = (min if lower else max)(rs, key=lambda r: r.value) if rs else None

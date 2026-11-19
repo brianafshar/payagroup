@@ -14,7 +14,7 @@ class AthleteScopedMixin:
     def scope(self, qs):
         user = self.request.user
         if is_coach(user):
-            return qs.filter(**{f"{self.athlete_lookup}__coach": user.coach})
+            return qs.filter(**{f"{self.athlete_lookup}__coach__in": user.coach.athlete_scope_ids()})
         if is_athlete(user):
             return qs.filter(**{self.athlete_lookup: user.athlete})
         return qs.none()
@@ -36,6 +36,6 @@ class AthleteScopedMixin:
         athlete = serializer.validated_data.get("athlete")
         if athlete is None:
             raise ValidationError({"athlete": "This field is required."})
-        if not is_coach(user) or athlete.coach_id != user.coach.pk:
+        if not is_coach(user) or athlete.coach_id not in user.coach.athlete_scope_ids():
             raise PermissionDenied("Not your athlete.")
         return athlete

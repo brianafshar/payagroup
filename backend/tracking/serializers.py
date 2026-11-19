@@ -353,6 +353,6 @@ class TestResultSerializer(serializers.ModelSerializer):
 
     def validate_test_id(self, test):
         user = self.context["request"].user
-        if user.role != "coach" or test.coach_id != user.coach.pk:
+        if user.role != "coach" or test.coach_id not in user.coach.gym_ids():
             raise serializers.ValidationError("Unknown test.")
         return test
