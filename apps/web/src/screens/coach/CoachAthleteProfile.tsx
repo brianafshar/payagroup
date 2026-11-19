@@ -314,7 +314,7 @@ class CoachAthleteProfile extends Screen {
             <Button variant="secondary" icon="ruler" onClick={v.openMeasure}>
               ثبت اندازه‌گیری
             </Button>
-            <ProgramPdfButtons athleteId={v.L.a.id} name={v.L.a.name} />
+            <ProgramPdfButtons athleteId={v.L.a.id} name={v.L.a.name} phone={v.L.a.phone} />
             <Button variant="primary" icon="edit" to={'coach:customize?id=' + v.L.a.id}>
               ویرایش برنامه
             </Button>

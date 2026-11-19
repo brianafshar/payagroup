@@ -11,13 +11,13 @@ export default class CoachLogin extends Screen {
   state: ScreenState = { email: '', pw: '', tried: false, loading: false, remember: true, mfaToken: null, otp: '', err: null };
   renderVals() {
     const { email, pw, tried } = this.state;
-    const emailBad = !/^\S+@\S+\.\S+$/.test(email);
+    const emailBad = !email.trim();
     return {
       brand: this.props.brand ?? 'brand',
       loading: this.state.loading,
       setEmail: (v) => this.setState({ email: v }),
       setPw: (v) => this.setState({ pw: v }),
-      emailError: tried && emailBad ? 'یک ایمیل معتبر وارد کنید.' : undefined,
+      emailError: tried && emailBad ? 'نام کاربری را وارد کنید.' : undefined,
       pwError: this.props.showError
         ? 'رمز عبور درست نیست. دوباره تلاش کنید یا آن را بازنشانی کنید.'
         : this.state.err && !this.state.mfaToken
@@ -89,13 +89,6 @@ export default class CoachLogin extends Screen {
         if (emailBad || !pw) return this.setState({ tried: true });
         this.setState({ loading: true, err: null });
         const r = await submitPassword(email, pw, 'coach', this.state.remember);
-        if ('done' in r) return navigate(landingPath(r.done));
-        if ('mfaToken' in r) return this.setState({ loading: false, mfaToken: r.mfaToken, otp: '' });
-        this.setState({ loading: false, err: stepError(r) });
-      },
-      guestSignIn: async () => {
-        this.setState({ loading: true, err: null });
-        const r = await submitPassword("guest@gmail.com", "guest123", 'coach', this.state.remember);
         if ('done' in r) return navigate(landingPath(r.done));
         if ('mfaToken' in r) return this.setState({ loading: false, mfaToken: r.mfaToken, otp: '' });
         this.setState({ loading: false, err: stepError(r) });
@@ -179,24 +172,15 @@ export default class CoachLogin extends Screen {
                 v.signIn();
               }}
             >
-              <TextField label="ایمیل" placeholder="name@example.com" type="email" dir="ltr" onChange={v.setEmail} error={v.emailError} />
+              <TextField label="نام کاربری" placeholder="نام کاربری" dir="ltr" onChange={v.setEmail} error={v.emailError} />
               <TextField label="رمز عبور" placeholder="رمز عبور خود را وارد کنید" type="password" onChange={v.setPw} error={v.pwError} />
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                 <Checkbox label="من را به خاطر بسپار" checked={v.remember} onChange={v.setRemember} />
-                <div style={{ flex: '1' }}></div>
-                <a href="#" onClick={v.forgot} style={{ fontSize: '14px', lineHeight: '22px', fontWeight: '500' }}>
-                  رمز عبور را فراموش کرده‌اید؟
-                </a>
               </div>
               <div style={{ display: 'flex', flexDirection: "column" ,gap: '12px' }}>
                 <div style={{ flex: 1 }}>
                   <Button variant="primary" size="lg" fullWidth loading={v.loading} type="submit">
                     ورود
-                  </Button>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <Button variant="secondary" size="lg" fullWidth loading={v.loading} type="button" onClick={v.guestSignIn}>
-                    ورود به عنوان مهمان
                   </Button>
                 </div>
               </div>

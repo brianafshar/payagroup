@@ -12,14 +12,14 @@ export default class AdminLogin extends Screen {
   renderVals() {
     const brand = this.props.brand ?? 'brand';
     const { email, pw, tried } = this.state;
-    const emailBad = !/^\S+@\S+\.\S+$/.test(email);
+    const emailBad = !email.trim();
     return {
       brand,
       loading: this.state.loading,
       setEmail: (v) => this.setState({ email: v }),
       setPw: (v) => this.setState({ pw: v }),
-      emailError: tried && emailBad ? 'یک ایمیل معتبر وارد کنید.' : undefined,
-      pwError: this.props.showError ? 'ایمیل یا رمز عبور درست نیست. دوباره تلاش کنید.' : this.state.err ? this.state.err : tried && !pw ? 'رمز عبور را وارد کنید.' : undefined,
+      emailError: tried && emailBad ? 'نام کاربری را وارد کنید.' : undefined,
+      pwError: this.props.showError ? 'نام کاربری یا رمز عبور درست نیست. دوباره تلاش کنید.' : this.state.err ? this.state.err : tried && !pw ? 'رمز عبور را وارد کنید.' : undefined,
       setRemember: (on) => this.setState({ remember: on }),
       mfa: !!this.state.mfaToken,
       setOtp: (v) => this.setState({ otp: v, err: null }),
@@ -127,7 +127,7 @@ export default class AdminLogin extends Screen {
                   v.signIn();
                 }}
               >
-                <TextField label="ایمیل" placeholder="name@example.com" type="email" dir="ltr" onChange={v.setEmail} error={v.emailError} />
+                <TextField label="نام کاربری" placeholder="نام کاربری" dir="ltr" onChange={v.setEmail} error={v.emailError} />
                 <TextField label="رمز عبور" placeholder="رمز عبور خود را وارد کنید" type="password" onChange={v.setPw} error={v.pwError} />
                 <Checkbox label="من را به خاطر بسپار" checked={v.remember} onChange={v.setRemember} />
                 <Button variant="primary" size="lg" fullWidth loading={v.loading} type="submit">

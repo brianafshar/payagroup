@@ -18,7 +18,9 @@ export interface Branding {
 
 export interface SessionUser {
   id: number;
+  username: string;
   email: string;
+  isHeadCoach?: boolean;
   name: string;
   role: Role;
   adminRole: 'super' | 'support' | '';
@@ -130,7 +132,7 @@ export type LoginResult = { ok: true; user: SessionUser } | { ok: false; mfaToke
 
 /** Password step. With two-factor on, returns `mfaToken` for `verifyMfa`. */
 export async function login(email: string, password: string, role: Role, keep = true): Promise<LoginResult> {
-  const r = await http.post<TokenResponse | { mfaRequired: true; mfaToken: string }>('/auth/login/', { email: email.trim(), password, role }, { anonymous: true });
+  const r = await http.post<TokenResponse | { mfaRequired: true; mfaToken: string }>('/auth/login/', { username: email.trim(), password, role }, { anonymous: true });
   if ('mfaRequired' in r) {
     remember = keep;
     return { ok: false, mfaToken: r.mfaToken };

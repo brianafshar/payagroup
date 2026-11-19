@@ -29,7 +29,6 @@ const NAV: Record<'coach' | 'coachFoot' | 'admin' | 'adminFoot', NavItem[]> = {
     { id: 'nutrition', label: 'تغذیه', icon: 'utensils' },
     { id: 'recovery', label: 'ریکاوری', icon: 'moon' },
     { id: 'analytics', label: 'تحلیل‌ها', icon: 'progress' },
-    { id: 'chat', label: 'گفتگو', icon: 'chat' },
   ],
   coachFoot: [{ id: 'settings', label: 'تنظیمات', icon: 'settings' }],
   admin: [
@@ -89,6 +88,7 @@ export function Sidebar(p: SidebarProps) {
       }
     }
   };
+  const me = useSessionUser();
   const u = p.user || (app === 'admin' ? { name: 'Sina Tavakoli', role: 'مدیر ارشد' } : { name: 'Ali Ahmadi', role: 'سرمربی' });
   const item = (it: NavItem) => {
     const on = it.id === p.active;
@@ -151,7 +151,7 @@ export function Sidebar(p: SidebarProps) {
           <Icon name={narrow ? 'x' : rail ? 'chevron-left' : 'chevron-right'} size={16} />
         </button>
       </div>
-      <ul className="bl-nav-list">{NAV[app].map(item)}</ul>
+      <ul className="bl-nav-list">{[...NAV[app], ...(app === 'coach' && me?.isHeadCoach ? [{ id: 'team', label: 'تیم مربیان', icon: 'users' as IconName }] : [])].map(item)}</ul>
       <div className="bl-grow" />
       <ul className="bl-nav-list">{NAV[app === 'admin' ? 'adminFoot' : 'coachFoot'].map(item)}</ul>
       <div className="bl-sidebar-user">
@@ -223,7 +223,6 @@ const COACH_PAGES: SearchEntry[] = [
   { g: 'صفحه', t: 'تحلیل‌ها', to: 'coach:analytics', ic: 'trend-up' },
   { g: 'صفحه', t: 'ترکیب بدن', to: 'coach:body', ic: 'ruler' },
   { g: 'صفحه', t: 'رکوردهای شخصی', to: 'coach:records', ic: 'trophy' },
-  { g: 'صفحه', t: 'گفتگو', to: 'coach:chat', ic: 'chat' },
   { g: 'صفحه', t: 'تنظیمات', to: 'coach:settings', ic: 'settings' },
 ];
 

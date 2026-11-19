@@ -156,7 +156,10 @@ export interface LinkResult {
 
 export interface NewCoach {
   name: string;
-  email: string;
+  /** Sign-in name (letters, digits, _ . -). */
+  username: string;
+  password: string;
+  isHead?: boolean;
   phone?: string;
   appName: string;
   sport: string;
@@ -164,7 +167,7 @@ export interface NewCoach {
   /** `null` = unlimited; otherwise days of validity from activation (1–1095). */
   durationDays: number | null;
   reminderDays: Coach['reminderDays'];
-  sendInvite: boolean;
+  sendInvite?: boolean;
 }
 
 /** The coach is the signed-in one (the server scopes it). */

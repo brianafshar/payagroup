@@ -1,5 +1,5 @@
 // Ported from design handoff: project/A04 Admin Create Coach.dc.html
-import { Banner, Button, PageHeader, Select, Sidebar, StepIndicator, TextField, TopBar } from '@/ds';
+import { Banner, Button, Checkbox, PageHeader, Select, Sidebar, StepIndicator, TextField, TopBar } from '@/ds';
 import { PanelLayout } from '@/app/PanelLayout';
 import { api, ApiError, faError } from '@/data/api';
 import { SPORTS } from '@/data/exercises';
@@ -13,6 +13,8 @@ export default class AdminCreateCoach extends Screen {
     sport: 'fitness',
     name: '',
     email: '',
+    password: '',
+    isHead: false,
     phone: '',
     app: '',
     cap: '',
@@ -25,7 +27,7 @@ export default class AdminCreateCoach extends Screen {
     phoneErr: '',
   };
   renderVals() {
-    const { name, email, phone, app, cap, tried, dur, days, remind, saving, emailTaken, phoneErr } = this.state;
+    const { name, email, password, isHead, phone, app, cap, tried, dur, days, remind, saving, emailTaken, phoneErr } = this.state;
     const fa = (n) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
     const en = (v) =>
       +String(v || '')
@@ -39,15 +41,17 @@ export default class AdminCreateCoach extends Screen {
       return d.toLocaleDateString('fa-IR-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric' });
     };
     const daysBad = dur === 'custom' && !(nDays >= 1 && nDays <= 1095);
-    const bad = { name: !name.trim(), email: !/^\S+@\S+\.\S+$/.test(email) };
+    const bad = { name: !name.trim(), email: !/^[A-Za-z0-9_.-]{3,40}$/.test(email.trim()), pw: password.length < 8 };
     /** Step 1 creates the coach as a draft; branding (step 2) and activation (step 3) complete it. */
     const create = async (then: 'branding' | 'list') => {
-      if (bad.name || bad.email || daysBad) return this.setState({ tried: true });
+      if (bad.name || bad.email || bad.pw || daysBad) return this.setState({ tried: true });
       this.setState({ saving: then });
       try {
         const created = await api.coaches.create({
           name: name.trim(),
-          email: email.trim(),
+          username: email.trim(),
+          password,
+          isHead,
           phone: String(phone || '').replace(/\s/g, ''),
           appName: app.trim() || name.trim(),
           sport: this.state.sport,
@@ -70,13 +74,16 @@ export default class AdminCreateCoach extends Screen {
     return {
       setName: (v) => this.setState({ name: v }),
       setEmail: (v) => this.setState({ email: v, emailTaken: false }),
+      setPassword: (v) => this.setState({ password: v }),
+      setHead: (v) => this.setState({ isHead: v }),
+      pwErr: tried && bad.pw ? 'رمز عبور حداقل ۸ نویسه باشد.' : undefined,
       setPhone: (v) => this.setState({ phone: v, phoneErr: '' }),
       phoneErr: phoneErr || undefined,
       setApp: (v) => this.setState({ app: v }),
       setCap: (v) => this.setState({ cap: v }),
       saving,
       nameErr: tried && bad.name ? 'نام مربی را وارد کنید.' : undefined,
-      emailErr: tried && bad.email ? 'یک ایمیل معتبر وارد کنید.' : emailTaken ? 'حساب دیگری با این ایمیل ثبت شده است.' : undefined,
+      emailErr: tried && bad.email ? 'نام کاربری: حروف انگلیسی، عدد و _ . - (حداقل ۳ نویسه).' : emailTaken ? 'این نام کاربری قبلاً ثبت شده است.' : undefined,
       saveDraft: () => create('list'),
       next: () => create('branding'),
       dur,
@@ -155,7 +162,9 @@ export default class AdminCreateCoach extends Screen {
               <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>حساب مربی</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: '16px', alignItems: 'start' }}>
                 <TextField label="نام و نام خانوادگی" placeholder="مثلاً کاوه نیک‌پور" onChange={v.setName} error={v.nameErr} />
-                <TextField label="ایمیل" placeholder="name@example.com" onChange={v.setEmail} error={v.emailErr} hint="دعوت‌نامه و لینک ورود به این آدرس ارسال می‌شود." />
+                <TextField label="نام کاربری" placeholder="مثلاً head_coach" dir="ltr" onChange={v.setEmail} error={v.emailErr} hint="مربی با این نام کاربری وارد می‌شود." />
+                <TextField label="رمز عبور" type="password" onChange={v.setPassword} error={v.pwErr} hint="حداقل ۸ نویسه؛ آن را به مربی بدهید." />
+                <Checkbox label="سرمربی (مدیریت مربیان زیرمجموعه)" checked={v.isHead} onChange={v.setHead} />
                 <TextField label="تلفن" optional placeholder="۰۹۱۲ ..." inputMode="tel" onChange={v.setPhone} error={v.phoneErr} />
                 <Select label="زبان" value="fa" options={v.langs} />
               </div>

@@ -19,7 +19,7 @@ export function toCoach(c: Json): Coach {
     id: String(c.id),
     userId: str(c.userId),
     name: c.name,
-    email: c.email,
+    email: c.username ?? c.email,
     status: c.status,
     branding: { ...c.branding, logoUrl: str(c.branding?.logoUrl), theme: str(c.branding?.theme) },
     sport: c.sport,
@@ -161,6 +161,16 @@ function mutate<T>(p: Promise<T>): Promise<T> {
     changed();
     return r;
   });
+}
+
+export interface TeamCoach {
+  id: number;
+  name: string;
+  username: string;
+  phone: string;
+  status: string;
+  athleteCount: number;
+  lastLoginAt: string | null;
 }
 
 export const remoteApi = {
@@ -440,7 +450,12 @@ export const remote = {
   createFood: (food: Omit<BankFood, 'id' | 'mine'>) => http.post<BankFood>('/foods/', food),
   /** The athlete's weekly program (training, nutrition, supplements, recovery) as a PDF. */
   programPdf: (athleteId: ID) => http.get<Blob>(`/athletes/${athleteId}/program.pdf`, { blob: true }),
-  sendProgramPdf: (athleteId: ID) => http.post<ChatMessage>(`/athletes/${athleteId}/program-pdf/send/`),
+  /** SMS the athlete a link to their program PDF; a new name + phone is saved as a contact. */
+  sendProgramSms: (b: { athlete?: number; name?: string; phone: string }) => http.post<{ athleteId: number; url: string; smsSent: boolean }>('/program-pdf/send-sms/', b),
+  /** Head coach: the coaches under them. */
+  team: () => http.get<TeamCoach[]>('/coach/team/'),
+  createTeamCoach: (b: { name: string; username: string; password: string; phone?: string }) => http.post<TeamCoach>('/coach/team/', b),
+  setTeamStatus: (id: number, status: 'active' | 'inactive') => http.post<TeamCoach>(`/coach/team/${id}/set_status/`, { status }),
   mealLogs: (athleteId: ID, from?: string) => getAll<Json>(`/meal-logs/?athlete=${athleteId}${from ? `&from=${from}` : ''}`),
   waterLogs: (athleteId: ID, from?: string) => getAll<Json>(`/water-logs/?athlete=${athleteId}${from ? `&from=${from}` : ''}`),
 
