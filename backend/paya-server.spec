@@ -3,8 +3,10 @@
 from PyInstaller.utils.hooks import collect_all, collect_submodules
 
 datas, binaries, hidden = [], [], []
-for pkg in ["django", "rest_framework", "rest_framework_simplejwt", "corsheaders", "django_filters", "drf_spectacular",
-            "channels", "daphne", "autobahn", "twisted", "zope.interface", "weasyprint", "pyphen", "cssselect2", "tinycss2", "pydyf", "fontTools"]:
+for pkg in ["django", "rest_framework", "rest_framework_simplejwt", "djangorestframework_camel_case", "corsheaders",
+            "django_filters", "drf_spectacular", "channels", "channels_redis", "daphne", "autobahn", "twisted",
+            "zope.interface", "pyotp", "pywebpush", "storages", "dj_database_url", "PIL", "weasyprint", "pyphen",
+            "cssselect2", "tinycss2", "pydyf", "fontTools"]:
     d, b, h = collect_all(pkg)
     datas += d; binaries += b; hidden += h
 # collect_submodules imports each module and silently skips the ones that need configured settings (asgi,
