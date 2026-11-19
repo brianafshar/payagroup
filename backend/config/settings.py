@@ -204,6 +204,15 @@ CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:5173,h
 # Our apps name themselves in X-Client (panel / app-android / app-ios / app-web) for the device list.
 CORS_ALLOW_HEADERS = (*default_headers, "x-client")
 
+# --- Gym site (payagroup.org) & SMS ---
+# Exercise names in the PDF link to {SITE_URL}/training/<key>. Program PDFs are published to the site through
+# SITE_API_URL (POST {pdf}, header X-Api-Key) which answers {"url": ...}; unset = served by this server.
+SITE_URL = env("SITE_URL", "https://payagroup.org").rstrip("/")
+SITE_API_URL = env("SITE_API_URL", "").rstrip("/")
+SITE_API_KEY = env("SITE_API_KEY", "")
+KAVENEGAR_API_KEY = env("KAVENEGAR_API_KEY", "")
+KAVENEGAR_SENDER = env("KAVENEGAR_SENDER", "")
+
 # --- Links & email ---
 FRONTEND_URL = env("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "indow <no-reply@indow.ir>")

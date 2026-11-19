@@ -10,6 +10,7 @@ from pathlib import Path
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from core import site
 from core.jalali import fa_date
 from core.text import fa_digits
 
@@ -76,6 +77,7 @@ def _row(i: int, slot: dict, exercises: dict) -> dict:
     return {
         "i": num(i),
         "name": ex.name if ex else "حرکت",
+        "url": site.exercise_url(ex) if ex else "",
         "sets": num(len(sets)) if sets else "",
         "reps": fa_digits(reps_text),
         "rest": num(first.get("rest_sec")) + "ث" if first.get("rest_sec") else "",

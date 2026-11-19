@@ -46,6 +46,7 @@ class MeSerializer(serializers.ModelSerializer):
             "mfa_setup_required",
             "remove_photo",
             "id",
+            "username",
             "email",
             "name",
             "role",
@@ -62,7 +63,7 @@ class MeSerializer(serializers.ModelSerializer):
             "branding",
             "last_login",
         ]
-        read_only_fields = ["id", "email", "role", "two_factor", "force_password_change", "last_login"]
+        read_only_fields = ["id", "username", "email", "role", "two_factor", "force_password_change", "last_login"]
 
     def validate_phone(self, value):
         digits = value.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")).replace(" ", "")
@@ -91,15 +92,19 @@ class MeSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    username = serializers.CharField(required=False)
+    email = serializers.CharField(required=False, write_only=True, help_text="Deprecated alias of `username`.")
     password = serializers.CharField(write_only=True, trim_whitespace=False)
     # Which panel/app the user is signing in to; a mismatch is refused (e.g. an athlete on /coach/login).
     role = serializers.ChoiceField(choices=User.Role.choices, required=False)
 
     def validate(self, attrs):
-        user = authenticate(self.context.get("request"), email=attrs["email"].lower(), password=attrs["password"])
+        name = (attrs.get("username") or attrs.get("email") or "").strip().lower()
+        if not name:
+            raise serializers.ValidationError({"username": "This field is required."})
+        user = authenticate(self.context.get("request"), username=name, password=attrs["password"])
         if user is None:
-            raise AuthenticationFailed("Email or password is incorrect.", code="invalid_credentials")
+            raise AuthenticationFailed("Username or password is incorrect.", code="invalid_credentials")
         if attrs.get("role") and attrs["role"] != user.role:
             raise PermissionDenied("This account can't sign in here.", code="wrong_role")
         reason = user.sign_in_block_reason()

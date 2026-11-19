@@ -67,7 +67,7 @@ class CoachViewSet(
 
     serializer_class = CoachSerializer
     queryset = Coach.objects.select_related("user").prefetch_related("tests")
-    search_fields = ["user__name", "user__email", "app_name"]
+    search_fields = ["user__name", "user__username", "app_name"]
     ordering_fields = ["created_at", "expires_at", "user__name", "user__last_login"]
     filterset_fields = ["sport"]
     http_method_names = ["get", "post", "patch", "delete"]
@@ -743,15 +743,15 @@ class TeamSerializer(serializers.Serializer):
     """Head coach creates a coach under them: a password is set directly (no invite e-mail needed)."""
 
     name = serializers.CharField(max_length=120)
-    email = serializers.EmailField()
+    username = serializers.RegexField(r"^[A-Za-z0-9_.-]{3,40}$", help_text="Sign-in name: letters, digits, _ . -")
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=False)
 
-    def validate_email(self, value):
+    def validate_username(self, value):
         from accounts.models import User
 
-        if User.objects.filter(email=value.lower()).exists():
-            raise serializers.ValidationError("Email already in use.", code="conflict")
+        if User.objects.filter(username=value.lower()).exists():
+            raise serializers.ValidationError("Username already in use.", code="conflict")
         return value.lower()
 
 
@@ -776,7 +776,7 @@ class TeamViewSet(viewsets.GenericViewSet):
         return {
             "id": c.pk,
             "name": c.user.name,
-            "email": c.user.email,
+            "username": c.user.username,
             "phone": c.user.phone,
             "status": c.status,
             "athlete_count": c.athlete_count,
@@ -795,7 +795,7 @@ class TeamViewSet(viewsets.GenericViewSet):
         d = s.validated_data
         head = request.user.coach
         with transaction.atomic():
-            user = User.objects.create_user(d["email"], password=d["password"], name=d["name"], role=User.Role.COACH, phone=d["phone"])
+            user = User.objects.create_user(d["username"], password=d["password"], name=d["name"], role=User.Role.COACH, phone=d["phone"])
             coach = Coach.objects.create(
                 user=user, head=head, app_name=head.app_name, sport=head.sport, primary=head.primary, secondary=head.secondary,
                 status=AccountStatus.ACTIVE, activated_at=timezone.now(),

@@ -39,7 +39,7 @@ def test_athlete_must_change_the_emailed_password(api, coach):
 
 
 def test_coach_must_change_the_emailed_password(api, coach):
-    User.objects.filter(pk=coach.user.pk).update(email=ME)
+    User.objects.filter(pk=coach.user.pk).update(email=ME, username=ME)
     r = api.anon().post("/api/auth/forgot-password/", {"email": "nobody@example.com"})
     assert r.status_code == 204 and not mail.outbox
     assert api.post("/api/auth/forgot-password/", {"email": ME.upper()}).status_code == 204

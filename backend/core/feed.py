@@ -53,7 +53,7 @@ class SearchView(APIView):
             for e in Exercise.objects.filter(coach=coach, name__icontains=q)[:4]:
                 out.append({"kind": "exercise", "id": e.pk, "title": e.name, "category": e.category, "equipment": e.equipment})
         else:
-            coaches = Coach.objects.filter(Q(user__name__icontains=q) | Q(app_name__icontains=q) | Q(user__email__icontains=q)).select_related("user")
+            coaches = Coach.objects.filter(Q(user__name__icontains=q) | Q(app_name__icontains=q) | Q(user__username__icontains=q)).select_related("user")
             for c in coaches[:6]:
                 out.append({"kind": "coach", "id": c.pk, "title": c.user.name, "subtitle": c.app_name, "status": c.effective_status})
             if admin_can(request.user, "ath"):

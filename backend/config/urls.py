@@ -86,6 +86,8 @@ api = [
     path("recovery-plans/<str:athlete_id>/", tracking.RecoveryPlanView.as_view(), name="recovery-plan"),
     path("athletes/<int:pk>/program.pdf", program_pdf.CoachProgramPdfView.as_view(), name="athlete-program-pdf"),
     path("athletes/<int:pk>/program-pdf/send/", program_pdf.SendProgramPdfView.as_view(), name="athlete-program-pdf-send"),
+    path("program-pdf/send-sms/", program_pdf.SendProgramSmsView.as_view(), name="program-pdf-send-sms"),
+    path("shared-pdf/<str:token>/", program_pdf.SharedPdfView.as_view(), name="shared-pdf"),
     path("program-pdf/<str:token>/", program_pdf.SignedProgramPdfView.as_view(), name="program-pdf-link"),
     # athlete app
     path("me/athlete/", coaching.MyAthleteView.as_view(), name="me-athlete"),

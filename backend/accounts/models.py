@@ -15,10 +15,15 @@ from core.uploads import photo_upload_to, validate_photo
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, email, password=None, **extra):
-        if not email:
-            raise ValueError("Email is required")
-        user = self.model(email=self.normalize_email(email).lower(), **extra)
+    def create_user(self, username, password=None, **extra):
+        """Accounts sign in with a username. A username that looks like an e-mail address is also kept as the
+        (optional) contact e-mail so the admin e-mail flows keep working."""
+        if not username:
+            raise ValueError("Username is required")
+        username = username.strip().lower()
+        if "@" in username:
+            extra.setdefault("email", username)
+        user = self.model(username=username, **extra)
         if password:
             user.set_password(password)
         else:
@@ -26,9 +31,9 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra):
+    def create_superuser(self, username, password=None, **extra):
         extra.update(role=User.Role.ADMIN, admin_role=User.AdminRole.SUPER, is_staff=True, is_superuser=True)
-        return self.create_user(email, password, **extra)
+        return self.create_user(username, password, **extra)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -48,7 +53,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         DARK = "dark"
         SYSTEM = "system"
 
-    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, unique=True, help_text="Sign-in name.")
+    email = models.EmailField(blank=True, help_text="Optional contact e-mail (not used to sign in).")
     name = models.CharField(max_length=120)
     role = models.CharField(max_length=10, choices=Role.choices)
     admin_role = models.CharField(max_length=10, choices=AdminRole.choices, blank=True)
@@ -71,14 +77,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["name"]
 
     class Meta:
         ordering = ["name"]
 
     def __str__(self) -> str:
-        return f"{self.name} <{self.email}>"
+        return f"{self.name} ({self.username})"
 
     def save(self, *args, **kwargs):
         # Admins created in Django admin without an admin role would otherwise have no panel permissions.

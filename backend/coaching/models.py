@@ -261,6 +261,21 @@ class AthleteNote(models.Model):
         ordering = ["-created_at"]
 
 
+class ProgramShare(models.Model):
+    """A program PDF sent to an athlete by SMS: the public link and whether the SMS went out."""
+
+    athlete = models.ForeignKey(Athlete, on_delete=models.CASCADE, related_name="shares")
+    sent_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+    token = models.CharField(max_length=64, unique=True)
+    url = models.URLField(max_length=500)
+    pdf = models.FileField(upload_to="shared-pdfs/", blank=True)
+    sms_sent = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
 class CoachDocument(models.Model):
     """Coach's résumé and certificates (C32 › پروفایل)."""
 

@@ -30,7 +30,7 @@ class CoachSerializer(serializers.ModelSerializer):
     """Coach workspace as the admin panel sees it (web `Coach` type). Branding is written as flat fields."""
 
     name = serializers.CharField(source="user.name")
-    email = serializers.EmailField(source="user.email")
+    username = serializers.CharField(source="user.username")
     user_id = serializers.IntegerField(source="user.pk", read_only=True)
     status = serializers.CharField(source="effective_status", read_only=True)
     branding = serializers.SerializerMethodField()
@@ -46,7 +46,7 @@ class CoachSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coach
         fields = [
-            "id", "user_id", "name", "email", "status", "is_head", "branding", "sport", "athlete_cap", "athlete_count", "validity",
+            "id", "user_id", "name", "username", "status", "is_head", "branding", "sport", "athlete_cap", "athlete_count", "validity",
             "days_left", "reminder_days", "cadence", "custom_tests", "last_login_at", "has_account", "created_at",
             # write-only branding fields
             "app_name", "initials", "primary", "secondary", "theme", "logo", "remove_logo",
@@ -66,13 +66,13 @@ class CoachSerializer(serializers.ModelSerializer):
     def get_cadence(self, coach) -> dict:
         return cadence(coach)
 
-    def validate_email(self, value):
+    def validate_username(self, value):
         value = value.lower()
-        qs = User.objects.filter(email=value)
+        qs = User.objects.filter(username=value)
         if self.instance:
             qs = qs.exclude(pk=self.instance.user_id)
         if qs.exists():
-            raise serializers.ValidationError("Email already in use.", code="conflict")
+            raise serializers.ValidationError("Username already in use.", code="conflict")
         return value
 
     def update(self, coach, validated):
@@ -91,7 +91,8 @@ class CoachCreateSerializer(serializers.Serializer):
     """A04 Create coach. `durationDays: null` = unlimited; validity starts when the coach activates."""
 
     name = serializers.CharField(max_length=120)
-    email = serializers.EmailField()
+    username = serializers.RegexField(r"^[A-Za-z0-9_.-]{3,40}$", help_text="Sign-in name: letters, digits, _ . -")
+    password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=False)
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True, default="")
     app_name = serializers.CharField(max_length=60)
     sport = serializers.CharField(max_length=40, default="fitness")
@@ -99,11 +100,12 @@ class CoachCreateSerializer(serializers.Serializer):
     duration_days = serializers.IntegerField(min_value=1, max_value=1095, allow_null=True, default=None)
     reminder_days = serializers.ChoiceField(choices=[1, 2, 3, 7], default=2)
     primary = serializers.RegexField(r"^#[0-9A-Fa-f]{6}$", default="#FF9A1F")
-    send_invite = serializers.BooleanField(default=True)
+    send_invite = serializers.BooleanField(default=False)
+    is_head = serializers.BooleanField(default=False)
 
-    def validate_email(self, value):
-        if User.objects.filter(email=value.lower()).exists():
-            raise serializers.ValidationError("Email already in use.", code="conflict")
+    def validate_username(self, value):
+        if User.objects.filter(username=value.lower()).exists():
+            raise serializers.ValidationError("Username already in use.", code="conflict")
         return value.lower()
 
     def validate_phone(self, value):
@@ -116,17 +118,20 @@ class CoachCreateSerializer(serializers.Serializer):
     def create(self, data):
         from training import library
 
-        user = User.objects.create_user(data["email"], name=data["name"], role=User.Role.COACH, phone=data["phone"])
+        user = User.objects.create_user(data["username"], password=data["password"], name=data["name"], role=User.Role.COACH, phone=data["phone"])
         coach = Coach.objects.create(
             user=user,
             app_name=data["app_name"],
+            is_head=data["is_head"],
             sport=data["sport"],
             athlete_cap=data["athlete_cap"],
             validity_days=data["duration_days"],
             reminder_days=data["reminder_days"],
             primary=data["primary"],
-            status=AccountStatus.INVITED if data["send_invite"] else AccountStatus.DRAFT,
+            status=AccountStatus.ACTIVE,
         )
+        coach.activate()  # starts the validity window
+        coach.save()
         library.install(coach)  # every new coach starts with the standard exercise library (#39)
         return coach
 
@@ -135,7 +140,7 @@ class CoachProfileSerializer(serializers.ModelSerializer):
     """The coach's own settings (C32). Branding, cap and validity are managed by admins (read-only here)."""
 
     name = serializers.CharField(source="user.name")
-    email = serializers.EmailField(source="user.email", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
     status = serializers.CharField(source="effective_status", read_only=True)
     branding = serializers.SerializerMethodField()
     validity = serializers.SerializerMethodField()
@@ -148,7 +153,7 @@ class CoachProfileSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "email",
+            "username",
             "status",
             "sport",
             "bio",

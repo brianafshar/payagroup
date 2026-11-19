@@ -1,4 +1,3 @@
-import re
 from datetime import timedelta
 
 import pytest
@@ -15,27 +14,25 @@ pytestmark = pytest.mark.django_db
 
 NEW_COACH = {
     "name": "کاوه نیک‌پور",
-    "email": "kaveh@kova.app",
+    "username": "kaveh",
+    "password": "kova-pass-12",
     "appName": "Kova Athletics",
     "sport": "fitness",
     "athleteCap": 30,
     "durationDays": 90,
     "reminderDays": 3,
-    "sendInvite": True,
 }
 
 
-def test_create_coach_invites_and_starts_validity_on_accept(api, admin):
+def test_create_coach_with_username_and_password(api, admin):
     r = api.as_user(admin).post("/api/coaches/", NEW_COACH)
     assert r.status_code == 201, r.data
     c = r.json()
-    assert c["status"] == "invited" and c["branding"]["initials"] == "KA"
-    assert c["validity"] == {"kind": "limited", "days": 90, "expiresAt": None}
-    assert "kaveh@kova.app" in mail.outbox[0].to
-    token = re.search(r"/invite/([\w-]+)", mail.outbox[0].body).group(1)
-
-    r = api.anon().post(f"/api/auth/invites/{token}/", {"password": "kova-pass-12"})
-    assert r.status_code == 201
+    assert c["status"] == "active" and c["branding"]["initials"] == "KA" and c["username"] == "kaveh"
+    assert c["validity"]["kind"] == "limited" and c["validity"]["days"] == 90
+    assert not mail.outbox
+    login = api.anon().post("/api/auth/login/", {"username": "kaveh", "password": "kova-pass-12"})
+    assert login.status_code == 200
     coach = Coach.objects.get(pk=c["id"])
     assert coach.status == "active" and 89 <= (coach.expires_at - timezone.now()).days <= 90
 
@@ -43,10 +40,12 @@ def test_create_coach_invites_and_starts_validity_on_accept(api, admin):
 def test_create_coach_validation(api, admin, coach):
     api.as_user(admin)
     assert api.post("/api/coaches/", {**NEW_COACH, "durationDays": 2000}).status_code == 400
-    r = api.post("/api/coaches/", {**NEW_COACH, "email": coach.user.email})
-    assert r.status_code == 400 and r.data["email"][0].code == "conflict"
-    r = api.post("/api/coaches/", {**NEW_COACH, "durationDays": None, "sendInvite": False})
-    assert r.json()["status"] == "draft" and r.json()["validity"] == {"kind": "unlimited"}
+    assert api.post("/api/coaches/", NEW_COACH).status_code == 201
+    r = api.post("/api/coaches/", NEW_COACH)
+    assert r.status_code == 400 and r.data["username"][0].code == "conflict"
+    assert api.post("/api/coaches/", {**NEW_COACH, "username": "a b"}).status_code == 400
+    r = api.post("/api/coaches/", {**NEW_COACH, "username": "unlimited", "durationDays": None})
+    assert r.json()["validity"] == {"kind": "unlimited"}
 
 
 def test_expired_coach_is_inactive_and_extend_reactivates(api, admin):
@@ -159,24 +158,6 @@ def test_coach_summary(api, admin, coach, athlete):
     assert s["athletes"] == 1 and s["activeAthletes"] == 1 and s["workoutsWeek"] == 0
 
 
-def test_draft_coach_steps_to_invited_then_active(api, admin):
-    """A04 wizard: step 1 saves a draft (with phone), step 3 sends the invite; accepting activates."""
-    api.as_user(admin)
-    r = api.post("/api/coaches/", {**NEW_COACH, "phone": "۰۹۱۲۱۲۳۴۵۶۷", "sendInvite": False})
-    c = r.json()
-    assert c["status"] == "draft" and c["hasAccount"] is False and not mail.outbox
-    assert User.objects.get(email=NEW_COACH["email"]).phone == "09121234567"
-    assert api.post("/api/coaches/", {**NEW_COACH, "email": "x@y.z", "phone": "12345"}).status_code == 400
-    assert api.post(f"/api/coaches/{c['id']}/status/", {"status": "active"}).status_code == 400  # no password yet
-    r = api.post(f"/api/coaches/{c['id']}/invite/", {"send": True})
-    assert r.status_code == 200 and api.get(f"/api/coaches/{c['id']}/").json()["status"] == "invited"
-    token = re.search(r"/invite/([\w-]+)", mail.outbox[0].body).group(1)
-    api.anon().post(f"/api/auth/invites/{token}/", {"password": "kova-pass-12"})
-    api.as_user(admin)
-    assert Coach.objects.get(pk=c["id"]).status == "active"
-    assert api.get(f"/api/coaches/{c['id']}/").json()["hasAccount"] is True
-
-
 def test_any_admin_reads_the_admin_list_but_only_adm_changes_it(api, admin, support):
     api.as_user(support)
     assert api.get("/api/admin/admins/").status_code == 200
@@ -185,6 +166,6 @@ def test_any_admin_reads_the_admin_list_but_only_adm_changes_it(api, admin, supp
 
 
 def test_admin_made_in_django_admin_gets_a_role():
-    boss = User.objects.create(email="boss@x.y", name="Boss", role="admin", is_superuser=True)
-    helper = User.objects.create(email="help@x.y", name="Help", role="admin")
+    boss = User.objects.create(username="boss@x.y", email="boss@x.y", name="Boss", role="admin", is_superuser=True)
+    helper = User.objects.create(username="help@x.y", email="help@x.y", name="Help", role="admin")
     assert (boss.admin_role, helper.admin_role) == ("super", "support")

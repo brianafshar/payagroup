@@ -29,7 +29,7 @@ def new_secret() -> str:
 
 
 def provisioning_uri(user, secret: str) -> str:
-    return pyotp.TOTP(secret).provisioning_uri(name=user.email, issuer_name=ISSUER)
+    return pyotp.TOTP(secret).provisioning_uri(name=user.username, issuer_name=ISSUER)
 
 
 def verify_totp(user, secret: str, code: str) -> bool:

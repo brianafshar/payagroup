@@ -53,12 +53,19 @@ def test_library_and_templates_shared_in_gym_only():
 def test_head_manages_team_and_coach_cannot():
     head = make_coach("h@x.io", is_head=True)
     c = client(head.user)
-    r = c.post("/api/coach/team/", {"name": "New", "email": "n@x.io", "password": "longpass123"}, format="json")
+    r = c.post("/api/coach/team/", {"name": "New", "username": "new_coach", "password": "longpass123"}, format="json")
     assert r.status_code == 201
-    new = Coach.objects.get(user__email="n@x.io")
+    new = Coach.objects.get(user__username="new_coach")
     assert new.head_id == head.pk and new.status == AccountStatus.ACTIVE
     assert len(c.get("/api/coach/team/").data) == 1
     assert c.post(f"/api/coach/team/{new.pk}/set_status/", {"status": "inactive"}, format="json").status_code == 200
     new.refresh_from_db()
     assert new.status == AccountStatus.INACTIVE
     assert client(new.user).get("/api/coach/team/").status_code == 403
+
+
+def test_team_coach_signs_in_with_username_only():
+    head = make_coach("h@x.io", is_head=True)
+    client(head.user).post("/api/coach/team/", {"name": "N", "username": "new_coach", "password": "longpass123"}, format="json")
+    r = APIClient().post("/api/auth/login/", {"username": "new_coach", "password": "longpass123", "role": "coach"}, format="json")
+    assert r.status_code == 200 and r.json()["user"]["username"] == "new_coach"

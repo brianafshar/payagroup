@@ -38,7 +38,7 @@ def test_transfer_resets_the_program_but_keeps_personal_data(api, admin, assigne
 def test_library_is_installed_for_new_coaches_with_photos(api, admin):
     """#39: every new coach gets the standard library; photos are shared, not copied per coach."""
     r = api.as_user(admin).post(
-        "/api/coaches/", {"name": "دونده", "email": "run@x.app", "appName": "Run", "sport": "running", "sendInvite": False, "durationDays": None}
+        "/api/coaches/", {"name": "دونده", "username": "run_coach", "password": "pass-12345", "appName": "Run", "sport": "running", "sendInvite": False, "durationDays": None}
     )
     coach_id = r.json()["id"]
     exs = Exercise.objects.filter(coach_id=coach_id)
@@ -125,7 +125,7 @@ def test_program_unit_is_kept_for_distance_exercises(api, coach):
 
 def test_new_coach_other_sport(api, admin):
     """#37: sports beyond fitness can be chosen."""
-    r = api.as_user(admin).post("/api/coaches/", {"name": "شناگر", "email": "swim@x.app", "appName": "Swim", "sport": "swimming", "sendInvite": False})
+    r = api.as_user(admin).post("/api/coaches/", {"name": "شناگر", "username": "swim_coach", "password": "pass-12345", "appName": "Swim", "sport": "swimming", "sendInvite": False})
     assert r.status_code == 201 and r.json()["sport"] == "swimming"
 
 

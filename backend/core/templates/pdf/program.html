@@ -22,6 +22,7 @@
   .mark { width: 46px; height: 46px; border-radius: 10px; flex: none; background: {{ primary }}; color: #fff; font-weight: 800; font-size: 17pt; text-align: center; line-height: 46px; }
   .who { flex: 1; }
   h1 { margin: 0; font-size: 16pt; font-weight: 800; line-height: 1.4; }
+  a.ex { color: inherit; text-decoration: none; border-bottom: 0.4pt dotted #9aa1ad; }
   .meta { color: #5b6270; font-size: 8.5pt; }
   .goal { color: #5b6270; font-size: 8.5pt; white-space: nowrap; padding-top: 6px; }
   .cards { display: flex; gap: 8px; margin: 12px 0 6px; }
@@ -86,7 +87,7 @@
         <table>
           <tr><th>#</th><th>حرکت</th><th>ست</th><th>تکرار</th><th>استراحت</th><th>توضیح</th></tr>
           {% for r in s.rows %}
-          <tr><td class="n">{{ r.i }}</td><td>{{ r.name }}</td><td class="num">{{ r.sets }}</td><td class="num">{{ r.reps }}</td><td class="num">{{ r.rest }}</td><td class="soft">{{ r.note }}</td></tr>
+          <tr><td class="n">{{ r.i }}</td><td>{% if r.url %}<a class="ex" href="{{ r.url }}">{{ r.name }}</a>{% else %}{{ r.name }}{% endif %}</td><td class="num">{{ r.sets }}</td><td class="num">{{ r.reps }}</td><td class="num">{{ r.rest }}</td><td class="soft">{{ r.note }}</td></tr>
           {% endfor %}
         </table>
       </div>
