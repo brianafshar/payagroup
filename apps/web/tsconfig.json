@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vite/client", "node"],
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
+  },
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["src/screens/*/**", "src/app/routes.tsx", "src/app/App.tsx", "src/main.tsx"]
+}

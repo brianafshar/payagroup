@@ -1,0 +1,30 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'app.baseline'
+version = '0.1.0'
+
+// Pushe is compiled in only when the build has its manifest token (PUSHE_MANIFEST_TOKEN, added to the
+// manifest by plugins/withPushe.js); its SDK starts itself with the app and expects that token.
+// Without it the module is a stub that reports "not registered".
+def pusheOn = (System.getenv('PUSHE_MANIFEST_TOKEN') ?: '').trim()
+
+android {
+  namespace "expo.modules.baselinepushe"
+  defaultConfig {
+    versionCode 1
+    versionName '0.1.0'
+  }
+  sourceSets {
+    main.java.srcDirs += pusheOn ? 'src/pushe/java' : 'src/stub/java'
+  }
+}
+
+dependencies {
+  if (pusheOn) {
+    // Pushe (pushe.co) Android SDK from Maven Central.
+    implementation 'co.pushe.plus:base:2.6.4'
+  }
+}

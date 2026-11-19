@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "indow",
+    "slug": "baseline-athlete",
+    "scheme": "baseline",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#0A0A0A",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "app.baseline.athlete"
+    },
+    "android": {
+      "package": "app.baseline.athlete",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF9A1F"
+      },
+      "versionCode": 1
+    },
+    "extra": {
+      "supportsRTL": true,
+      "forcesRTL": true
+    },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "برای فرستادن پیام صوتی به مربی، indow به میکروفون دسترسی لازم دارد.",
+          "enableBackgroundRecording": false
+        }
+      ],
+      "./plugins/withPushe",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#0A0A0A"
+        }
+      ]
+    ],
+    "icon": "./assets/icon.png",
+    "web": {
+      "favicon": "./public/icons/icon-192.png"
+    }
+  }
+}

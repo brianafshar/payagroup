@@ -1,0 +1,88 @@
+/* Hover/focus styles for inline-styled screen elements (ported from `style-hover` / `style-focus`).
+   `!important` is required to win over the inline styles, as in the prototype runtime. */
+.fc-ring:focus {
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 0 0 3px var(--brand-primary-subtle) !important;
+}
+.fc-underline:focus {
+  box-shadow: inset 0 -2px 0 var(--brand-primary) !important;
+}
+.hv-border-brand:hover {
+  border-color: var(--brand-primary) !important;
+}
+.hv-border-brand-text:hover {
+  border-color: var(--brand-primary) !important;
+  color: var(--text-primary) !important;
+}
+.hv-brand-soft:hover {
+  border-color: var(--brand-primary) !important;
+  background: var(--brand-primary-subtle) !important;
+}
+.hv-danger:hover {
+  background: var(--error-subtle, #fdecec) !important;
+  color: var(--error, #c62828) !important;
+}
+.hv-danger-soft:hover {
+  background: var(--surface-sunken) !important;
+  color: var(--error, #c62828) !important;
+}
+.hv-danger-text:hover {
+  color: var(--error, #c62828) !important;
+}
+.hv-index-link:hover {
+  background: rgba(255, 154, 31, 0.12) !important;
+  text-decoration: none !important;
+}
+.hv-lift:hover {
+  border-color: var(--brand-primary) !important;
+  box-shadow: var(--shadow-1) !important;
+}
+.hv-subtle:hover {
+  background: var(--border-subtle) !important;
+}
+.hv-sunken:hover {
+  background: var(--surface-sunken) !important;
+}
+.hv-sunken-text:hover {
+  background: var(--surface-sunken) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Chat: your own messages open «ویرایش / حذف» on right-click or long-press (no text selection then). */
+.bl-msg-own {
+  -webkit-touch-callout: none;
+  cursor: context-menu;
+}
+@media (hover: none) {
+  .bl-msg-own {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+.bl-msg-act {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.bl-msg-act:hover {
+  color: var(--brand-primary-text);
+  text-decoration: underline;
+}
+
+/* Voice message recording indicator. */
+@keyframes bl-rec-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+.bl-rec-dot {
+  animation: bl-rec-pulse 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bl-rec-dot {
+    animation: none;
+  }
+}

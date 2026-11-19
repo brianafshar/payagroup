@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>برنامه هفتگی — {{ athlete }}</title>
+<style>
+  @font-face { font-family: "Vazirmatn"; font-weight: 400; src: url("{{ font_dir }}/Vazirmatn-FD-Regular.ttf"); }
+  @font-face { font-family: "Vazirmatn"; font-weight: 500; src: url("{{ font_dir }}/Vazirmatn-FD-Medium.ttf"); }
+  @font-face { font-family: "Vazirmatn"; font-weight: 700; src: url("{{ font_dir }}/Vazirmatn-FD-Bold.ttf"); }
+  @font-face { font-family: "Vazirmatn"; font-weight: 800; src: url("{{ font_dir }}/Vazirmatn-FD-ExtraBold.ttf"); }
+  @page {
+    size: A4;
+    margin: 16mm 14mm 18mm;
+    @bottom-center { content: "صفحه " counter(page) " از " counter(pages); font: 400 8.5pt "Vazirmatn"; color: #8a8f98; }
+    @bottom-left { content: ""; background: url("{{ indow_logo }}") no-repeat left center; background-size: auto 9pt; opacity: .45; width: 40mm; }
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Vazirmatn", sans-serif; font-size: 9.5pt; line-height: 1.6; color: #1d2330; direction: rtl; margin: 0; }
+  .ltr { direction: ltr; unicode-bidi: embed; }
+  header { display: flex; align-items: flex-start; gap: 12px; padding-bottom: 10px; border-bottom: 2.5px solid {{ primary }}; }
+  .logo { width: 46px; height: 46px; border-radius: 10px; flex: none; }
+  .mark { width: 46px; height: 46px; border-radius: 10px; flex: none; background: {{ primary }}; color: #fff; font-weight: 800; font-size: 17pt; text-align: center; line-height: 46px; }
+  .who { flex: 1; }
+  h1 { margin: 0; font-size: 16pt; font-weight: 800; line-height: 1.4; }
+  .meta { color: #5b6270; font-size: 8.5pt; }
+  .goal { color: #5b6270; font-size: 8.5pt; white-space: nowrap; padding-top: 6px; }
+  .cards { display: flex; gap: 8px; margin: 12px 0 6px; }
+  .card { flex: 1; background: {{ tint2 }}; border-radius: 8px; padding: 8px 10px; }
+  .card b { display: block; font-size: 14pt; font-weight: 800; color: {{ primary }}; line-height: 1.3; }
+  .card span { color: #5b6270; font-size: 8.5pt; }
+  h2 { font-size: 12pt; font-weight: 800; margin: 18px 0 8px; padding-right: 8px; border-right: 4px solid {{ primary }}; line-height: 1.3; page-break-after: avoid; }
+  h3 { font-size: 10.5pt; font-weight: 700; margin: 0; }
+  .sub { color: #5b6270; font-size: 9pt; font-weight: 700; margin: 4px 0 8px; page-break-after: avoid; }
+  .block { border: 1px solid #e3e6ea; border-radius: 8px; margin-bottom: 10px; break-inside: avoid; overflow: hidden; }
+  .bhead { display: flex; justify-content: space-between; align-items: baseline; background: {{ tint }}; padding: 6px 10px; }
+  .bhead.plain { display: block; font-size: 10.5pt; }
+  .bhead .muted { color: #5b6270; font-size: 8.5pt; font-weight: 400; }
+  .total { font-weight: 700; color: {{ primary }}; font-size: 9pt; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: right; font-weight: 700; font-size: 8.5pt; color: #5b6270; background: #f6f7f9; padding: 5px 8px; }
+  td { padding: 5px 8px; border-top: 1px solid #eef0f3; vertical-align: top; }
+  td.n { color: #8a8f98; width: 22px; }
+  .num { white-space: nowrap; }
+  .soft { color: #5b6270; }
+  .note { background: #fdf8e6; border-radius: 6px; padding: 7px 10px; margin: 0 0 10px; font-size: 9pt; }
+  .part { display: flex; justify-content: space-between; align-items: baseline; margin: 12px 0 6px; padding-bottom: 3px; border-bottom: 1.5px solid {{ primary }}; font-weight: 800; font-size: 11pt; color: {{ primary }}; page-break-after: avoid; }
+  .part-kcal { font-weight: 500; font-size: 8.5pt; color: #5b6270; }
+  .tday { margin-bottom: 12px; }
+  .tday-head { font-weight: 800; font-size: 11.5pt; padding: 4px 10px; margin: 10px 0 4px; background: {{ tint }}; border-radius: 6px; page-break-after: avoid; }
+  .day-total { background: {{ tint }}; border-radius: 8px; padding: 8px 12px; font-weight: 700; margin-bottom: 10px; }
+  ul.list { margin: 0; padding: 0 18px 0 0; }
+  ul.list li { margin: 3px 0; }
+  .empty { color: #8a8f98; }
+</style>
+</head>
+<body>
+  <header>
+    {% if logo %}<img class="logo" src="{{ logo }}" alt="">{% else %}<div class="mark">{{ initials }}</div>{% endif %}
+    <div class="who">
+      <h1>برنامه هفتگی — {{ athlete }}</h1>
+      <div class="meta">{{ meta }}</div>
+    </div>
+    {% if goal %}<div class="goal">هدف: {{ goal }}</div>{% endif %}
+  </header>
+
+  {% with t=nutrition.targets %}{% if t %}
+  <div class="cards">
+    <div class="card"><b>{{ t.kcal }}</b><span>کالری هدف</span></div>
+    <div class="card"><b>{{ t.protein }}g</b><span>پروتئین</span></div>
+    <div class="card"><b>{{ t.carbs }}g</b><span>کربوهیدرات</span></div>
+    <div class="card"><b>{{ t.fat }}g</b><span>چربی</span></div>
+    <div class="card"><b>{{ t.water }} لیتر</b><span>آب</span></div>
+  </div>
+  {% endif %}{% endwith %}
+
+  <h2>۱. برنامه تمرین</h2>
+  {% if training.any %}
+  {% for day in training.days %}
+  <div class="tday">
+    <div class="tday-head">{{ day.title }}{% if day.rest %} <span class="muted">· استراحت</span>{% endif %}</div>
+    {% for part in day.parts %}
+      {% if part.label %}<div class="part">{{ part.label }}</div>{% endif %}
+      {% for s in part.sessions %}
+      <div class="block">
+        <div class="bhead plain"><b>{{ s.focus|default:"جلسه تمرین" }}</b>{% if s.program %} <span class="muted">· {{ s.program }}</span>{% endif %}</div>
+        <table>
+          <tr><th>#</th><th>حرکت</th><th>ست</th><th>تکرار</th><th>استراحت</th><th>توضیح</th></tr>
+          {% for r in s.rows %}
+          <tr><td class="n">{{ r.i }}</td><td>{{ r.name }}</td><td class="num">{{ r.sets }}</td><td class="num">{{ r.reps }}</td><td class="num">{{ r.rest }}</td><td class="soft">{{ r.note }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+      {% if s.note %}<div class="note">{{ s.note }}</div>{% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+  {% endfor %}
+  {% else %}
+    <p class="empty">این هفته جلسه تمرینی برنامه‌ریزی نشده است.</p>
+  {% endif %}
+
+  <h2>۲. برنامه تغذیه</h2>
+  {% for menu in nutrition.menus %}
+    {% if nutrition.menus|length > 1 or menu.title != "منوی هر روز" %}<div class="sub">{{ menu.title }}</div>{% endif %}
+    {% for part in menu.parts %}
+    <div class="part"><span>{{ part.label }}</span><span class="part-kcal">{{ part.kcal }} کالری</span></div>
+    {% for m in part.meals %}
+    <div class="block">
+      <div class="bhead">
+        <h3>{{ m.name }}{% if m.time %} <span class="muted">{{ m.time }}</span>{% endif %}</h3>
+        <span class="total">{{ m.kcal }} کالری · {{ m.protein }}g پروتئین</span>
+      </div>
+      <table>
+        <tr><th>غذا</th><th>مقدار</th><th>معادل</th><th>کالری</th><th>پروتئین</th></tr>
+        {% for f in m.foods %}
+        <tr><td>{{ f.name }}</td><td>{{ f.amount }}</td><td class="num">{{ f.grams }}</td><td class="num">{{ f.kcal }}</td><td class="num">{{ f.protein }}</td></tr>
+        {% empty %}
+        <tr><td colspan="5" class="empty">غذایی ثبت نشده است.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endfor %}
+    {% endfor %}
+    <div class="day-total">جمع روز: {{ menu.kcal }} کالری · {{ menu.protein }}g پروتئین <span class="soft" style="font-weight:400">— مقادیر تقریبی است.</span></div>
+  {% empty %}
+    <p class="empty">برنامه تغذیه هنوز تنظیم نشده است.</p>
+  {% endfor %}
+
+  {% if nutrition.supplements %}
+  <div class="block">
+    <div class="bhead"><h3>مکمل‌ها</h3></div>
+    <table>
+      <tr><th>مکمل</th><th>مقدار مصرف</th><th>زمان مصرف</th></tr>
+      {% for s in nutrition.supplements %}
+      <tr><td>{{ s.name }}</td><td>{{ s.dose }}</td><td>{{ s.timing }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
+  {% if recovery %}
+  <h2>۳. ریکاوری و سبک زندگی</h2>
+  <div class="block" style="padding: 8px 10px;">
+    <ul class="list">{% for line in recovery %}<li>{{ line|linebreaksbr }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+</body>
+</html>

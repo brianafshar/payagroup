@@ -1,0 +1,8 @@
+{
+  // Ported screen controllers come from the prototypes' untyped JS logic, so they are checked
+  // non-strictly; everything they render is still checked against the typed design system.
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "strict": false, "noImplicitAny": false, "strictNullChecks": false },
+  "include": ["src"],
+  "exclude": []
+}

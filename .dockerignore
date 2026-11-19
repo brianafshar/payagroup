@@ -1,0 +1,13 @@
+# Context of deploy/web.Dockerfile (the repository root): sources only.
+**/node_modules
+.git
+**/dist
+**/dist-web
+**/.expo
+backend
+chats
+project
+tools
+deploy/.env
+deploy/backups
+deploy/download

@@ -1,0 +1,293 @@
+/*
+ * Tablet & phone layout for the admin/coach panels. The screens are desktop designs with inline styles,
+ * so below 900px the shell changes (sidebar → drawer, compact top bar) and below 768px the page content
+ * reflows: card grids stack, side-by-side columns become one, rows wrap, the page never scrolls sideways
+ * (wide tables and charts scroll inside their own box).
+ */
+
+.bl-topbar-menu,
+.bl-panel-scrim {
+  display: none;
+}
+
+.bl-collapse-toggle,
+.bl-chat-back {
+  display: none;
+}
+
+/* Scroll boxes are the containing block of their absolutely positioned bits (screen-reader labels), so
+   those are clipped with the content instead of widening the page. */
+.bl-dt-scroll,
+.bl-tabs,
+.bl-seg {
+  position: relative;
+}
+
+@media (max-width: 1100px) {
+  /* Rows wrap instead of pushing past the edge. */
+  .bl-panel-main [style*='display: flex']:not([style*='flex-direction: column']) {
+    flex-wrap: wrap;
+  }
+  .bl-pagehead-row {
+    flex-wrap: wrap;
+  }
+  .bl-pagehead-actions {
+    flex-wrap: wrap;
+  }
+  .bl-pagehead-title {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  /* Tabs scroll sideways rather than wrap into a pile. */
+  .bl-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none;
+  }
+  .bl-tabs .bl-tab {
+    flex: none;
+  }
+  .bl-seg {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .bl-seg .bl-seg-opt {
+    flex: none;
+  }
+
+  /* Six metric cards in a row → three. */
+  .bl-panel-main [style*='grid-template-columns: repeat(6'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Sidebar → off-canvas drawer from the right (RTL start). */
+  .bl-panel-side {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 70;
+    transform: translateX(105%);
+    visibility: hidden;
+    transition:
+      transform 0.2s ease,
+      visibility 0.2s;
+    box-shadow: none;
+  }
+  .bl-panel.is-nav-open .bl-panel-side {
+    transform: none;
+    visibility: visible;
+    box-shadow: -12px 0 32px rgba(0, 0, 0, 0.2);
+  }
+  .bl-panel-side .bl-sidebar {
+    width: min(300px, 86vw);
+    overflow-y: auto;
+  }
+  .bl-panel.is-nav-open .bl-panel-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Compact top bar: menu button, current page, notifications and theme. */
+  .bl-topbar {
+    padding: 0 8px 0 12px;
+    gap: 4px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+  .bl-topbar-menu {
+    display: inline-flex;
+    flex: none;
+  }
+  .bl-topbar .bl-crumbs {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .bl-topbar .bl-crumbs li:not(:last-child) {
+    display: none;
+  }
+  .bl-topbar .bl-crumbs li:last-child,
+  .bl-topbar .bl-crumbs li:last-child * {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .bl-topbar-search {
+    width: 200px;
+    margin: 0;
+  }
+  .bl-topbar-pop {
+    position: fixed !important;
+    top: calc(var(--topbar-height) + 4px) !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    max-height: 70vh !important;
+  }
+
+  /* Dialogs and toasts fit the screen. */
+  .bl-layer {
+    padding: 12px;
+  }
+  .bl-modal,
+  .bl-modal-sm,
+  .bl-modal-lg,
+  .bl-modal-xl {
+    width: 100%;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+  }
+  .bl-drawer {
+    width: 100%;
+  }
+  .bl-toasts {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+  .bl-apptoast {
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+@media (max-width: 600px) {
+  /* The help (?) stays: it opens the getting-started guide (#84). */
+  .bl-topbar-search {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Page padding: the screens' 24–32px side padding → 16px. */
+  .bl-panel-main > :not(header) {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Chat: one pane at a time — the thread list, or the open conversation with a back button. */
+  .bl-panel-main > .bl-chat {
+    padding: 0 !important;
+  }
+  .bl-chat-info,
+  .bl-chat.is-thread .bl-chat-list,
+  .bl-chat.is-list .bl-chat-thread,
+  .bl-chat-hist {
+    display: none !important;
+  }
+  .bl-chat.is-list .bl-chat-list {
+    width: 100% !important;
+    border: 0 !important;
+  }
+  .bl-chat-back {
+    display: inline-flex;
+    margin-inline-start: -8px;
+  }
+  .bl-panel-main .bl-chat-head {
+    flex-wrap: nowrap;
+    padding: 8px 12px !important;
+    gap: 8px !important;
+  }
+
+  /* Card grids and two/three-column page layouts stack. */
+  .bl-panel-main [style*='grid-template-columns: repeat(2'],
+  .bl-panel-main [style*='grid-template-columns: repeat(3'],
+  .bl-panel-main [style*='grid-template-columns: repeat(4'],
+  .bl-panel-main [style*='grid-template-columns: repeat(5'],
+  .bl-panel-main [style*='grid-template-columns: repeat(6'],
+  .bl-panel-main [style*='grid-template-columns: minmax(0px, 1fr) 3'],
+  .bl-panel-main [style*='grid-template-columns: minmax(0px, 2fr)'],
+  .bl-panel-main [style*='grid-template-columns: 1fr 1fr'],
+  .bl-panel-main [style*='grid-template-columns: 2fr'],
+  .bl-panel-main [style*='grid-template-columns: 3fr'] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .bl-panel-main [style*='grid-column: span'],
+  .bl-panel-main [style*='grid-column: 1 / -1'] {
+    grid-column: auto !important;
+  }
+  /* Screen hooks: side panels go below and stop sticking; collapsible panels show only their header. */
+  .bl-panel-main .bl-stack-mobile {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+  }
+  .bl-panel-main .bl-stack-mobile > * {
+    flex: none !important;
+    width: 100%;
+  }
+  .bl-panel-main .bl-unstick-mobile {
+    position: static !important;
+    width: auto !important;
+    max-height: none !important;
+    align-self: stretch !important;
+  }
+  .bl-panel-main .bl-last-mobile {
+    order: 2;
+  }
+  .bl-collapse-mobile:not(.is-open) > :not(.bl-collapse-head) {
+    display: none !important;
+  }
+  .bl-collapse-mobile .bl-collapse-title {
+    display: none;
+  }
+  .bl-collapse-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  .bl-collapse-toggle::after {
+    content: '▾';
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .bl-collapse-mobile.is-open .bl-collapse-toggle::after {
+    content: '▴';
+  }
+
+  /* Small tiles (metric cards, mini stats) keep two per row. */
+  .bl-panel-main .bl-two-up {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .bl-panel-main .bl-keep-cols {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  /* Nutrition food rows: name · grams · kcal/100 g · kcal · remove, in phone-sized columns. */
+  .bl-panel-main .bl-foodrow {
+    grid-template-columns: minmax(0, 1fr) 56px 64px 48px 24px !important;
+    gap: 6px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  .bl-panel-main .bl-foodrow > * {
+    font-size: 12px !important;
+  }
+
+  /* Fixed widths from the desktop design never exceed the screen. */
+  .bl-panel-main :where(div, section, article, aside, form, label, input, textarea, select, img, video, p, h1, h2, h3, nav) {
+    max-width: 100%;
+  }
+  .bl-panel-main [style*='min-width: 2'],
+  .bl-panel-main [style*='min-width: 3'],
+  .bl-panel-main [style*='min-width: 4'] {
+    min-width: 0 !important;
+  }
+  .bl-panel-main [style*='white-space: nowrap'] {
+    white-space: normal !important;
+  }
+}

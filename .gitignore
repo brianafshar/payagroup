@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.expo/
+*.tsbuildinfo
+.DS_Store
+.env*.local
+dist-web/
+
+# Server deployment: secrets, backups and the APK stay on the server
+deploy/.env
+deploy/backups/
+deploy/download/*.apk

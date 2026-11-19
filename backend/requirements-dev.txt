@@ -1,0 +1,6 @@
+-r requirements.txt
+pytest>=8,<10
+pytest-django>=4.9,<5
+ruff>=0.12
+pytest-asyncio>=0.24
+moto[s3]>=5,<6
