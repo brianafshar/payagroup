@@ -51,7 +51,7 @@ export interface AnalyticsProps {
 /** Loads the athletes and one analytics section, then renders `render(props)` (or loading / empty states). */
 export function useAnalyticsPage(section: Section, active: string, title: string, days?: number, extra?: { tests?: boolean }) {
   const athletes = useQuery('athletes', () => api.athletes.list());
-  const list = (athletes.data || []).filter((a) => a.userId);
+  const list = athletes.data || [];
   const id = param('id') || list[0]?.id || '';
   const data = useQuery(`analytics:${section}:${id}:${days || ''}`, () => (id ? remote.analytics(id, section, days) : Promise.resolve(null)));
   const tests = useQuery('tests', () => (extra?.tests ? remote.tests() : Promise.resolve([])));

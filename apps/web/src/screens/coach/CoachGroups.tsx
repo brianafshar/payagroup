@@ -73,7 +73,7 @@ function GroupEditor({ group, athletes, onSaved, onClose }: { group: ChatGroup |
             <Checkbox
               key={a.id}
               label={a.name}
-              description={a.userId ? undefined : 'هنوز وارد اپ نشده'}
+              
               checked={sel.includes(Number(a.id))}
               onChange={(on) => toggle(Number(a.id), on)}
             />

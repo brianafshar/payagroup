@@ -242,3 +242,27 @@ def finish_workout(log: WorkoutLog, *, rpe=None, note="", duration_min=None, avg
         "duration_min": log.duration_min,
         "prs": [{"exercise_id": p.exercise_id, "exercise_name": p.exercise.name, "type": p.type, "value": p.value, "previous": p.previous} for p in prs],
     }
+
+
+@transaction.atomic
+def set_attendance(athlete: Athlete, day: date, program: Program | None, part: str, present: bool | None) -> WorkoutLog:
+    """Coach marks a session. Present: every prescribed set is logged as done (unless the coach already
+    edited some) and the session is closed; absent: sets undone and the session counts as missed (no
+    analytics); None: back to not marked."""
+    log = start_workout(athlete, day, program, part)
+    sets = list(log.sets.select_related("exercise", "log__athlete"))
+    if present:
+        if not any(s.done for s in sets):
+            for s in sets:
+                log_set(s, done=True, actual_reps=s.actual_reps or None, actual_value=s.actual_value)
+        finish_workout(log)
+        log.refresh_from_db()
+    else:
+        for s in sets:
+            if s.done:
+                log_set(s, done=False, actual_reps=s.actual_reps or None, actual_value=s.actual_value)
+        log.status = WorkoutLog.Status.MISSED if present is False else WorkoutLog.Status.PLANNED
+        log.finished_at = timezone.now() if present is False else None
+        log.started_at = log.started_at if present is False else None
+        log.save(update_fields=["status", "finished_at", "started_at"])
+    return log

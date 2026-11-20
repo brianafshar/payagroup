@@ -41,6 +41,7 @@ export const SCREENS: Partial<Record<RouteKey, Page>> = {
   'coach:records': lazy(() => import('@/screens/coach/CoachPersonalRecords')),
   'coach:settings': lazy(() => import('@/screens/coach/CoachSettings')),
   'coach:chat': lazy(() => import('@/screens/coach/CoachChat')),
+  'coach:attendance': lazy(() => import('@/screens/coach/CoachAttendance')),
   'coach:team': lazy(() => import('@/screens/coach/CoachTeam')),
 };
 

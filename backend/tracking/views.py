@@ -117,7 +117,7 @@ class NutritionPlanView(APIView):
             return request.user.athlete
         if not is_coach(request.user):
             raise PermissionDenied()
-        return get_object_or_404(Athlete, pk=athlete_id, coach=request.user.coach)
+        return get_object_or_404(Athlete, pk=athlete_id, coach__in=request.user.coach.athlete_scope_ids())
 
     @extend_schema(responses=NutritionPlanSerializer)
     def get(self, request, athlete_id):

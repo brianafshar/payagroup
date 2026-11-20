@@ -35,7 +35,7 @@ const invert = (o: Record<string, string>) => Object.fromEntries(Object.entries(
 /** Data container: the athlete in `?id=` (or the first one), their recovery plan and last check-ins. */
 export default function CoachRecoveryPlanPage(props: { brand?: string }) {
   const athletes = useQuery('athletes', () => api.athletes.list());
-  const id = param('id') || athletes.data?.find((a) => a.userId)?.id || '';
+  const id = param('id') || athletes.data?.[0]?.id || '';
   const plan = useQuery('recovery-plan:' + id, () => (id ? remote.recoveryPlan(id) : Promise.resolve(null)));
   const recent = useQuery('recovery-analytics:' + id + ':30', () => (id ? remote.analytics(id, 'recovery', 30) : Promise.resolve(null)));
   const wait = pending(athletes, plan, recent);

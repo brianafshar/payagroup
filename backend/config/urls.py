@@ -48,6 +48,7 @@ api = [
     path("auth/logout/", accounts.LogoutView.as_view(), name="logout"),
     path("auth/me/", accounts.MeView.as_view(), name="me"),
     path("auth/password/", accounts.ChangePasswordView.as_view(), name="change-password"),
+    path("attendance/", training.AttendanceView.as_view(), name="attendance"),
     path("sms-settings/", sms_views.SmsSettingsView.as_view(), name="sms-settings"),
     path("sms-settings/test/", sms_views.SmsTestView.as_view(), name="sms-settings-test"),
     path("auth/username/", accounts.ChangeUsernameView.as_view(), name="change-username"),

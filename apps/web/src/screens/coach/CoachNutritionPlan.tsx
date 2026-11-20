@@ -34,7 +34,7 @@ const servedOn = (m, day: string) => day === 'all' || !m.days?.length || m.days.
 /** Data container: the athlete in `?id=` (or the first one), their plan and last week's logs. */
 export default function CoachNutritionPlanPage(props: { brand?: string }) {
   const athletes = useQuery('athletes', () => api.athletes.list());
-  const id = param('id') || athletes.data?.find((a) => a.userId)?.id || '';
+  const id = param('id') || athletes.data?.[0]?.id || '';
   const week = new Date();
   week.setDate(week.getDate() - 6);
   const plan = useQuery('nutrition-plan:' + id, () => (id ? remote.nutritionPlan(id) : Promise.resolve(null)));
@@ -184,7 +184,7 @@ class CoachNutritionPlan extends Screen {
       kcal = en(cur.t.kcal);
     const diff = Math.round(macroKcal - kcal);
     const who = this.props.athlete;
-    const ATH = this.props.athletes.filter((a) => a.id !== who.id && a.userId).map((a) => [a.id, a.name, a.programName || '']);
+    const ATH = this.props.athletes.filter((a) => a.id !== who.id).map((a) => [a.id, a.name, a.programName || '']);
     const fk = (f) => Math.round((en(f.g) * en(f.k100)) / 100);
     const ev = (e) => (e && e.target ? e.target.value : e);
     const kcalOf = (m) => m.foods.reduce((a, f) => a + fk(f), 0);

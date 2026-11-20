@@ -28,6 +28,7 @@ const URL_OF: Record<string, string> = {
   'coach/CoachAthletes': '/coach/athletes',
   'coach/CoachBodyComposition': '/coach/analytics/body?id=1',
   'coach/CoachChat': '/coach/chat',
+  'coach/CoachAttendance': '/coach/attendance',
   'coach/CoachTeam': '/coach/team',
   'coach/CoachCreateAthlete': '/coach/athletes/new',
   'coach/CoachCreateExercise': '/coach/library/new',

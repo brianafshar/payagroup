@@ -29,7 +29,7 @@ function jalaliMonth() {
 /** Data container: the athlete in `?id=` (or the first one), this Jalali month's calendar and logs. */
 export default function CoachTrainingHistoryPage(props: { brand?: string }) {
   const athletes = useQuery('athletes', () => api.athletes.list());
-  const id = param('id') || athletes.data?.find((a) => a.userId)?.id || '';
+  const id = param('id') || athletes.data?.[0]?.id || '';
   const m = jalaliMonth();
   const cal = useQuery('calendar:' + id, () => (id ? remote.athleteCalendar(id, isoOf(m.first), isoOf(m.last)) : Promise.resolve([])));
   // This month's sessions (calendar details) and the latest six (recent list); the full history only on export.

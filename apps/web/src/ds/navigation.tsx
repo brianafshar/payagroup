@@ -25,6 +25,7 @@ const NAV: Record<'coach' | 'coachFoot' | 'admin' | 'adminFoot', NavItem[]> = {
     { id: 'dashboard', label: 'داشبورد', icon: 'dashboard' },
     { id: 'athletes', label: 'ورزشکاران', icon: 'users' },
     { id: 'programs', label: 'برنامه‌ها', icon: 'clipboard' },
+    { id: 'attendance', label: 'حضور و غیاب', icon: 'check-circle' },
     { id: 'library', label: 'کتابخانه حرکات', icon: 'library' },
     { id: 'nutrition', label: 'تغذیه', icon: 'utensils' },
     { id: 'recovery', label: 'ریکاوری', icon: 'moon' },

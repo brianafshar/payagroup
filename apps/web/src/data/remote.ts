@@ -453,6 +453,10 @@ export const remote = {
   /** SMS the athlete a link to their program PDF; a new name + phone is saved as a contact. */
   sendProgramSms: (b: { athlete?: number; name?: string; phone: string }) => http.post<{ athleteId: number; url: string; smsSent: boolean }>('/program-pdf/send-sms/', b),
   /** Head coach: the coaches under them. */
+  attendance: (date: string) => http.get<Json>(`/attendance/?date=${date}`),
+  setAttendance: (body: Json) => mutate(http.post<Json>('/attendance/', body)),
+  workout: (id: ID) => http.get<Json>(`/workouts/${id}/`),
+  patchSet: (id: ID, body: Json) => mutate(http.patch<Json>(`/sets/${id}/`, body)),
   team: () => http.get<TeamCoach[]>('/coach/team/'),
   createTeamCoach: (b: { name: string; username: string; password: string; phone?: string }) => http.post<TeamCoach>('/coach/team/', b),
   setTeamStatus: (id: number, status: 'active' | 'inactive') => http.post<TeamCoach>(`/coach/team/${id}/set_status/`, { status }),

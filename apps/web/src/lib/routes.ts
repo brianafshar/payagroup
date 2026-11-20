@@ -40,6 +40,7 @@ export const ROUTES = {
   'coach:records': '/coach/analytics/records',
   'coach:settings': '/coach/settings',
   'coach:chat': '/coach/chat',
+  'coach:attendance': '/coach/attendance',
   'coach:team': '/coach/team',
   account: '/account',
 } as const;

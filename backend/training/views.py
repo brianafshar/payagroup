@@ -315,17 +315,20 @@ class LoggedSetViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """M38: tick a set (done as prescribed) or record what was actually done. Undo with `done: false`."""
 
     serializer_class = LoggedSetSerializer
-    permission_classes = [IsAthlete]
+    permission_classes = [IsCoachOrAthlete]
     http_method_names = ["patch"]
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return LoggedSet.objects.none()
-        return LoggedSet.objects.filter(log__athlete=self.request.user.athlete).select_related("log__athlete", "exercise")
+        qs = LoggedSet.objects.select_related("log__athlete", "exercise")
+        if is_coach(self.request.user):  # the coach corrects what was done (weights, reps) for their athletes
+            return qs.filter(log__athlete__coach__in=self.request.user.coach.athlete_scope_ids())
+        return qs.filter(log__athlete=self.request.user.athlete)
 
     def partial_update(self, request, pk=None):
         s = self.get_object()
-        if s.log.status in (WorkoutLog.Status.COMPLETED, WorkoutLog.Status.MISSED) and s.log.date < timezone.localdate():
+        if is_athlete(request.user) and s.log.status in (WorkoutLog.Status.COMPLETED, WorkoutLog.Status.MISSED) and s.log.date < timezone.localdate():
             raise PermissionDenied("This session is closed.")
         data = LoggedSetSerializer(s, data=request.data, partial=True)
         data.is_valid(raise_exception=True)
@@ -333,6 +336,8 @@ class LoggedSetViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         services.log_set(
             s, done=v.get("done", s.done), actual_reps=v.get("actual_reps", s.actual_reps or None), actual_value=v.get("actual_value", s.actual_value)
         )
+        if is_coach(request.user) and s.log.finished_at and s.log.status != WorkoutLog.Status.MISSED:
+            services.finish_workout(s.log)  # recount completed / partial after the correction
         return Response(LoggedSetSerializer(s).data)
 
 
@@ -573,3 +578,76 @@ def _best_loads(athlete, exercise_ids) -> dict:
         .annotate(w=Max(Coalesce("actual_value", "target_value")))
     )
     return {r["exercise_id"]: r["w"] for r in rows}
+
+
+class AttendanceView(APIView):
+    """Coach attendance. `GET attendance/?date=` lists the coach's athletes with the sessions their programs
+    prescribe that day and whether attendance was marked. `POST attendance/` `{athlete, date?, program?, part?,
+    present: true|false|null}`: present → the session is logged as prescribed (counts in analytics; weights and
+    reps can then be edited per set) · absent → missed (no sets count) · null → cleared."""
+
+    permission_classes = [IsCoach]
+
+    class Input(serializers.Serializer):
+        athlete = serializers.IntegerField()
+        date = serializers.DateField(required=False)
+        program = serializers.IntegerField(required=False, allow_null=True)
+        part = serializers.CharField(required=False, allow_blank=True, default="")
+        present = serializers.BooleanField(allow_null=True)
+
+    @staticmethod
+    def _day(request):
+        raw = request.query_params.get("date") or request.data.get("date")
+        try:
+            day = timezone.datetime.fromisoformat(raw).date() if raw else timezone.localdate()
+        except ValueError as e:
+            raise ValidationError({"date": "Invalid date."}) from e
+        if day > timezone.localdate():
+            raise ValidationError({"date": "Attendance can't be marked for a future day."})
+        return day
+
+    @extend_schema(parameters=[OpenApiParameter("date", str)], responses={200: dict})
+    def get(self, request):
+        day = self._day(request)
+        athletes = list(Athlete.objects.filter(coach__in=request.user.coach.athlete_scope_ids()).order_by("name"))
+        logs = {}
+        for x in WorkoutLog.objects.filter(athlete__in=athletes, date=day):
+            logs[(x.athlete_id, x.program_id, x.part)] = x
+        rows = []
+        for a in athletes:
+            sessions = []
+            for s in services.sessions_for(a, day):
+                if not services.trains(s) or not s["program"]:
+                    continue
+                for part in services.day_parts(s["day"]):
+                    log = logs.get((a.pk, s["program"].pk, part))
+                    present = None if not log or log.status in (WorkoutLog.Status.PLANNED, WorkoutLog.Status.IN_PROGRESS) else log.status != WorkoutLog.Status.MISSED
+                    sessions.append(
+                        {
+                            "program_id": s["program"].pk,
+                            "program_name": s["program"].name,
+                            "part": part,
+                            "part_label": services.PART_FA.get(part, ""),
+                            "focus": s["day"].get("focus", ""),
+                            "log_id": log.pk if log else None,
+                            "status": log.status if log else None,
+                            "present": present,
+                        }
+                    )
+            rows.append({"athlete_id": a.pk, "name": a.name, "sessions": sessions})
+        return Response({"date": day, "athletes": rows})
+
+    @extend_schema(request=Input, responses=WorkoutLogSerializer)
+    def post(self, request):
+        s = self.Input(data=request.data)
+        s.is_valid(raise_exception=True)
+        d = s.validated_data
+        day = self._day(request)
+        athlete = Athlete.objects.filter(coach__in=request.user.coach.athlete_scope_ids(), pk=d["athlete"]).first()
+        if not athlete:
+            raise ValidationError({"athlete": "Unknown athlete."})
+        program = Program.objects.filter(pk=d["program"]).first() if d.get("program") else None
+        if not services.trains(services.session_for(athlete, day, program)):
+            raise ValidationError({"detail": "This athlete has no training prescribed on that day."})
+        log = services.set_attendance(athlete, day, program, d.get("part", ""), d["present"])
+        return Response(WorkoutLogSerializer(log, context={"request": request}).data)

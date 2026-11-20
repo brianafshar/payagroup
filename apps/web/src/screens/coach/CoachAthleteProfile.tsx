@@ -426,7 +426,7 @@ class CoachAthleteProfile extends Screen {
                 ))}
               </div>
               {v.noMeasures ? (
-                <EmptyState icon="ruler" title="هنوز اندازه‌گیری ثبت نشده" description="ورزشکار از اپ یا شما از «ثبت اندازه‌گیری» اولین مقدار را ثبت کنید." compact />
+                <EmptyState icon="ruler" title="هنوز اندازه‌گیری ثبت نشده" description="با دکمه‌ی «ثبت اندازه‌گیری» اولین مقدار را ثبت کنید." compact />
               ) : null}
             </>
           ) : null}
