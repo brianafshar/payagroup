@@ -1,0 +1,16 @@
+services:
+  paya-site:
+    build:
+      context: .
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    container_name: paya-site
+    restart: unless-stopped
+    networks: [web]
+
+# Join the same Docker network as your existing Caddy.
+# Create it once if needed:  docker network create web
+networks:
+  web:
+    external: true
+    name: ${CADDY_NETWORK:-web}
