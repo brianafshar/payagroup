@@ -15,13 +15,22 @@ class SmsError(Exception):
     pass
 
 
+def credentials() -> tuple[str, str]:
+    """(api key, sender): what the head coach saved in the app, else the environment."""
+    from core.models import SmsSettings
+
+    row = SmsSettings.load()
+    return (row.api_key.strip() or settings.KAVENEGAR_API_KEY, row.sender.strip() or settings.KAVENEGAR_SENDER)
+
+
 def send_sms(phone: str, message: str) -> None:
-    if not settings.KAVENEGAR_API_KEY:
-        raise SmsNotConfigured("KAVENEGAR_API_KEY is not set.")
+    key, sender = credentials()
+    if not key:
+        raise SmsNotConfigured("The Kavenegar API key is not set.")
     params = {"receptor": phone, "message": message}
-    if settings.KAVENEGAR_SENDER:
-        params["sender"] = settings.KAVENEGAR_SENDER
-    url = f"https://api.kavenegar.com/v1/{settings.KAVENEGAR_API_KEY}/sms/send.json"
+    if sender:
+        params["sender"] = sender
+    url = f"https://api.kavenegar.com/v1/{key}/sms/send.json"
     try:
         with urllib.request.urlopen(url, data=urllib.parse.urlencode(params).encode(), timeout=15) as r:  # noqa: S310
             ok = json.loads(r.read()).get("return", {}).get("status") == 200

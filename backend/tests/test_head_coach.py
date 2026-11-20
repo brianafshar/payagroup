@@ -81,3 +81,23 @@ def test_coach_changes_own_username():
     assert r.status_code == 200 and r.json()["username"] == "new_name"
     login = APIClient().post("/api/auth/login/", {"username": "new_name", "password": "pw-12345678", "role": "coach"}, format="json")
     assert login.status_code == 200
+
+
+def test_sms_settings_head_only_and_templates(monkeypatch):
+    from core import sms
+    from core.models import SmsSettings
+
+    head = make_coach("h@x.io", is_head=True)
+    coach = make_coach("a@x.io", head=head)
+    c = client(head.user)
+    r = c.get("/api/sms-settings/")
+    assert r.status_code == 200 and r.json()["keySet"] is False
+    r = c.put("/api/sms-settings/", {"apiKey": "abcd1234", "sender": "1000", "programText": "سلام {name} {link}"}, format="json")
+    assert r.status_code == 200 and r.json()["keySet"] and r.json()["keyHint"] == "1234" and "apiKey" not in r.json()
+    assert c.put("/api/sms-settings/", {"programText": "بدون لینک"}, format="json").status_code == 400
+    sent = []
+    monkeypatch.setattr(sms, "send_sms", lambda phone, text: sent.append((phone, text)))
+    assert c.post("/api/sms-settings/test/", {"phone": "09121234567"}, format="json").json()["status"] == "sent"
+    assert sent and sms.credentials() == ("abcd1234", "1000")
+    assert SmsSettings.load().program_text == "سلام {name} {link}"
+    assert client(coach.user).put("/api/sms-settings/", {"sender": "x"}, format="json").status_code == 403

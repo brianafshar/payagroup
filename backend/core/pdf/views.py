@@ -17,7 +17,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from coaching.models import AccountStatus, Athlete, ProgramShare
-from core import site, sms
+from core import notify, site, sms
+from core.models import SmsSettings
 from core.permissions import IsAthlete, IsCoach
 
 from .program import filename, render_pdf
@@ -145,12 +146,12 @@ class SendProgramSmsView(APIView):
             return Response({"code": "site_failed", "detail": "Could not publish the PDF to the site."}, status=502)
         share = ProgramShare(athlete=athlete, sent_by=request.user, token=token, url=url)
         share.pdf.save(f"{token}.pdf", ContentFile(data), save=False)
-        text = f"{athlete.name} عزیز، برنامه شما آماده است:\n{url}\n{coach.app_name}"
+        text = notify.render_text(SmsSettings.load().program_text, name=athlete.name, brand=notify.brand_of(athlete), link=url)
         try:
             sms.send_sms(athlete.phone, text)
         except sms.SmsNotConfigured:
             share.save()
-            return Response({"code": "sms_not_configured", "detail": "SMS is not configured (KAVENEGAR_API_KEY).", "url": url}, status=503)
+            return Response({"code": "sms_not_configured", "detail": "SMS is not configured (Kavenegar API key).", "url": url}, status=503)
         except sms.SmsError:
             share.save()
             return Response({"code": "sms_failed", "detail": "The SMS could not be sent.", "url": url}, status=502)

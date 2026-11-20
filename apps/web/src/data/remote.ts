@@ -501,6 +501,9 @@ export const remote = {
 
   me: () => http.get<Json>('/auth/me/'),
   updateMe: (data: Json | FormData) => http.patch<Json>('/auth/me/', data),
+  smsSettings: () => http.get<Json>('/sms-settings/'),
+  saveSmsSettings: (data: Json) => http.put<Json>('/sms-settings/', data),
+  smsTest: (phone: string) => http.post<Json>('/sms-settings/test/', { phone }),
   changeUsername: (username: string, currentPassword: string) => http.post<Json>('/auth/username/', { username, currentPassword }),
   changePassword: (currentPassword: string, newPassword: string) => http.post<Json>('/auth/password/', { currentPassword, newPassword }),
   mfaStatus: () => http.get<{ enabled: boolean; required: boolean; recoveryCodesLeft: number }>('/auth/2fa/'),

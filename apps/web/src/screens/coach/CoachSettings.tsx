@@ -20,6 +20,7 @@ import {
   TopBar,
 } from '@/ds';
 import { AppearanceSettings } from '@/app/AppearanceSettings';
+import { SmsSettingsPanel } from '@/app/SmsSettingsPanel';
 import { ChangePasswordForm } from '@/app/ChangePasswordForm';
 import { ChangeUsernameForm } from '@/app/ChangeUsernameForm';
 import { PanelLayout } from '@/app/PanelLayout';
@@ -273,12 +274,14 @@ class CoachSettings extends Screen {
         { id: 'units', label: 'واحدها' },
         { id: 'appearance', label: 'ظاهر' },
         { id: 'tests', label: 'آزمون‌ها و شاخص‌ها', count: fa(s.tests.length) },
+        ...(this.props.me?.isHeadCoach ? [{ id: 'sms', label: 'پیامک' }] : []),
         { id: 'security', label: 'امنیت' },
       ],
       tProfile: tab === 'profile',
       tUnits: tab === 'units',
       tAppearance: tab === 'appearance',
       tTests: tab === 'tests',
+      tSms: tab === 'sms',
       tSecurity: tab === 'security',
       n1: 1,
       n2: 2,
@@ -580,6 +583,7 @@ class CoachSettings extends Screen {
               </div>
             </>
           ) : null}
+          {v.tSms ? <SmsSettingsPanel /> : null}
           {v.tSecurity ? (
             <>
               <div

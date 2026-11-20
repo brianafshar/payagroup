@@ -86,3 +86,26 @@ class SectionUsage(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=["user", "date", "section"], name="one_usage_row_per_day")]
         indexes = [models.Index(fields=["date", "section"])]
+
+
+DEFAULT_ACCOUNT_SMS = "{name} عزیز، حساب شما در {brand} ساخته شد. به‌زودی برنامه تمرینی شما برایتان ارسال می‌شود."
+DEFAULT_PROGRAM_SMS = "{name} عزیز، برنامه تمرینی جدید به شما اختصاص داده شد.\nدانلود برنامه:\n{link}\n{brand}"
+
+
+class SmsSettings(models.Model):
+    """Singleton (pk=1): Kavenegar credentials and the two SMS texts, edited by the head coach in the app.
+    Falls back to the KAVENEGAR_* environment variables when the key is left empty."""
+
+    api_key = models.CharField(max_length=200, blank=True)
+    sender = models.CharField(max_length=32, blank=True)
+    account_text = models.TextField(default=DEFAULT_ACCOUNT_SMS)
+    program_text = models.TextField(default=DEFAULT_PROGRAM_SMS)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = verbose_name_plural = "SMS settings"
+
+    @classmethod
+    def load(cls) -> "SmsSettings":
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj

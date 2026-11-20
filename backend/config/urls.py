@@ -10,7 +10,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from accounts import mfa_views as mfa
 from accounts import views as accounts
 from coaching import views as coaching
-from core import activity, feed
+from core import activity, feed, sms_views
 from core.pdf import views as program_pdf
 from messaging import groups as messaging_groups
 from messaging import views as messaging
@@ -48,6 +48,8 @@ api = [
     path("auth/logout/", accounts.LogoutView.as_view(), name="logout"),
     path("auth/me/", accounts.MeView.as_view(), name="me"),
     path("auth/password/", accounts.ChangePasswordView.as_view(), name="change-password"),
+    path("sms-settings/", sms_views.SmsSettingsView.as_view(), name="sms-settings"),
+    path("sms-settings/test/", sms_views.SmsTestView.as_view(), name="sms-settings-test"),
     path("auth/username/", accounts.ChangeUsernameView.as_view(), name="change-username"),
     path("auth/forgot-password/", accounts.ForgotPasswordView.as_view(), name="forgot-password"),
     path("auth/reset-password/", accounts.ResetPasswordView.as_view(), name="reset-password"),
