@@ -19,7 +19,7 @@ from core.pdf.program import filename, render_pdf
 log = logging.getLogger(__name__)
 
 
-def _send(phone: str, text: str) -> str:
+def _send(phone: str, text: str, detail: list | None = None) -> str:
     if not phone:
         return "no_phone"
     try:
@@ -27,8 +27,10 @@ def _send(phone: str, text: str) -> str:
         return "sent"
     except sms.SmsNotConfigured:
         return "not_configured"
-    except sms.SmsError:
-        log.warning("SMS to athlete failed", exc_info=True)
+    except sms.SmsError as e:
+        log.warning("SMS to athlete failed: %s", e)
+        if detail is not None:
+            detail.append(str(e))
         return "failed"
 
 

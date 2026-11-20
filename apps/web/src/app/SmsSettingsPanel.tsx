@@ -67,9 +67,9 @@ export function SmsSettingsPanel() {
   const test = async () => {
     setTesting(true);
     try {
-      const r = (await remote.smsTest(phone.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/\s/g, ''))) as { status: string };
+      const r = (await remote.smsTest(phone.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/\s/g, ''))) as { status: string; detail?: string };
       if (r.status === 'sent') toast('پیامک آزمایشی ارسال شد');
-      else toast('ارسال نشد', r.status === 'not_configured' ? 'ابتدا کلید API را ذخیره کنید.' : 'کاوه‌نگار پیامک را نپذیرفت؛ کلید، شماره خط و اعتبار حساب را بررسی کنید.', 'error');
+      else toast('ارسال نشد', r.status === 'not_configured' ? 'ابتدا کلید API را ذخیره کنید.' : 'کاوه‌نگار پیامک را نپذیرفت' + (r.detail ? ': ' + r.detail : '') + '. اگر خطا درباره‌ی ارسال‌کننده است، شماره‌ی یکی از خطوط حساب‌تان را در «شماره خط ارسال‌کننده» بنویسید.', 'error');
     } catch (e) {
       toast('ارسال نشد', faError(e), 'error');
     } finally {

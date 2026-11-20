@@ -1,6 +1,7 @@
 """SMS through Kavenegar (https://kavenegar.com). Configure KAVENEGAR_API_KEY (+ KAVENEGAR_SENDER)."""
 
 import json
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -33,8 +34,14 @@ def send_sms(phone: str, message: str) -> None:
     url = f"https://api.kavenegar.com/v1/{key}/sms/send.json"
     try:
         with urllib.request.urlopen(url, data=urllib.parse.urlencode(params).encode(), timeout=15) as r:  # noqa: S310
-            ok = json.loads(r.read()).get("return", {}).get("status") == 200
+            body = json.loads(r.read())
+    except urllib.error.HTTPError as e:  # Kavenegar answers refusals (412 …) with an HTTP error + JSON body
+        try:
+            body = json.loads(e.read())
+        except Exception:
+            raise SmsError(f"HTTP {e.code}") from e
     except Exception as e:
         raise SmsError(str(e)) from e
-    if not ok:
-        raise SmsError("Kavenegar refused the message.")
+    ret = body.get("return", {})
+    if ret.get("status") != 200:
+        raise SmsError(f"{ret.get('status')}: {ret.get('message') or 'Kavenegar refused the message.'}")

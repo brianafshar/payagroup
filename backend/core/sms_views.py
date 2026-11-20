@@ -91,5 +91,6 @@ class SmsTestView(APIView):
         s = self.Input(data=request.data)
         s.is_valid(raise_exception=True)
         text = notify.render_text(SmsSettings.load().account_text, name="آزمایشی", brand=notify.brand_of_coach(request.user.coach))
-        status = notify._send(s.validated_data["phone"], text)
-        return Response({"status": status})
+        detail: list = []
+        status = notify._send(s.validated_data["phone"], text, detail)
+        return Response({"status": status, "detail": detail[0] if detail else ""})
