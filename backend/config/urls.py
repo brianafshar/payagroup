@@ -48,6 +48,7 @@ api = [
     path("auth/logout/", accounts.LogoutView.as_view(), name="logout"),
     path("auth/me/", accounts.MeView.as_view(), name="me"),
     path("auth/password/", accounts.ChangePasswordView.as_view(), name="change-password"),
+    path("auth/username/", accounts.ChangeUsernameView.as_view(), name="change-username"),
     path("auth/forgot-password/", accounts.ForgotPasswordView.as_view(), name="forgot-password"),
     path("auth/reset-password/", accounts.ResetPasswordView.as_view(), name="reset-password"),
     path("auth/invites/<str:token>/", accounts.InviteView.as_view(), name="invite"),

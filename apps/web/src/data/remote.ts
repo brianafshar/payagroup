@@ -194,12 +194,12 @@ export const remoteApi = {
     list: async (filter: { coachId?: ID } = {}): Promise<Athlete[]> =>
       (await getAll<Json>('/athletes/' + (filter.coachId && isAdminFilter() ? `?coach=${filter.coachId}` : ''))).map(toAthlete),
     get: async (id: ID): Promise<Athlete> => toAthlete(await http.get<Json>(`/athletes/${id}/`)),
-    async create(input: NewAthlete & { startDate?: string }): Promise<Athlete & { inviteLink?: LinkResult }> {
-      const { programId, startDate, invite, ...rest } = input;
-      const a = await http.post<Json>('/athletes/', { ...rest, invite: invite || false });
+    async create(input: NewAthlete & { startDate?: string }): Promise<Athlete & { smsStatus?: string }> {
+      const { programId, startDate, ...rest } = input;
+      const a = await http.post<Json>('/athletes/', rest);
       if (programId) await http.post(`/programs/${programId}/assign/`, { athleteIds: [a.id], ...(startDate ? { startDate } : {}) });
       changed();
-      return { ...toAthlete(a), inviteLink: a.inviteLink ?? undefined };
+      return { ...toAthlete(a), smsStatus: a.smsStatus };
     },
     update: async (id: ID, data: Json): Promise<Athlete> => toAthlete(await mutate(http.patch<Json>(`/athletes/${id}/`, data))),
     setStatus: async (ids: ID[], status: AccountStatus): Promise<void> => {
@@ -501,6 +501,7 @@ export const remote = {
 
   me: () => http.get<Json>('/auth/me/'),
   updateMe: (data: Json | FormData) => http.patch<Json>('/auth/me/', data),
+  changeUsername: (username: string, currentPassword: string) => http.post<Json>('/auth/username/', { username, currentPassword }),
   changePassword: (currentPassword: string, newPassword: string) => http.post<Json>('/auth/password/', { currentPassword, newPassword }),
   mfaStatus: () => http.get<{ enabled: boolean; required: boolean; recoveryCodesLeft: number }>('/auth/2fa/'),
   mfaSetup: () => http.post<{ secret: string; otpauthUrl: string }>('/auth/2fa/setup/'),

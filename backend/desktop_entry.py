@@ -40,6 +40,7 @@ def main() -> None:
         DJANGO_ALLOWED_HOSTS="127.0.0.1,localhost",
         DJANGO_SETTINGS_MODULE="config.settings",
         PUSH_BACKEND="off",
+        REFRESH_TOKEN_DAYS="365",  # one gym PC: stay signed in
         EXERCISE_ILLUSTRATIONS="0",  # first start must not wait on downloads; they are filled in the background
     )
     sys.path.insert(0, str(bundle_dir()))

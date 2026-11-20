@@ -173,13 +173,11 @@ export interface NewCoach {
 /** The coach is the signed-in one (the server scopes it). */
 export interface NewAthlete {
   name: string;
-  email?: string;
-  phone?: string;
+  /** Required: the account / program SMS goes to this number (09xxxxxxxxx). */
+  phone: string;
   gender?: Gender;
   goal?: Goal;
   programId?: ID;
-  /** `email`: send the invite by email · `link`: coach shares the link manually · `false`: save only. */
-  invite: 'email' | 'link' | false;
   sport?: string;
   /** Admins only (#96): the coach the athlete joins. */
   coach?: ID;

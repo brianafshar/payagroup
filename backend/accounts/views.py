@@ -23,6 +23,7 @@ from .serializers import (
     AdminUserSerializer,
     BrandingSerializer,
     ChangePasswordSerializer,
+    ChangeUsernameSerializer,
     ForgotPasswordSerializer,
     InviteInfoSerializer,
     LinkRequestSerializer,
@@ -129,6 +130,21 @@ class ChangePasswordView(APIView):
         user.notify_sessions_ended()
         audit(user, "password.change", user, self_service=True)
         return Response(token_response(user, {"request": request}))
+
+
+class ChangeUsernameView(APIView):
+    """Own sign-in name change (needs the current password). The session continues: tokens carry the user id."""
+
+    @extend_schema(request=ChangeUsernameSerializer, responses=MeSerializer)
+    def post(self, request):
+        s = ChangeUsernameSerializer(data=request.data, context={"request": request})
+        s.is_valid(raise_exception=True)
+        user = request.user
+        old = user.username
+        user.username = s.validated_data["username"]
+        user.save(update_fields=["username"])
+        audit(user, "username.change", user, old=old, new=user.username)
+        return Response(MeSerializer(user, context={"request": request}).data)
 
 
 class ForgotPasswordView(AuthThrottled, APIView):

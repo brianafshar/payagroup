@@ -8,7 +8,7 @@ import pytest
 from django.core import mail
 from django.core.management import call_command
 
-from accounts.models import PASSWORD_ALPHABET, Invite, User, random_password
+from accounts.models import PASSWORD_ALPHABET, User, random_password
 
 from .conftest import PASSWORD, make_athlete
 from .test_auth import login
@@ -60,19 +60,6 @@ def test_forgot_password_keeps_the_old_password_when_the_email_fails(api, coach,
     r = api.anon().post("/api/auth/forgot-password/", {"email": ME})
     assert r.status_code == 502 and r.json()["code"] == "email_failed"
     assert login(api, ME, PASSWORD).status_code == 200
-
-
-def test_smtp_failure_is_reported_and_rolled_back(api, coach, monkeypatch):
-    athlete = make_athlete(coach, email=ME, name="مسعود", with_user=False)
-    api.as_user(coach.user)
-    assert api.post(f"/api/athletes/{athlete.pk}/invite/", {"send": True}).status_code == 200
-    assert mail.outbox[0].to == [ME] and "/invite/" in mail.outbox[0].body
-    monkeypatch.setattr("accounts.emails.send_mail", refuse)
-    r = api.post(f"/api/athletes/{athlete.pk}/invite/", {"send": True})
-    assert r.status_code == 502 and r.json()["code"] == "email_failed"
-    assert Invite.objects.usable().filter(athlete=athlete).count() == 1  # the earlier link still works
-    r = api.post("/api/athletes/", {"name": "نفر جدید", "email": "new@example.com", "invite": "email"})
-    assert r.status_code == 502 and not coach.athletes.filter(email="new@example.com").exists()
 
 
 def test_send_test_email_command(capsys):

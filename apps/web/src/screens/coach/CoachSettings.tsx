@@ -20,6 +20,8 @@ import {
   TopBar,
 } from '@/ds';
 import { AppearanceSettings } from '@/app/AppearanceSettings';
+import { ChangePasswordForm } from '@/app/ChangePasswordForm';
+import { ChangeUsernameForm } from '@/app/ChangeUsernameForm';
 import { PanelLayout } from '@/app/PanelLayout';
 import { toast } from '@/lib/toast';
 import { TwoFactorPanel } from '@/app/TwoFactorPanel';
@@ -268,19 +270,15 @@ class CoachSettings extends Screen {
       setTab: (v) => this.setState({ tab: v }),
       tabs: [
         { id: 'profile', label: 'پروفایل و فضای کاری' },
-        { id: 'notif', label: 'اعلان‌ها' },
         { id: 'units', label: 'واحدها' },
         { id: 'appearance', label: 'ظاهر' },
         { id: 'tests', label: 'آزمون‌ها و شاخص‌ها', count: fa(s.tests.length) },
-        { id: 'measure', label: 'اندازه‌گیری بدن' },
         { id: 'security', label: 'امنیت' },
       ],
       tProfile: tab === 'profile',
-      tNotif: tab === 'notif',
       tUnits: tab === 'units',
       tAppearance: tab === 'appearance',
       tTests: tab === 'tests',
-      tMeasure: tab === 'measure',
       tSecurity: tab === 'security',
       n1: 1,
       n2: 2,
@@ -393,11 +391,10 @@ class CoachSettings extends Screen {
         ' شاخص اجباری را در اپ ثبت می‌کنند' +
         (m.remind === 'off' ? ' و یادآوری نمی‌گیرند.' : ' و ' + { eve: 'شب قبل', morning: 'صبح همان روز', both: 'شب قبل و صبح همان روز' }[m.remind] + ' یادآوری می‌گیرند.'),
       secItems: [
-        { label: 'ایمیل', value: this.props.me?.email || '—' },
+        { label: 'نام کاربری', value: this.props.me?.username || '—' },
         { label: 'آخرین ورود', value: this.props.me?.lastLogin ? faLastSeen(this.props.me.lastLogin) : '—' },
       ],
-      changePw: () => navigate('/account'),
-      signOut: async () => {
+            signOut: async () => {
         await logout();
         go('coach:login');
       },
@@ -450,341 +447,29 @@ class CoachSettings extends Screen {
         }
       >
         <div style={{ flex: '1 1 auto', padding: '24px 32px 48px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <PageHeader title="تنظیمات" subtitle="پروفایل، فضای کاری، اعلان‌ها، آزمون‌ها و اندازه‌گیری‌ها" badges={v.badges}>
+          <PageHeader title="تنظیمات" subtitle="پروفایل، نام کاربری و رمز، واحدها، ظاهر و آزمون‌ها" badges={v.badges}>
             <Button variant="primary" icon="save" disabled={v.clean} loading={v.saving} onClick={v.save}>
               ذخیره تغییرات
             </Button>
           </PageHeader>
           <Tabs value={v.tab} tabs={v.tabs} onChange={v.setTab} />
           {v.tProfile ? (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: '16px', alignItems: 'start' }}>
-                <div
-                  style={{
-                    gridColumn: 'span 2',
-                    minWidth: '0',
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '24px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px',
-                  }}
-                >
-                  <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>پروفایل</h3>
-                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <div
-                      style={{
-                        width: '88px',
-                        height: '88px',
-                        flexShrink: '0',
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        background: 'var(--brand-primary-subtle)',
-                        color: 'var(--brand-primary-text)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        font: "600 28px/1 'Vazirmatn',sans-serif",
-                        border: '1px solid var(--border)',
-                      }}
-                    >
-                      {v.avatarImg}
-                      {v.noPhoto ? (
-                        <>
-                          <span>{v.initials}</span>
-                        </>
-                      ) : null}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '0' }}>
-                      <span style={{ fontSize: '14px', lineHeight: '20px', fontWeight: '500' }}>عکس پروفایل</span>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <label
-                          className="hv-border-brand"
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            height: '32px',
-                            padding: '0 12px',
-                            border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius-sm)',
-                            background: 'var(--surface)',
-                            cursor: 'pointer',
-                            font: "500 13px/1 'Vazirmatn',sans-serif",
-                            color: 'var(--text-primary)',
-                          }}
-                        >
-                          <input type="file" accept="image/*" onChange={v.pickPhoto} style={{ display: 'none' }} />
-                          {v.photoBtn}
-                        </label>
-                        {v.hasPhoto ? (
-                          <>
-                            <button
-                              className="hv-danger-text"
-                              type="button"
-                              onClick={v.removePhoto}
-                              style={{
-                                height: '32px',
-                                padding: '0 10px',
-                                border: '0',
-                                background: 'none',
-                                color: 'var(--text-muted)',
-                                cursor: 'pointer',
-                                font: "500 13px/1 'Vazirmatn',sans-serif",
-                              }}
-                            >
-                              حذف
-                            </button>
-                          </>
-                        ) : null}
-                      </div>
-                      <span style={{ fontSize: '12px', lineHeight: '18px', color: 'var(--text-muted)' }}>
-                        JPG یا PNG، مربع، حداکثر ۲۰ مگابایت. در اپ ورزشکاران نمایش داده می‌شود.
-                      </span>
-                    </div>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: '16px', alignItems: 'start' }}>
-                    <TextField label="نام و نام خانوادگی" value={v.p?.name} placeholder="مثلاً علی احمدی" onChange={v.setName} />
-                    <TextField label="ایمیل" value={v.email} readOnly hint="برای تغییر ایمیل ورود با مدیر پلتفرم تماس بگیرید." />
-                    <TextField label="تلفن" value={v.p?.phone} placeholder="۰۹۱۲ ۰۰۰ ۰۰۰۰" onChange={v.setPhone} />
-                    <Select label="زبان" value="fa" options={v.langs} />
-                  </div>
-                  <TextField label="معرفی برای ورزشکاران" multiline rows={v.n2} value={v.p?.bio} placeholder="چند خط درباره سابقه و تخصص شما" onChange={v.setBio} />
-                  <div style={{ height: '1px', background: 'var(--border-subtle)' }}></div>
-                  <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>سوابق حرفه‌ای</h3>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: '16px', alignItems: 'start' }}>
-                    <TextField label="سال‌های سابقه مربیگری" value={v.p?.years} suffix="سال" placeholder="مثلاً ۹" onChange={v.setYears} />
-                    <TextField label="شهر / باشگاه" value={v.p?.city} optional placeholder="مثلاً تهران · باشگاه آرمان" onChange={v.setCity} />
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <span style={{ fontSize: '14px', lineHeight: '20px', fontWeight: '500' }}>تخصص‌ها</span>
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                      {(v.specs || []).map((c: any, $index: number) => (
-                        <Fragment key={$index}>
-                          <div onClick={c?.toggle} style={{ display: 'flex', cursor: 'pointer' }}>
-                            <Tag variant="filter" selected={c?.on}>
-                              {c?.label}
-                            </Tag>
-                          </div>
-                        </Fragment>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '14px', lineHeight: '20px', fontWeight: '500', flex: '1' }}>مدارک و گواهی‌ها</span>
-                      <label
-                        className="hv-border-brand"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          height: '32px',
-                          padding: '0 12px',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius-sm)',
-                          background: 'var(--surface)',
-                          cursor: 'pointer',
-                          font: "500 13px/1 'Vazirmatn',sans-serif",
-                          color: 'var(--text-primary)',
-                        }}
-                      >
-                        <input type="file" accept=".pdf,image/*" multiple onChange={v.pickCert} style={{ display: 'none' }} />+ افزودن مدرک
-                      </label>
-                    </div>
-                    {(v.certs || []).map((c: any, $index: number) => (
-                      <Fragment key={$index}>
-                        <div
-                          style={{
-                            display: 'flex',
-                            gap: '12px',
-                            alignItems: 'center',
-                            padding: '10px 12px',
-                            border: '1px solid var(--border-subtle)',
-                            borderRadius: 'var(--radius-sm)',
-                          }}
-                        >
-                          <span
-                            style={{
-                              width: '32px',
-                              height: '32px',
-                              flexShrink: '0',
-                              borderRadius: '8px',
-                              background: 'var(--surface-sunken)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              font: "600 10px/1 'IBM Plex Mono',monospace",
-                              color: 'var(--text-muted)',
-                            }}
-                          >
-                            {c?.ext}
-                          </span>
-                          <div style={{ display: 'flex', flexDirection: 'column', minWidth: '0', flex: '1' }}>
-                            <span style={{ fontSize: '14px', lineHeight: '22px', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {c?.name}
-                            </span>
-                            <span style={{ fontSize: '12px', lineHeight: '18px', color: 'var(--text-muted)' }}>{c?.meta}</span>
-                          </div>
-                          <button
-                            className="hv-danger-soft"
-                            type="button"
-                            onClick={c?.remove}
-                            title="حذف"
-                            style={{
-                              width: '28px',
-                              height: '28px',
-                              border: '0',
-                              borderRadius: '6px',
-                              background: 'none',
-                              color: 'var(--text-muted)',
-                              cursor: 'pointer',
-                              fontSize: '16px',
-                            }}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </Fragment>
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <span style={{ fontSize: '14px', lineHeight: '20px', fontWeight: '500' }}>
-                      {'فایل رزومه '}
-                      <span style={{ fontWeight: '400', color: 'var(--text-muted)' }}>(اختیاری)</span>
-                    </span>
-                    {v.noResume ? (
-                      <>
-                        <label
-                          className="hv-brand-soft"
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '4px',
-                            padding: '20px',
-                            border: '1.5px dashed var(--border)',
-                            borderRadius: 'var(--radius-sm)',
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                          }}
-                        >
-                          <input type="file" accept=".pdf,.doc,.docx" onChange={v.pickResume} style={{ display: 'none' }} />
-                          <span style={{ fontSize: '14px', lineHeight: '22px', fontWeight: '500' }}>برای انتخاب رزومه کلیک کنید</span>
-                          <span style={{ fontSize: '12px', lineHeight: '18px', color: 'var(--text-muted)' }}>PDF یا Word، حداکثر ۱۰ مگابایت</span>
-                        </label>
-                      </>
-                    ) : null}
-                    {v.hasResume ? (
-                      <>
-                        <div
-                          style={{
-                            display: 'flex',
-                            gap: '12px',
-                            alignItems: 'center',
-                            padding: '10px 12px',
-                            border: '1px solid var(--border-subtle)',
-                            borderRadius: 'var(--radius-sm)',
-                          }}
-                        >
-                          <span
-                            style={{
-                              width: '32px',
-                              height: '32px',
-                              flexShrink: '0',
-                              borderRadius: '8px',
-                              background: 'var(--brand-primary-subtle)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              font: "600 10px/1 'IBM Plex Mono',monospace",
-                              color: 'var(--brand-primary-text)',
-                            }}
-                          >
-                            {v.resume?.ext}
-                          </span>
-                          <div style={{ display: 'flex', flexDirection: 'column', minWidth: '0', flex: '1' }}>
-                            <span style={{ fontSize: '14px', lineHeight: '22px', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {v.resume?.name}
-                            </span>
-                            <span style={{ fontSize: '12px', lineHeight: '18px', color: 'var(--text-muted)' }}>{v.resume?.meta}</span>
-                          </div>
-                          <label
-                            className="hv-sunken"
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              height: '28px',
-                              padding: '0 10px',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              font: "500 12px/1 'Vazirmatn',sans-serif",
-                              color: 'var(--text-secondary)',
-                            }}
-                          >
-                            <input type="file" accept=".pdf,.doc,.docx" onChange={v.pickResume} style={{ display: 'none' }} />
-                            جایگزینی
-                          </label>
-                          <button
-                            className="hv-danger-soft"
-                            type="button"
-                            onClick={v.removeResume}
-                            title="حذف"
-                            style={{
-                              width: '28px',
-                              height: '28px',
-                              border: '0',
-                              borderRadius: '6px',
-                              background: 'none',
-                              color: 'var(--text-muted)',
-                              cursor: 'pointer',
-                              fontSize: '16px',
-                            }}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </>
-                    ) : null}
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: '16px', alignItems: 'start' }}>
-                    <TextField label="اینستاگرام" value={v.p?.insta} optional prefix="@" placeholder="alifitness" onChange={v.setInsta} />
-                    <TextField label="وب‌سایت" value={v.p?.site} optional placeholder="alifitness.ir" onChange={v.setSite} />
-                  </div>
-                  <Switch
-                    label="نمایش سوابق و رزومه در اپ ورزشکاران"
-                    description="ورزشکاران در صفحه «مربی من» این اطلاعات را می‌بینند."
-                    checked={v.p?.showPublic}
-                    onChange={v.setShowPublic}
-                  />
-                </div>
-              </div>
-            </>
-          ) : null}
-          {v.tNotif ? (
-            <>
-              <div
-                style={{
-                  maxWidth: '720px',
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '14px',
-                }}
-              >
-                <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>اعلان‌ها</h3>
-                {(v.notifs || []).map((n: any, $index: number) => (
-                  <Fragment key={$index}>
-                    <Switch label={n?.label} description={n?.desc} checked={n?.on} onChange={n?.toggle} />
-                  </Fragment>
-                ))}
-              </div>
-            </>
+            <div
+              style={{
+                maxWidth: '560px',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-md)',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
+              <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>پروفایل</h3>
+              <TextField label="نام و نام خانوادگی" value={v.p?.name} placeholder="مثلاً علی احمدی" onChange={v.setName} />
+              <TextField label="شماره موبایل" value={v.p?.phone} dir="ltr" placeholder="۰۹۱۲ ۰۰۰ ۰۰۰۰" onChange={v.setPhone} />
+            </div>
           ) : null}
           {v.tUnits ? (
             <>
@@ -895,62 +580,6 @@ class CoachSettings extends Screen {
               </div>
             </>
           ) : null}
-          {v.tMeasure ? (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: '16px', alignItems: 'start' }}>
-                <div
-                  style={{
-                    gridColumn: 'span 2',
-                    minWidth: '0',
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '24px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px',
-                  }}
-                >
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>زمان‌بندی پیش‌فرض اندازه‌گیری بدن</h3>
-                    <span style={{ fontSize: '13px', lineHeight: '20px', color: 'var(--text-muted)' }}>
-                      برای ورزشکاران جدید اعمال می‌شود. برای هر ورزشکار در صفحه ترکیب بدن قابل تغییر است.
-                    </span>
-                  </div>
-                  <RadioGroup label="تناوب" value={v.m?.freq} options={v.freqOpts} onChange={v.setFreq} />
-                  {v.isCustom ? (
-                    <>
-                      <div style={{ maxWidth: '220px' }}>
-                        <NumberStepper label="هر چند هفته یک‌بار" value={v.m?.n} min={2} max={12} unit="هفته" onChange={v.setN} />
-                      </div>
-                    </>
-                  ) : null}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: '12px' }}>
-                    <Select label="روز اندازه‌گیری" value={v.m?.day} options={v.dayOpts} onChange={v.setDay} />
-                    <Select label="یادآوری در اپ ورزشکار" value={v.m?.remind} options={v.remindOpts} onChange={v.setRemind} />
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <span style={{ fontSize: '14px', lineHeight: '20px', fontWeight: '500' }}>شاخص‌های اجباری</span>
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                      {(v.reqChips || []).map((c: any, $index: number) => (
-                        <Fragment key={$index}>
-                          <div onClick={c?.toggle} style={{ display: 'flex', cursor: 'pointer' }}>
-                            <Tag variant="filter" selected={c?.on}>
-                              {c?.label}
-                            </Tag>
-                          </div>
-                        </Fragment>
-                      ))}
-                    </div>
-                  </div>
-                  <Checkbox label="اعمال روی ورزشکاران فعلی هم" description={v.applyDesc} checked={v.m?.applyAll} onChange={v.setApplyAll} />
-                </div>
-                <Card title="خلاصه">
-                  <p style={{ margin: '0', fontSize: '14px', lineHeight: '24px', color: 'var(--text-secondary)', textWrap: 'pretty' }}>{v.measureSummary}</p>
-                </Card>
-              </div>
-            </>
-          ) : null}
           {v.tSecurity ? (
             <>
               <div
@@ -968,10 +597,13 @@ class CoachSettings extends Screen {
                 <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>امنیت</h3>
                 <DescriptionList columns={v.n1} items={v.secItems} />
                 <TwoFactorPanel />
+                <div style={{ height: '1px', background: 'var(--border-subtle)' }}></div>
+                <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>تغییر نام کاربری</h4>
+                <ChangeUsernameForm />
+                <div style={{ height: '1px', background: 'var(--border-subtle)' }}></div>
+                <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>تغییر رمز عبور</h4>
+                <ChangePasswordForm />
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <Button variant="secondary" icon="key" onClick={v.changePw}>
-                    تغییر رمز عبور
-                  </Button>
                   <Button variant="ghost" icon="log-out" onClick={v.signOut}>
                     خروج از حساب
                   </Button>

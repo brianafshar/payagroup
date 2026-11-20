@@ -226,7 +226,7 @@ class AthleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Athlete
         fields = [
-            "id", "coach_id", "coach_name", "user_id", "name", "email", "phone", "status", "goal", "gender", "birth_date",
+            "id", "coach_id", "coach_name", "user_id", "name", "phone", "status", "goal", "gender", "birth_date",
             "sport", "height_cm", "program_id", "program_name", "program_week", "customized", "stats", "last_active_at", "created_at",
             "goal_weight_kg", "measure_schedule", "max_hr", "key_lifts",
         ]  # fmt: skip
@@ -252,9 +252,6 @@ class AthleteSerializer(serializers.ModelSerializer):
     def get_stats(self, a) -> dict:
         return stats.athlete_stats(a)
 
-    def validate_email(self, value):
-        return value.lower()
-
     def validate_measure_schedule(self, value):
         if value is None:
             return None
@@ -269,30 +266,24 @@ class AthleteSerializer(serializers.ModelSerializer):
         return digits
 
 
-class InviteModeField(serializers.ChoiceField):
-    """`"email"` · `"link"` · `false`/`"none"` (save as draft)."""
-
-    def __init__(self, **kwargs):
-        super().__init__(choices=["email", "link", "none"], **kwargs)
-
-    def to_internal_value(self, data):
-        return "none" if data in (False, None, "") else super().to_internal_value(data)
-
-
 class AthleteCreateSerializer(AthleteSerializer):
-    """C13 Add athlete. `invite`: `email` sends the invite · `link` returns it for copying · `false` saves a draft."""
+    """C13 Add athlete: name + mobile number (required — the SMS goes there). No e-mail, no invite: the account is
+    active from the start."""
 
-    invite = InviteModeField(default="none", write_only=True)
+    phone = serializers.CharField(max_length=20)
 
-    class Meta(AthleteSerializer.Meta):
-        fields = [*AthleteSerializer.Meta.fields, "invite"]
-
-    def validate(self, attrs):
-        if attrs.get("invite") != "none" and not attrs.get("email"):
-            raise serializers.ValidationError({"email": "Email is required to invite."})
-        if attrs.get("email") and User.objects.filter(email=attrs["email"]).exclude(role="athlete").exists():
-            raise serializers.ValidationError({"email": "Email already in use."}, code="conflict")
-        return attrs
+    def validate_phone(self, value):
+        value = super().validate_phone(value)
+        if not value:
+            raise serializers.ValidationError("Mobile number is required.", code="required")
+        user = self.context["request"].user
+        coach = getattr(user, "coach", None) if getattr(user, "role", "") == "coach" else None
+        taken = Athlete.objects.filter(phone=value)
+        if coach:
+            taken = taken.filter(coach__in=coach.gym_ids())
+        if taken.exists():
+            raise serializers.ValidationError("This number is already registered.", code="conflict")
+        return value
 
 
 class HealthProfileSerializer(serializers.ModelSerializer):

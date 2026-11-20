@@ -1,8 +1,8 @@
 // Ported from design handoff: project/C13 Coach Create Athlete.dc.html
-import { Button, Checkbox, PageHeader, Select, SensitiveSection, Sidebar, TextField, TopBar } from '@/ds';
+import { Button, PageHeader, Select, SensitiveSection, Sidebar, TextField, TopBar } from '@/ds';
 import { SPORTS } from '@/data/exercises';
 import { PanelLayout } from '@/app/PanelLayout';
-import { go, href } from '@/lib/nav';
+import { go } from '@/lib/nav';
 import { api, faError } from '@/data/api';
 import { EX_CATS, EX_EQUIP } from '@/data/exercises';
 import { pending } from '@/app/pending';
@@ -38,7 +38,6 @@ function saturdays(): Array<{ value: string; label: string }> {
 export class CoachCreateAthlete extends Screen {
   state: ScreenState = {
     name: '',
-    email: '',
     phone: '',
     gender: null,
     goal: null,
@@ -52,12 +51,13 @@ export class CoachCreateAthlete extends Screen {
     savedId: null,
   };
   renderVals() {
-    const { name, email, program, start, tried, saving, picked, exQ, customName } = this.state;
+    const { name, phone, program, start, tried, saving, picked, exQ, customName } = this.state;
     const fa = (n) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
     const lib = this.props.exercises.map((e) => ({ id: e.id, name: e.name, meta: [EX_CATS[e.cat] || e.cat, EX_EQUIP[e.equip] || e.equip].filter(Boolean).join(' · ') }));
     const togglePick = (id) => this.setState((st) => ({ picked: st.picked.includes(id) ? st.picked.filter((x) => x !== id) : [...st.picked, id] }));
     const shown = lib.filter((e) => !exQ.trim() || (e.name + ' ' + e.meta).includes(exQ.trim()));
-    const bad = { name: !name.trim(), email: !/^\S+@\S+\.\S+$/.test(email) };
+    const digits = phone.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/\s/g, '');
+    const bad = { name: !name.trim(), phone: !/^09\d{9}$/.test(digits) };
     const first = name.trim().split(/\s+/)[0] || 'ورزشکار';
     const programs = [
       { value: 'custom', label: 'برنامه شخصی — ساخت در برنامه‌ساز' },
@@ -66,35 +66,35 @@ export class CoachCreateAthlete extends Screen {
     const starts = saturdays();
     const prog = programs.find((p) => p.value === program);
     const st = starts.find((s) => s.value === start);
-    /** Saves the athlete (optionally inviting by email) and returns to the list. */
-    const submit = async (invite: boolean) => {
-      if (bad.name || (invite && bad.email)) return this.setState({ tried: true });
-      this.setState({ saving: invite ? 'invite' : 'save' });
-      const { phone, gender, goal, savedId } = this.state;
-      // Already saved as "invited" by copying the invite link — don't create a duplicate.
-      if (!savedId)
-        try {
-          await api.athletes.create({
-            name: name.trim(),
-            email: email.trim() || undefined,
-            phone: phone.trim() || undefined,
-            gender: (gender as Gender) || undefined,
-            goal: (goal as Goal) || undefined,
-            sport: this.state.sport || 'fitness',
-            programId: program && program !== 'custom' ? program : undefined,
-            startDate: start,
-            invite: invite ? 'email' : false,
-          });
-        } catch (e) {
-          this.setState({ saving: false });
-          return toast('ذخیره نشد', faError(e), 'error');
-        }
-      go(
-        'coach:athletes',
-        invite
-          ? { title: 'دعوت‌نامه ارسال شد', desc: name.trim() + ' به ' + this.props.appName + ' دعوت شد.' }
-          : { title: 'ورزشکار ذخیره شد', desc: name.trim() + ' بدون دعوت اضافه شد. هر زمان می‌توانید دعوت بفرستید.' },
-      );
+    /** Saves the athlete (active at once) — the server texts them «your account was created», and the program link when one is chosen. */
+    const submit = async () => {
+      if (bad.name || bad.phone) return this.setState({ tried: true });
+      this.setState({ saving: 'save' });
+      const { gender, goal } = this.state;
+      let sms: string | undefined;
+      try {
+        const a = await api.athletes.create({
+          name: name.trim(),
+          phone: digits,
+          gender: (gender as Gender) || undefined,
+          goal: (goal as Goal) || undefined,
+          sport: this.state.sport || 'fitness',
+          programId: program && program !== 'custom' ? program : undefined,
+          startDate: start,
+        });
+        sms = a.smsStatus;
+      } catch (e) {
+        this.setState({ saving: false });
+        return toast('ذخیره نشد', faError(e), 'error');
+      }
+      go('coach:athletes', {
+        title: 'ورزشکار اضافه شد',
+        desc:
+          name.trim() +
+          (sms === 'sent'
+            ? ' اضافه شد و پیامک حساب برایش رفت.'
+            : ' اضافه شد، اما پیامک ارسال نشد' + (sms === 'not_configured' ? ' (سرویس پیامک تنظیم نشده است).' : '.')),
+      });
     };
     return {
       brand: this.props.brand ?? 'brand',
@@ -102,9 +102,8 @@ export class CoachCreateAthlete extends Screen {
       crumbs: [{ label: 'ورزشکاران', to: 'coach:athletes' }, 'افزودن ورزشکار'],
       appName: this.props.appName,
       setName: (v) => this.setState({ name: v }),
-      setEmail: (v) => this.setState({ email: v }),
       nameErr: tried && bad.name ? 'نام ورزشکار را وارد کنید.' : undefined,
-      emailErr: tried && bad.email ? 'برای ارسال دعوت، یک ایمیل معتبر وارد کنید.' : undefined,
+      phoneErr: tried && bad.phone ? 'شماره موبایل را به‌صورت ۰۹۱۲۱۲۳۴۵۶۷ وارد کنید.' : undefined,
       genders: [
         { value: 'f', label: 'زن' },
         { value: 'm', label: 'مرد' },
@@ -164,51 +163,8 @@ export class CoachCreateAthlete extends Screen {
           : prog
             ? first + ' نسخه اختصاصی خودش را از «' + prog.label + '» می‌گیرد. تغییر آن هرگز روی قالب یا ورزشکاران دیگر اثر ندارد.'
             : 'می‌توانید برنامه را بعداً از پروفایل ورزشکار اختصاص دهید.',
-      invitePreview:
-        panelUser({ name: 'مربی‌تان', role: '' }).name +
-        ' شما را به ' +
-        this.props.appName +
-        ' دعوت کرده است. اپ را نصب کنید و با ' +
-        (email.trim() || 'ایمیل خود') +
-        ' وارد شوید' +
-        (prog ? ' تا ' + (program === 'custom' ? '«' + (customName.trim() || 'برنامه اختصاصی شما') + '»' : 'برنامه‌تان') + ' را از ' + st.label + ' ببینید.' : '.'),
-      savingInvite: saving === 'invite',
       savingOnly: saving === 'save',
-      inviteHref: href('m:invite'),
-      saveOnly: () => submit(false),
-      saveInvite: () => submit(true),
-      inviteUrl: this.state.liveUrl || 'لینک پس از «کپی لینک» ساخته می‌شود',
-      copyLabel: this.state.copied ? 'کپی شد' : 'کپی لینک',
-      copyIcon: this.state.copied ? 'check' : 'copy',
-      copyInvite: async () => {
-        if (bad.name) return this.setState({ tried: true });
-        {
-          if (bad.email) return this.setState({ tried: true });
-          try {
-            let url: string | null | undefined;
-            if (!this.state.savedId) {
-              const a = await api.athletes.create({
-                name: name.trim(),
-                email: email.trim(),
-                sport: this.state.sport || 'fitness',
-                programId: program && program !== 'custom' ? program : undefined,
-                startDate: start,
-                invite: 'link',
-              } as Parameters<typeof api.athletes.create>[0]);
-              url = (a as { inviteLink?: { url: string | null } }).inviteLink?.url;
-              this.setState({ savedId: a.id });
-            } else url = (await api.auth.inviteLink({ kind: 'athlete', id: this.state.savedId }, { send: false })).url;
-            if (url) {
-              this.setState({ liveUrl: url });
-              navigator.clipboard?.writeText(url).catch(() => {});
-            }
-          } catch (e) {
-            return toast('لینک ساخته نشد', faError(e), 'error');
-          }
-          this.setState({ copied: true });
-          return toast('لینک دعوت کپی شد', name.trim() + ' در حالت «دعوت‌شده» ذخیره شد. لینک را مستقیم برای ورزشکار بفرستید.');
-        }
-      },
+      save: submit,
     };
   }
 
@@ -221,7 +177,7 @@ export class CoachCreateAthlete extends Screen {
         topBar={<TopBar breadcrumbs={v.crumbs} unread search />}
       >
         <div style={{ flex: '1 1 auto', padding: '24px 32px 48px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <PageHeader title="افزودن ورزشکار" subtitle={'یک دعوت‌نامه برای اپ ' + v.appName + ' دریافت می‌کند.'} back="ورزشکاران" backTo="coach:athletes" />
+          <PageHeader title="افزودن ورزشکار" subtitle={'با پیامک، حساب و برنامه‌اش را در ' + v.appName + ' دریافت می‌کند.'} back="ورزشکاران" backTo="coach:athletes" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: '16px', alignItems: 'start' }}>
             <div style={{ gridColumn: 'span 2', minWidth: '0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div
@@ -239,8 +195,7 @@ export class CoachCreateAthlete extends Screen {
                 <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>حساب</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: '16px', alignItems: 'start' }}>
                   <TextField label="نام و نام خانوادگی" placeholder="مثلاً ساناز احمدی" onChange={v.setName} error={v.nameErr} />
-                  <TextField label="ایمیل" placeholder="name@example.com" hint="دعوت‌نامه به این آدرس ارسال می‌شود." onChange={v.setEmail} error={v.emailErr} />
-                  <TextField label="تلفن" optional placeholder="۰۹۱۲ ..." dir="ltr" inputMode="tel" onChange={v.setPhone} />
+                  <TextField label="شماره موبایل" placeholder="۰۹۱۲ ..." hint="پیامک حساب و برنامه به این شماره می‌رود." dir="ltr" inputMode="tel" onChange={v.setPhone} error={v.phoneErr} />
                 </div>
               </div>
               <div
@@ -273,22 +228,14 @@ export class CoachCreateAthlete extends Screen {
                     <TextField label="حساسیت‌ها" optional placeholder="مثلاً لاکتوز" />
                     <TextField label="محدودیت‌های جسمی" optional placeholder="مثلاً پرهیز از پرش" />
                   </div>
-                  <Checkbox
-                    label="از ورزشکار بخواهید پروفایل سلامت را در اپ کامل کند"
-                    description="توصیه می‌شود. ورزشکار جزئیات را به‌صورت خصوصی اضافه می‌کند؛ پس از ذخیره شما هم می‌بینید."
-                    checked
-                  />
                 </div>
               </SensitiveSection>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
                 <Button variant="ghost" to="coach:athletes">
                   انصراف
                 </Button>
-                <Button variant="secondary" loading={v.savingOnly} onClick={v.saveOnly}>
-                  ذخیره بدون دعوت
-                </Button>
-                <Button variant="primary" icon="send" loading={v.savingInvite} onClick={v.saveInvite}>
-                  ذخیره و ارسال دعوت
+                <Button variant="primary" icon="send" loading={v.savingOnly} onClick={v.save}>
+                  ذخیره و ارسال پیامک
                 </Button>
               </div>
             </div>
@@ -309,64 +256,6 @@ export class CoachCreateAthlete extends Screen {
                 <Select label="برنامه" optional placeholder="بدون برنامه" options={v.programs} onChange={v.setProgram} />
                 <Select label="تاریخ شروع" value={v.startValue} options={v.starts} onChange={v.setStart} />
                 <p style={{ margin: '0', fontSize: '12px', lineHeight: '18px', color: 'var(--text-muted)', textWrap: 'pretty' }}>{v.copyNote}</p>
-              </div>
-              <div
-                style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '20px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px',
-                  minWidth: '0',
-                }}
-              >
-                <h3 style={{ margin: '0', fontSize: '16px', lineHeight: '24px', fontWeight: '600' }}>پیش‌نمایش دعوت‌نامه</h3>
-                <p style={{ margin: '0', fontSize: '14px', lineHeight: '24px', color: 'var(--text-secondary)', textWrap: 'pretty' }}>{v.invitePreview}</p>
-                <p style={{ margin: '0', fontSize: '12px', lineHeight: '18px', color: 'var(--text-muted)' }}>
-                  {'ارسال از '}
-                  <span dir="ltr" style={{ fontFamily: 'var(--font-mono)' }}>
-                    no-reply@indow.ir
-                  </span>
-                </p>
-                <div style={{ height: '1px', background: 'var(--border)' }}></div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', lineHeight: '20px', fontWeight: '500' }}>یا لینک را خودتان بفرستید</span>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <div
-                      dir="ltr"
-                      style={{
-                        flex: '1',
-                        minWidth: '0',
-                        height: '36px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '0 10px',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius-sm)',
-                        background: 'var(--surface-sunken)',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '12px',
-                        color: 'var(--text-secondary)',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {v.inviteUrl}
-                    </div>
-                    <Button variant="secondary" size="sm" icon={v.copyIcon} onClick={v.copyInvite}>
-                      {v.copyLabel}
-                    </Button>
-                  </div>
-                  <span style={{ fontSize: '12px', lineHeight: '18px', color: 'var(--text-muted)' }}>
-                    مثلاً در واتس‌اپ یا تلگرام. لینک ۷ روز و یک بار معتبر است و با کپی، ورزشکار در حالت «دعوت‌شده» ذخیره می‌شود.
-                  </span>
-                </div>
-                <a href={v.inviteHref} style={{ fontSize: '13px', lineHeight: '20px', fontWeight: '500' }}>
-                  دیدن تجربه شاگرد از دعوت
-                </a>
               </div>
             </div>
           </div>

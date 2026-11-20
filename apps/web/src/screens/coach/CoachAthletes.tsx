@@ -60,21 +60,9 @@ export default function CoachAthletesPage(props: { brand?: string }) {
       toast('انجام نشد', faError(e), 'error');
     }
   };
-  /** Invite by email; a draft without an email first gets one (`email` from the prompt). */
-  const resend = async (r: { id: string; a: { name: string } }, email?: string) => {
-    try {
-      if (email) await api.athletes.update(r.id, { email });
-      await api.auth.inviteLink({ kind: 'athlete', id: r.id }, { send: true });
-      toast('دعوت‌نامه ارسال شد', 'ایمیل دعوت برای ' + r.a.name + ' فرستاده شد.');
-      athletes.refetch();
-    } catch (e) {
-      toast('ارسال نشد', faError(e), 'error');
-    }
-  };
   return (
     <CoachAthletes
       {...props}
-      resend={resend}
       setStatus={setStatus}
       athletes={athletes.data}
       programs={programs.data}
@@ -112,7 +100,6 @@ class CoachAthletes extends Screen {
       ['all', 'همه'],
       ['attn', 'نیازمند توجه'],
       ['active', 'فعال'],
-      ['invited', 'دعوت‌شده'],
       ['paused', 'متوقف'],
     ];
     return {
@@ -158,25 +145,12 @@ class CoachAthletes extends Screen {
       rows: rows.map((r) => ({
         ...r,
         x: '',
-        to: r.s === 'invited' ? undefined : 'coach:athlete?id=' + r.id,
+        to: 'coach:athlete?id=' + r.id,
         progName: r.p ? r.p.label : 'بدون برنامه',
-        progSub: r.p ? r.p.sub : 'هنوز وارد نشده',
+        progSub: r.p ? r.p.sub : '',
         adhLabel: r.adh == null ? '—' : '٪' + fa(r.adh),
-        actions:
-          r.s === 'invited' || r.s === 'draft'
-            ? [
-                {
-                  icon: 'send',
-                  label: r.s === 'draft' ? 'ارسال دعوت‌نامه' : 'ارسال دوباره دعوت‌نامه',
-                  // No email yet (saved as a draft without one): ask for it first (#49).
-                  onClick: () => (r.email ? void this.props.resend(r) : this.setState({ ask: r, askEmail: '', askTried: false })),
-                },
-                { divider: true },
-                { icon: 'trash', label: 'حذف ورزشکار', destructive: true, onClick: () => void deleteAthlete({ id: r.id, name: r.a.name }) },
-              ]
-            : [
+        actions: [
                 { icon: 'user', label: 'مشاهده پروفایل', onClick: () => go('coach:athlete?id=' + r.id) },
-                { icon: 'chat', label: 'گفتگو', onClick: () => go('coach:chat?a=' + r.id) },
                 { icon: 'clipboard', label: r.p ? 'برنامه‌ها' : 'اختصاص برنامه', onClick: () => go('coach:programs') },
                 { icon: 'calendar', label: 'سابقه تمرین', onClick: () => go('coach:history?id=' + r.id) },
                 { icon: 'utensils', label: 'برنامه تغذیه', onClick: () => go('coach:nutrition?id=' + r.id) },
@@ -188,8 +162,8 @@ class CoachAthletes extends Screen {
                   : { icon: 'check-circle', label: 'فعال‌سازی دوباره', onClick: () => void this.props.setStatus(r, 'active') },
                 ...(r.s !== 'inactive' ? [{ icon: 'x', label: 'غیرفعال کردن', destructive: true, onClick: () => void this.props.setStatus(r, 'inactive') }] : []),
                 { icon: 'trash', label: 'حذف ورزشکار', destructive: true, onClick: () => void deleteAthlete({ id: r.id, name: r.a.name }) },
-              ],
-        open: () => (r.s === 'invited' ? toast('ورزشکار هنوز وارد نشده', 'بعد از پذیرش دعوت، پروفایل در دسترس خواهد بود.') : go('coach:athlete?id=' + r.id)),
+        ],
+        open: () => go('coach:athlete?id=' + r.id),
       })),
       pagination: {
         label: total ? fa(pg * PAGE + 1) + '–' + fa(Math.min(total, pg * PAGE + PAGE)) + ' از ' + fa(total) : fa(0) + ' مورد',
@@ -208,33 +182,6 @@ class CoachAthletes extends Screen {
         theme={v.brand}
         sidebar={<Sidebar app="coach" active="athletes" brandSub="فضای کاری مربی" user={v.user} />}
         topBar={<TopBar breadcrumbs={v.crumbs} unread search />}
-        overlays={
-          this.state.ask ? (
-            <Modal
-              title={'ارسال دعوت‌نامه · ' + this.state.ask.a.name}
-              description="برای این ورزشکار ایمیلی ثبت نشده است. ایمیلش را وارد کنید تا ذخیره و لینک دعوت برایش فرستاده شود."
-              primaryLabel="ذخیره و ارسال"
-              secondaryLabel="انصراف"
-              onPrimary={() => {
-                const e = (this.state.askEmail || '').trim();
-                if (!/^\S+@\S+\.\S+$/.test(e)) return this.setState({ askTried: true });
-                const who = this.state.ask;
-                this.setState({ ask: null });
-                void this.props.resend(who, e);
-              }}
-              onClose={() => this.setState({ ask: null })}
-            >
-              <TextField
-                label="ایمیل"
-                dir="ltr"
-                placeholder="name@example.com"
-                value={this.state.askEmail}
-                onChange={(val) => this.setState({ askEmail: val })}
-                error={this.state.askTried ? 'یک ایمیل معتبر وارد کنید.' : undefined}
-              />
-            </Modal>
-          ) : null
-        }
       >
         <div style={{ flex: '1 1 auto', padding: '24px 32px 48px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <PageHeader title="ورزشکاران" subtitle={v.subtitle}>

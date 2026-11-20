@@ -130,6 +130,23 @@ interface TokenResponse extends Tokens {
 
 export type LoginResult = { ok: true; user: SessionUser } | { ok: false; mfaToken: string };
 
+const LAST_USER = 'bl:last-username';
+function rememberUsername(name: string): void {
+  try {
+    name ? localStorage.setItem(LAST_USER, name) : localStorage.removeItem(LAST_USER);
+  } catch {
+    /* ignore */
+  }
+}
+/** Username typed at the last «remember me» sign-in (the password itself is never stored). */
+export function lastUsername(): string {
+  try {
+    return localStorage.getItem(LAST_USER) ?? '';
+  } catch {
+    return '';
+  }
+}
+
 /** Password step. With two-factor on, returns `mfaToken` for `verifyMfa`. */
 export async function login(email: string, password: string, role: Role, keep = true): Promise<LoginResult> {
   const r = await http.post<TokenResponse | { mfaRequired: true; mfaToken: string }>('/auth/login/', { username: email.trim(), password, role }, { anonymous: true });
@@ -138,6 +155,7 @@ export async function login(email: string, password: string, role: Role, keep = 
     return { ok: false, mfaToken: r.mfaToken };
   }
   remember = keep;
+  rememberUsername(keep ? email.trim() : '');
   signIn(r);
   return { ok: true, user: r.user };
 }

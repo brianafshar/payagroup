@@ -69,3 +69,15 @@ def test_team_coach_signs_in_with_username_only():
     client(head.user).post("/api/coach/team/", {"name": "N", "username": "new_coach", "password": "longpass123"}, format="json")
     r = APIClient().post("/api/auth/login/", {"username": "new_coach", "password": "longpass123", "role": "coach"}, format="json")
     assert r.status_code == 200 and r.json()["user"]["username"] == "new_coach"
+
+
+def test_coach_changes_own_username():
+    head = make_coach("h@x.io", is_head=True)
+    other = make_coach("taken", head=head)
+    c = client(head.user)
+    assert c.post("/api/auth/username/", {"username": "new_name", "currentPassword": "wrong"}, format="json").status_code == 400
+    assert c.post("/api/auth/username/", {"username": other.user.username, "currentPassword": "pw-12345678"}, format="json").status_code == 400
+    r = c.post("/api/auth/username/", {"username": "New_Name", "currentPassword": "pw-12345678"}, format="json")
+    assert r.status_code == 200 and r.json()["username"] == "new_name"
+    login = APIClient().post("/api/auth/login/", {"username": "new_name", "password": "pw-12345678", "role": "coach"}, format="json")
+    assert login.status_code == 200

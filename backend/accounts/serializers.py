@@ -166,6 +166,23 @@ class ChangePasswordSerializer(serializers.Serializer):
         return attrs
 
 
+class ChangeUsernameSerializer(serializers.Serializer):
+    username = serializers.RegexField(r"^[A-Za-z0-9_.-]{3,40}$", help_text="Sign-in name: letters, digits, _ . -")
+    current_password = serializers.CharField(write_only=True, trim_whitespace=False)
+
+    def validate_username(self, value):
+        value = value.lower()
+        user = self.context["request"].user
+        if User.objects.filter(username=value).exclude(pk=user.pk).exists():
+            raise serializers.ValidationError("Username already in use.", code="conflict")
+        return value
+
+    def validate(self, attrs):
+        if not self.context["request"].user.check_password(attrs["current_password"]):
+            raise serializers.ValidationError({"current_password": "Current password is incorrect."})
+        return attrs
+
+
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 

@@ -58,7 +58,7 @@ class CoachDashboard extends Screen {
         : null,
       metrics: {
         total: faDigits(d.athletes.total),
-        totalCap: d.athletes.invited ? faDigits(d.athletes.invited) + ' دعوت در انتظار' : d.athletes.cap ? 'از سقف ' + faDigits(d.athletes.cap) : 'بدون دعوت در انتظار',
+        totalCap: d.athletes.cap ? 'از سقف ' + faDigits(d.athletes.cap) : '',
         active: faDigits(d.athletes.trained7d),
         today: faDigits(t.completed + t.partial),
         todayOf: '/ ' + faDigits(t.scheduled),
@@ -108,14 +108,6 @@ class CoachDashboard extends Screen {
       attn,
       noAttn: attn.length === 0,
       attnSub: faDigits(attn.length) + ' ورزشکار · به ترتیب فوریت',
-      resendTo: async (inv) => {
-        try {
-          await api.auth.inviteLink({ kind: 'athlete', id: String(inv.athleteId) }, { send: true });
-          toast('دعوت‌نامه دوباره ارسال شد', 'ایمیل دعوت برای ' + inv.name + ' فرستاده شد.');
-        } catch (e) {
-          toast('ارسال نشد', faError(e), 'error');
-        }
-      },
       breakdown: L.breakdown,
     };
   }
@@ -192,18 +184,7 @@ class CoachDashboard extends Screen {
                         to={'coach:athlete?id=' + e.athleteId}
                       />
                     ))}
-                    {v.L.invites.map((i) => (
-                      <ListRow
-                        key={'i' + i.athleteId}
-                        icon="mail"
-                        title={i.name}
-                        subtitle={i.invitedAt ? faLastSeen(i.invitedAt, new Date(), false) + ' دعوت شد · هنوز وارد نشده' : 'هنوز دعوت نشده'}
-                        badge="ارسال مجدد"
-                        badgeTone="neutral"
-                        onClick={() => v.resendTo(i)}
-                      />
-                    ))}
-                    {!v.L.ending.length && !v.L.invites.length ? <ListRow icon="check" title="موردی پیش رو نیست" chevron={false} /> : null}
+                    {!v.L.ending.length ? <ListRow icon="check" title="موردی پیش رو نیست" chevron={false} /> : null}
                   </>
                 </div>
               </Card>

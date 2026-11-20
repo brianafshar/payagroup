@@ -58,7 +58,6 @@ class CoachAssignProgram extends Screen {
     const { sel, q, together, mode, custom, fromWeek, notify, saving } = this.state;
     const start = mode === 'today' ? isoOf(new Date()) : mode === 'sat' ? nextSaturday() : custom;
     const ATH = this.props.athletes
-      .filter((a) => a.userId || a.status === 'invited' || a.status === 'draft')
       .map((a) => ({
         id: a.id,
         name: a.name,

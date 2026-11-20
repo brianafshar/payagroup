@@ -21,18 +21,19 @@ def test_athlete_cap(api, coach):
     coach.athlete_cap = 1
     coach.save()
     api.as_user(coach.user)
-    assert api.post("/api/athletes/", {"name": "یک"}).status_code == 201
-    r = api.post("/api/athletes/", {"name": "دو"})
+    assert api.post("/api/athletes/", {"name": "یک", "phone": "09120000001"}).status_code == 201
+    r = api.post("/api/athletes/", {"name": "دو", "phone": "09120000002"})
     assert r.status_code == 400 and r.data["code"] == "cap_reached"
 
 
 def test_add_athlete_validation(api, coach):
     api.as_user(coach.user)
-    assert api.post("/api/athletes/", {"name": "x", "invite": "email"}).status_code == 400  # email required
+    assert api.post("/api/athletes/", {"name": "x"}).status_code == 400  # phone required
     assert api.post("/api/athletes/", {"name": "x", "phone": "123"}).status_code == 400
-    r = api.post("/api/athletes/", {"name": "x", "email": "X@Example.com", "invite": False, "goal": "gain"})
-    assert r.status_code == 201 and r.json()["status"] == "draft" and r.json()["email"] == "x@example.com"
+    r = api.post("/api/athletes/", {"name": "x", "phone": "09121112233", "goal": "gain"})
+    assert r.status_code == 201 and r.json()["status"] == "active"
     assert r.json()["stats"] == {"adherencePct": None, "strengthChangePct": None}
+    assert api.post("/api/athletes/", {"name": "y", "phone": "09121112233"}).status_code == 400  # duplicate number
 
 
 def test_health_is_coach_only_and_audited(api, coach, athlete):

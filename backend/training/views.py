@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from coaching.models import Athlete, program_week_of
+from core import notify
 from core.permissions import CoachWritesAthleteReads, IsAthlete, IsCoach, IsCoachOrAthlete, is_athlete, is_coach
 from core.scoping import AthleteScopedMixin
 
@@ -155,7 +156,8 @@ class ProgramViewSet(viewsets.ModelViewSet):
         if len(athletes) != len(ids):
             raise ValidationError({"athlete_ids": "Unknown athletes."})
         copies = services.assign(program, athletes, s.validated_data.get("start_date") or timezone.localdate(), replace=s.validated_data["replace"])
-        return Response(ProgramListSerializer(copies, many=True, context={"request": request}).data, status=status.HTTP_201_CREATED)
+        sms_status = {a.pk: notify.send_program_assigned(a, sent_by=request.user, base_url=request.build_absolute_uri("/")) for a in athletes}
+        return Response(ProgramListSerializer(copies, many=True, context={"request": request}).data, status=status.HTTP_201_CREATED, headers={"X-SMS-Sent": str(sum(v == "sent" for v in sms_status.values()))})
 
     @extend_schema(request=ActivateSerializer, responses=ProgramSerializer)
     @action(detail=True, methods=["post"])
@@ -169,7 +171,9 @@ class ProgramViewSet(viewsets.ModelViewSet):
         s.is_valid(raise_exception=True)
         services.activate(program, s.validated_data.get("start_date") or timezone.localdate(), replace=s.validated_data["replace"])
         program.refresh_from_db()
-        return Response(ProgramSerializer(program, context={"request": request}).data)
+        data = ProgramSerializer(program, context={"request": request}).data
+        data["sms_status"] = notify.send_program_assigned(program.athlete, sent_by=request.user, base_url=request.build_absolute_uri("/"))
+        return Response(data)
 
     @extend_schema(request=None, responses=ProgramSerializer)
     @action(detail=True, methods=["post"])

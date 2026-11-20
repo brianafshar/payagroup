@@ -19,15 +19,27 @@ function serverCommand() {
   return { cmd: process.env.PYTHON || 'python', args: [path.join(root, 'backend', 'desktop_entry.py')], env: { PAYA_WEB_DIR: path.join(root, 'apps', 'web', 'dist') } };
 }
 
-function freePort() {
+// Preferred port stays the same on every launch: the web app keeps its sign-in and «first-visit guide» flag in
+// localStorage, which the browser scopes to the origin (host + port). A random port each start wiped both.
+const PREFERRED_PORT = 48765;
+
+function tryListen(port) {
   return new Promise((resolve, reject) => {
     const s = net.createServer();
-    s.listen(0, '127.0.0.1', () => {
-      const { port } = s.address();
-      s.close(() => resolve(port));
+    s.once('error', reject);
+    s.listen(port, '127.0.0.1', () => {
+      const { port: p } = s.address();
+      s.close(() => resolve(p));
     });
-    s.on('error', reject);
   });
+}
+
+async function freePort() {
+  try {
+    return await tryListen(PREFERRED_PORT);
+  } catch {
+    return tryListen(0); // taken by something else: fall back (sign-in will not persist this once)
+  }
 }
 
 function waitUntilUp(port, timeoutMs = 180000) {

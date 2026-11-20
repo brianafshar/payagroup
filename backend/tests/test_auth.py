@@ -5,7 +5,6 @@ import pytest
 from django.core import mail
 from django.utils import timezone
 
-from accounts.models import Invite, User
 from core.models import AuditEvent
 
 from .conftest import PASSWORD
@@ -72,35 +71,12 @@ def test_own_password_change_returns_fresh_tokens(api, athlete):
     assert api.get("/api/auth/me/").status_code == 200
 
 
-def test_athlete_invite_flow(api, coach):
+def test_athlete_is_active_on_creation_without_email(api, coach):
     api.as_user(coach.user)
-    r = api.post("/api/athletes/", {"name": "نیما کاظمی", "email": "nima@example.com", "invite": "link"})
+    r = api.post("/api/athletes/", {"name": "نیما کاظمی", "phone": "09121234567"})
     assert r.status_code == 201, r.data
     body = r.json()
-    assert body["status"] == "invited" and body["inviteLink"]["url"]
-    token = link_token(body["inviteLink"]["url"])
-    assert AuditEvent.objects.filter(action="invite.copy").exists()
-
-    info = api.anon().get(f"/api/auth/invites/{token}/").json()
-    assert info["kind"] == "athlete" and info["name"] == "نیما کاظمی" and info["coachName"] == "علی احمدی" and not info["expired"]
-    r = api.post(f"/api/auth/invites/{token}/", {"password": "short"})
-    assert r.status_code == 400
-    r = api.post(f"/api/auth/invites/{token}/", {"password": "my-password-1"})
-    assert r.status_code == 201 and r.json()["user"]["role"] == "athlete"
-    assert User.objects.get(email="nima@example.com").athlete.status == "active"
-    # single use
-    assert api.post(f"/api/auth/invites/{token}/", {"password": "my-password-1"}).status_code == 400
-    assert api.get(f"/api/auth/invites/{token}/").json()["used"] is True
-
-
-def test_expired_invite_is_refused(api, coach):
-    api.as_user(coach.user)
-    url = api.post("/api/athletes/", {"name": "x", "email": "x@example.com", "invite": "link"}).json()["inviteLink"]["url"]
-    Invite.objects.update(expires_at=timezone.now() - timedelta(seconds=1))
-    token = link_token(url)
-    assert api.anon().get(f"/api/auth/invites/{token}/").json()["expired"] is True
-    r = api.post(f"/api/auth/invites/{token}/", {"password": "my-password-1"})
-    assert r.status_code == 400 and r.data["code"] == "invite_expired"
+    assert body["status"] == "active" and "email" not in body and body["smsStatus"] in ("not_configured", "sent", "failed")
 
 
 def test_logout_revokes_refresh_token(api, athlete):

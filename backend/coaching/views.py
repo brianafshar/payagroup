@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 
 from accounts import services
 from accounts.serializers import LinkRequestSerializer, LinkSerializer
+from core import notify
 from core.models import audit
 from core.permissions import AdminAnyPerm, AdminPerm, IsAthlete, IsCoach, admin_can, is_admin, is_coach
 
@@ -330,21 +331,13 @@ class AthleteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Cr
             inviter = coach.user
         s = AthleteCreateSerializer(data=request.data, context={"request": request})
         s.is_valid(raise_exception=True)
-        invite = s.validated_data.pop("invite")
-        invite = None if invite == "none" else invite
         if coach.athlete_cap is not None and coach.athlete_count >= coach.athlete_cap:
             raise ValidationError({"detail": "Athlete limit reached."}, code="cap_reached")
-        with transaction.atomic():
-            athlete = Athlete.objects.create(coach=coach, status=AccountStatus.INVITED if invite else AccountStatus.DRAFT, **s.validated_data)
-            link = None
-            if invite:
-                link = services.issue_invite(
-                    kind="athlete", email=athlete.email, name=athlete.name, by=inviter, send=invite == "email", athlete=athlete, coach=coach
-                )
+        athlete = Athlete.objects.create(coach=coach, status=AccountStatus.ACTIVE, **s.validated_data)
         if inviter != request.user:
             audit(request.user, "athlete.create", athlete, coach=coach.pk)
         data = AthleteSerializer(athlete, context={"request": request}).data
-        data["invite_link"] = link
+        data["sms_status"] = notify.send_account_created(athlete)
         return Response(data, status=status.HTTP_201_CREATED)
 
     def perform_update(self, serializer):

@@ -1,14 +1,13 @@
 // Ported from design handoff: project/C09 Coach Login.dc.html
 import { type CSSProperties } from 'react';
 import { landingPath, stepError, submitOtp, submitPassword } from '@/app/auth';
-import { api, faError } from '@/data/api';
-import { Button, Checkbox, IndowLogo, Modal, TextField } from '@/ds';
+import { lastUsername } from '@/data/session';
+import { Button, Checkbox, IndowLogo, TextField } from '@/ds';
 import { navigate } from '@/lib/nav';
-import { toast } from '@/lib/toast';
 import { Screen, type ScreenState } from '../Screen';
 
 export default class CoachLogin extends Screen {
-  state: ScreenState = { email: '', pw: '', tried: false, loading: false, remember: true, mfaToken: null, otp: '', err: null };
+  state: ScreenState = { email: lastUsername(), pw: '', tried: false, loading: false, remember: true, mfaToken: null, otp: '', err: null };
   renderVals() {
     const { email, pw, tried } = this.state;
     const emailBad = !email.trim();
@@ -40,41 +39,6 @@ export default class CoachLogin extends Screen {
       back: (e) => {
         e.preventDefault();
         this.setState({ mfaToken: null, otp: '', err: null, loading: false });
-      },
-      fpOpen: !!this.state.fp,
-      fpForm: this.state.fp === 'form',
-      fpTitle: this.state.fp === 'sent' ? 'رمز جدید ارسال شد' : 'بازیابی رمز عبور',
-      fpDesc:
-        this.state.fp === 'sent'
-          ? 'اگر ' +
-            this.state.fpEmail.trim() +
-            ' ثبت شده باشد، تا چند دقیقه یک رمز جدید به آن ایمیل می‌رسد. پوشه اسپم را هم بررسی کنید. بعد از ورود، رمز دلخواه خودتان را بگذارید.'
-          : 'ایمیل حسابتان را وارد کنید تا یک رمز جدید برایتان ایمیل شود. رمز فعلی دیگر کار نمی‌کند.',
-      fpPrimary: this.state.fp === 'sent' ? 'متوجه شدم' : 'ارسال رمز جدید',
-      fpSecondary: this.state.fp === 'sent' ? undefined : 'انصراف',
-      fpEmail: this.state.fpEmail || '',
-      setFpEmail: (v) => this.setState({ fpEmail: v, fpTried: false }),
-      fpErr:
-        this.state.fpTried && !/^\S+@\S+\.\S+$/.test((this.state.fpEmail || '').trim())
-          ? (this.state.fpEmail || '').trim()
-            ? 'این ایمیل معتبر نیست.'
-            : 'ایمیل را وارد کنید.'
-          : undefined,
-      fpSubmit: async () => {
-        if (this.state.fp === 'sent') return this.setState({ fp: null });
-        if (!/^\S+@\S+\.\S+$/.test((this.state.fpEmail || '').trim())) return this.setState({ fpTried: true });
-        // Self-service only ever emails the new password — it is never shown here.
-        try {
-          await api.auth.requestReset(this.state.fpEmail.trim());
-        } catch (e) {
-          return toast('ارسال نشد', faError(e), 'error');
-        }
-        this.setState({ fp: 'sent' });
-      },
-      fpClose: () => this.setState({ fp: null }),
-      forgot: (e) => {
-        e.preventDefault();
-        this.setState({ fp: 'form', fpTried: false, fpEmail: this.state.email || '' });
       },
       // #79: real pages, not toasts.
       privacy: (e) => {
@@ -145,7 +109,7 @@ export default class CoachLogin extends Screen {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <h2 style={{ margin: '0', fontSize: '20px', lineHeight: '32px', fontWeight: '600' }}>ورود به فضای کاری مربی</h2>
-            <p style={{ margin: '0', fontSize: '14px', lineHeight: '24px', color: 'var(--text-secondary)' }}>ورزشکاران، برنامه‌ها و پیشرفت را مدیریت کنید.</p>
+            <p style={{ margin: '0', fontSize: '14px', lineHeight: '24px', color: 'var(--text-secondary)' }}>شاگردها، برنامه‌ها و پیشرفت را مدیریت کنید.</p>
           </div>
           {v.mfa ? (
             <form
@@ -172,7 +136,7 @@ export default class CoachLogin extends Screen {
                 v.signIn();
               }}
             >
-              <TextField label="نام کاربری" placeholder="نام کاربری" dir="ltr" onChange={v.setEmail} error={v.emailError} />
+              <TextField label="نام کاربری" placeholder="نام کاربری" dir="ltr" value={this.state.email} onChange={v.setEmail} error={v.emailError} />
               <TextField label="رمز عبور" placeholder="رمز عبور خود را وارد کنید" type="password" onChange={v.setPw} error={v.pwError} />
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                 <Checkbox label="من را به خاطر بسپار" checked={v.remember} onChange={v.setRemember} />
@@ -197,19 +161,6 @@ export default class CoachLogin extends Screen {
             راهنما
           </a>
         </div>
-        {v.fpOpen ? (
-          <>
-            <div style={{ position: 'absolute', inset: '0' }}>
-              <Modal title={v.fpTitle} description={v.fpDesc} primaryLabel={v.fpPrimary} secondaryLabel={v.fpSecondary} onPrimary={v.fpSubmit} onClose={v.fpClose}>
-                {v.fpForm ? (
-                  <>
-                    <TextField label="ایمیل" type="email" inputMode="email" placeholder="name@example.com" value={v.fpEmail} onChange={v.setFpEmail} error={v.fpErr} />
-                  </>
-                ) : null}
-              </Modal>
-            </div>
-          </>
-        ) : null}
       </div>
     );
   }
