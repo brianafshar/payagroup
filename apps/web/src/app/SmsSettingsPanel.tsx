@@ -9,6 +9,7 @@ interface Sms {
   sender: string;
   accountText: string;
   programText: string;
+  siteConfigured: boolean;
 }
 
 const card = {
@@ -99,6 +100,11 @@ export function SmsSettingsPanel() {
       </div>
       <div style={card}>
         <h3 style={h3}>متن پیامک‌ها</h3>
+        {s.siteConfigured ? null : (
+          <p style={{ ...muted, color: 'var(--warning, #b7791f)' }}>
+            هشدار: اتصال به سایت payagroup.org هنوز تنظیم نشده است؛ لینک PDF در پیامک فقط روی همین رایانه باز می‌شود و برای شاگرد کار نمی‌کند.
+          </p>
+        )}
         <p style={muted}>
           جای‌نگهدارها: <bdi>{'{name}'}</bdi> نام شاگرد · <bdi>{'{brand}'}</bdi> نام برند · <bdi>{'{link}'}</bdi> لینک دانلود برنامه. متن خالی یعنی بازگشت به متن پیش‌فرض.
         </p>

@@ -1,5 +1,6 @@
 """Head-coach SMS settings (Kavenegar key, sender line, message texts) and a test send."""
 
+from django.conf import settings
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -28,6 +29,7 @@ def _out() -> dict:
         "sender": row.sender,
         "account_text": row.account_text,
         "program_text": row.program_text,
+        "site_configured": bool(settings.SITE_API_URL),
         "placeholders": ["name", "brand", "link"],
     }
 
