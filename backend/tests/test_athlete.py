@@ -6,7 +6,7 @@ from django.utils import timezone
 from coaching import stats
 from training.models import PersonalRecord, WorkoutLog
 
-from .conftest import make_athlete
+from .conftest import make_athlete, make_coach
 
 pytestmark = pytest.mark.django_db
 
@@ -66,7 +66,10 @@ def test_athlete_cannot_touch_others_sets(api, assigned, coach):
     log = api.as_user(assigned.user).post("/api/workouts/start/").json()
     other = make_athlete(coach, "b@x.com", "ب")
     assert api.as_user(other.user).patch(f"/api/sets/{log['sets'][0]['id']}/", {"done": True}).status_code == 404
-    assert api.as_user(coach.user).patch(f"/api/sets/{log['sets'][0]['id']}/", {"done": True}).status_code == 403
+    # a coach may correct their own athlete's sets, but not another gym's
+    assert api.as_user(coach.user).patch(f"/api/sets/{log['sets'][0]['id']}/", {"done": True}).status_code == 200
+    outsider = make_coach("other@x.io")
+    assert api.as_user(outsider.user).patch(f"/api/sets/{log['sets'][0]['id']}/", {"done": True}).status_code == 404
 
 
 def test_coach_reads_history_and_gives_feedback(api, assigned, coach):
