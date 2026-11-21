@@ -4,6 +4,8 @@ import { useLang } from "../i18n";
 import Nav from "./Nav";
 import Footer from "./Footer";
 
+const VERTICAL = /^\/(fa|en)\/(exercises|contact)/;
+
 export default function Layout() {
   const lang = useLang();
   const { pathname } = useLocation();
@@ -30,7 +32,7 @@ export default function Layout() {
       <main className="page" key={pathname}>
         <Outlet />
       </main>
-      <Footer />
+      {VERTICAL.test(pathname) && <Footer />}
     </>
   );
 }

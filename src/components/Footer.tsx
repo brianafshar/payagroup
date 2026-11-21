@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="wrap footer-in">
-        <img src="/brand/paya-primary-reversed.svg" alt="Paya" height={72} />
+        <img src="/brand/paya-primary-color.svg" alt="Paya" height={72} />
         <div>
           <h4>{tr(S.footer.contact, lang)}</h4>
           <p>{tr(S.footer.address, lang)}</p>

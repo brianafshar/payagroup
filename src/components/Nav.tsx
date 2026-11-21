@@ -34,7 +34,7 @@ export default function Nav() {
     <>
       <header className="bar">
         <Link to={`/${lang}`} className="bar-logo" aria-label="Paya">
-          <img src="/brand/paya-primary-reversed.svg" alt="Paya" height={56} />
+          <img src="/brand/paya-primary-color.svg" alt="Paya" height={56} />
         </Link>
         <div className="bar-actions">
           <Link to={switchPath} className="lang">{tr(S.nav.switchTo, lang)}</Link>
