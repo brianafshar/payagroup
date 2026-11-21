@@ -328,6 +328,15 @@ export interface ChatMessage {
 }
 
 /** A food in the bank; nutrition per 100 g, units in grams (e.g. «عدد» = 33 g for an egg white). */
+export interface NutritionTemplate {
+  id: number;
+  name: string;
+  description: string;
+  mealCount: number;
+  kcal: number;
+  coachName: string;
+}
+
 export interface BankFood {
   id: number;
   name: string;
@@ -447,6 +456,12 @@ export const remote = {
   saveNutritionPlan: (athleteId: ID, plan: Json) => mutate(http.put<Json>(`/nutrition-plans/${athleteId}/`, plan)),
   /** Food bank: shared Persian foods + the coach's own (with household units). */
   foods: (q: string) => http.get<BankFood[]>(`/foods/?q=${encodeURIComponent(q)}`),
+  foodsByCategory: (category: string) => http.get<BankFood[]>(`/foods/?category=${encodeURIComponent(category)}`),
+  foodCategories: () => http.get<Array<{ category: string; count: number }>>('/foods/categories/'),
+  nutritionTemplates: () => http.get<NutritionTemplate[]>('/nutrition-templates/'),
+  saveNutritionTemplate: (body: { name: string; athlete: ID; description?: string }) => mutate(http.post<NutritionTemplate>('/nutrition-templates/', body)),
+  deleteNutritionTemplate: (id: ID) => mutate(http.del(`/nutrition-templates/${id}/`)),
+  assignNutritionTemplate: (id: ID, athleteIds: ID[]) => mutate(http.post(`/nutrition-templates/${id}/assign/`, { athleteIds })),
   createFood: (food: Omit<BankFood, 'id' | 'mine'>) => http.post<BankFood>('/foods/', food),
   /** The athlete's weekly program (training, nutrition, supplements, recovery) as a PDF. */
   programPdf: (athleteId: ID) => http.get<Blob>(`/athletes/${athleteId}/program.pdf`, { blob: true }),

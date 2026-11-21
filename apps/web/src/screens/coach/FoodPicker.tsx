@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Button, Icon, Modal, TextField } from '@/ds';
 import { faError, remote } from '@/data/api';
 import type { BankFood } from '@/data/remote';
+import { categoryIcon, foodIcon } from '@/lib/foodIcons';
+import { useQuery } from '@/data/hooks';
 import { toast } from '@/lib/toast';
 
 const fa = (v: number | string) =>
@@ -28,6 +30,66 @@ export const inputStyle: CSSProperties = {
   font: "400 14px/20px 'Vazirmatn',sans-serif",
 };
 
+/** Browse the food bank as cards: category cards first (breakfast, Iranian dishes, stews…), then the foods in it. */
+export function FoodBrowser({ onPick, onClose }: { onPick: (f: BankFood) => void; onClose: () => void }) {
+  const cats = useQuery<Array<{ category: string; count: number }>>('food-cats', () => remote.foodCategories());
+  const [cat, setCat] = useState<string | null>(null);
+  const foods = useQuery<BankFood[]>('foods-cat:' + (cat ?? ''), () => (cat ? remote.foodsByCategory(cat) : Promise.resolve([])));
+  const card: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 6,
+    padding: 12,
+    background: 'var(--surface)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-md)',
+    cursor: 'pointer',
+    font: "500 13px/20px 'Vazirmatn',sans-serif",
+    color: 'var(--text-primary)',
+    textAlign: 'center',
+  };
+  return (
+    <div role="dialog" aria-label="بانک غذا" style={{ position: 'fixed', inset: 0, zIndex: 120, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} onMouseDown={onClose}>
+      <div onMouseDown={(e) => e.stopPropagation()} style={{ width: 'min(860px, 100%)', maxHeight: '88vh', overflow: 'auto', background: 'var(--surface-raised, var(--surface))', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {cat ? (
+            <Button variant="ghost" size="sm" icon="arrow-right" onClick={() => setCat(null)}>
+              دسته‌ها
+            </Button>
+          ) : null}
+          <h3 style={{ margin: 0, flex: 1, fontSize: 16 }}>{cat ?? 'بانک غذا — یک دسته را انتخاب کنید'}</h3>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            بستن
+          </Button>
+        </div>
+        {!cat ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 10 }}>
+            {(cats.data ?? []).map((c) => (
+              <button key={c.category} type="button" style={card} onClick={() => setCat(c.category)}>
+                <img src={categoryIcon(c.category)} alt="" width={56} height={56} />
+                <span>{c.category}</span>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{fa(c.count)} غذا</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
+            {foods.loading ? <span>در حال بارگذاری…</span> : null}
+            {(foods.data ?? []).map((f) => (
+              <button key={f.id} type="button" style={card} onClick={() => onPick(f)}>
+                <img src={foodIcon(f.name, f.category)} alt="" width={56} height={56} loading="lazy" />
+                <span>{f.name}</span>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{fa(Math.round(f.kcalPer100g)) + ' kcal / ۱۰۰g'}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /** Name input with food-bank suggestions. Typing keeps it a hand-typed food; picking a suggestion calls `onPick`. */
 export function FoodNameInput({
   value,
@@ -47,6 +109,7 @@ export function FoodNameInput({
   const box = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const [pos, setPos] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [browsing, setBrowsing] = useState(false);
 
   useEffect(() => {
     const q = value.trim();
@@ -104,7 +167,19 @@ export function FoodNameInput({
   };
   const items = list.length + 1; // + «add as my food»
   return (
-    <div ref={box} style={{ position: 'relative', minWidth: 0 }}>
+    <div ref={box} style={{ position: 'relative', minWidth: 0, display: 'flex', gap: 4 }}>
+      {browsing ? (
+        <FoodBrowser
+          onPick={(f) => {
+            setBrowsing(false);
+            pick(f);
+          }}
+          onClose={() => setBrowsing(false)}
+        />
+      ) : null}
+      <button type="button" aria-label="مرور بانک غذا" title="مرور بانک غذا" onClick={() => setBrowsing(true)} style={{ ...inputStyle, width: 34, flex: '0 0 34px', padding: 0, cursor: 'pointer' }}>
+        <Icon name="library" size={16} />
+      </button>
       <input
         value={value}
         placeholder="جستجو در بانک غذا، مثلاً سفیده"
@@ -138,7 +213,7 @@ export function FoodNameInput({
             }
           } else if (e.key === 'Escape') setOpen(false);
         }}
-        style={inputStyle}
+        style={{ ...inputStyle, flex: 1, minWidth: 0 }}
       />
       {open && value.trim() && pos ? (
         <div

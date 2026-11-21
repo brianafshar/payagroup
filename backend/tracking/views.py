@@ -6,7 +6,7 @@ from django.db.models.functions import Replace
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ from core.permissions import CoachWritesAthleteReads, IsAthlete, IsCoach, IsCoac
 from core.scoping import AthleteScopedMixin
 from training.models import PY_WEEKDAY
 
-from .models import Food, MealLog, Measurement, NutritionPlan, RecoveryCheckIn, RecoveryPlan, TestResult, WaterLog
+from .models import Food, MealLog, Measurement, NutritionPlan, NutritionTemplate, RecoveryCheckIn, RecoveryPlan, TestResult, WaterLog
 from .serializers import (
     FoodSerializer,
     MealLogSerializer,
@@ -94,9 +94,19 @@ class FoodViewSet(viewsets.ModelViewSet):
             # Compare on names with the zero-width joiner removed, e.g. «تخممرغ» and «تخم‌مرغ».
             qs = qs.annotate(flat=Replace("name", Value("\u200c"), Value(""))).filter(flat__icontains=q)
             rows = sorted(qs, key=lambda f: (not f.flat.startswith(q), len(f.name), f.name))[: self.LIMIT]
+        elif request.query_params.get("category"):
+            rows = list(qs)  # a whole category (the card browser) is never cut off
         else:
             rows = list(qs[: self.LIMIT])
         return Response(self.get_serializer(rows, many=True).data)
+
+    @action(detail=False, methods=["get"])
+    def categories(self, request):
+        """Food-bank categories with their food counts (the browser's cards)."""
+        from django.db.models import Count
+
+        rows = visible_foods(request.user.coach).exclude(category="").values("category").annotate(count=Count("id")).order_by("-count")
+        return Response(list(rows))
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user.coach)
@@ -324,3 +334,74 @@ class TestResultViewSet(AthleteScopedMixin, DateRangeMixin, viewsets.ModelViewSe
 
     def perform_create(self, serializer):
         serializer.save(athlete=self.target_athlete(serializer))
+
+
+def _plan_payload(plan: NutritionPlan) -> dict:
+    """The plan as a reusable payload: API shape without ids, totals or the athlete."""
+    data = NutritionPlanSerializer(plan).data
+    out = {"targets": dict(data["targets"]), "supplements": [dict(x) for x in data["supplements"]], "meals": []}
+    for m in data["meals"]:
+        out["meals"].append(
+            {
+                "name": m["name"],
+                "time": m["time"],
+                "days": list(m["days"]),
+                "foods": [{k: v for k, v in dict(f).items() if k not in ("id", "totals")} for f in m["foods"]],
+            }
+        )
+    return out
+
+
+class NutritionTemplateViewSet(viewsets.ModelViewSet):
+    """Gym-wide nutrition templates. `POST` `{name, athlete}` saves that athlete's plan as a template;
+    `POST {id}/assign/` `{athleteIds}` copies it onto athletes (replacing their plan)."""
+
+    permission_classes = [IsCoach]
+    http_method_names = ["get", "post", "patch", "delete"]
+    pagination_class = None
+
+    class Out(serializers.ModelSerializer):
+        meal_count = serializers.SerializerMethodField()
+        kcal = serializers.SerializerMethodField()
+        coach_name = serializers.CharField(source="coach.user.name", read_only=True)
+
+        class Meta:
+            model = NutritionTemplate
+            fields = ["id", "name", "description", "meal_count", "kcal", "coach_name", "payload", "updated_at"]
+            read_only_fields = ["payload"]
+
+        def get_meal_count(self, t) -> int:
+            return len(t.payload.get("meals", []))
+
+        def get_kcal(self, t) -> int:
+            return t.payload.get("targets", {}).get("kcal", 0)
+
+    serializer_class = Out
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return NutritionTemplate.objects.none()
+        return NutritionTemplate.objects.filter(coach__in=self.request.user.coach.gym_ids()).select_related("coach__user")
+
+    def create(self, request, *args, **kwargs):
+        name = str(request.data.get("name", "")).strip()
+        if not name:
+            raise ValidationError({"name": "Name is required."})
+        athlete = get_object_or_404(Athlete, pk=request.data.get("athlete"), coach__in=request.user.coach.athlete_scope_ids())
+        plan, _ = NutritionPlan.objects.get_or_create(athlete=athlete)
+        t = NutritionTemplate.objects.create(coach=request.user.coach, name=name, description=str(request.data.get("description", ""))[:200], payload=_plan_payload(plan))
+        return Response(self.Out(t).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(request=dict, responses={200: dict})
+    @action(detail=True, methods=["post"])
+    def assign(self, request, pk=None):
+        t = self.get_object()
+        ids = request.data.get("athleteIds") or request.data.get("athlete_ids") or []
+        athletes = list(Athlete.objects.filter(coach__in=request.user.coach.athlete_scope_ids(), pk__in=ids))
+        if not athletes:
+            raise ValidationError({"athleteIds": "Choose at least one athlete."})
+        for a in athletes:
+            s = NutritionPlanSerializer(data=t.payload, context={"coach": request.user.coach})
+            s.is_valid(raise_exception=True)
+            s.save_plan(a)
+        return Response({"assigned": [a.pk for a in athletes]})

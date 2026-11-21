@@ -101,3 +101,27 @@ def test_sms_settings_head_only_and_templates(monkeypatch):
     assert sent and sms.credentials() == ("abcd1234", "1000")
     assert SmsSettings.load().program_text == "سلام {name} {link}"
     assert client(coach.user).put("/api/sms-settings/", {"sender": "x"}, format="json").status_code == 403
+
+
+def test_nutrition_templates_shared_and_assignable():
+    head = make_coach("h@x.io", is_head=True)
+    a = make_coach("a@x.io", head=head)
+    other = make_coach("o@x.io")
+    src = Athlete.objects.create(coach=head, name="S", status=AccountStatus.ACTIVE)
+    dst = Athlete.objects.create(coach=a, name="D", status=AccountStatus.ACTIVE)
+    plan = {
+        "targets": {"kcal": 2500, "protein": 150, "carbs": 300, "fat": 70, "waterL": 3},
+        "meals": [{"name": "صبحانه", "foods": [{"name": "تخم‌مرغ", "grams": 100, "kcalPer100g": 143}]}],
+        "supplements": [],
+    }
+    c = client(head.user)
+    assert c.put(f"/api/nutrition-plans/{src.pk}/", plan, format="json").status_code == 200
+    r = c.post("/api/nutrition-templates/", {"name": "حجم ۲۵۰۰", "athlete": src.pk}, format="json")
+    assert r.status_code == 201 and r.json()["mealCount"] == 1 and r.json()["kcal"] == 2500
+    tid = r.json()["id"]
+    # a coach of the same gym sees it and can assign it; an outsider cannot
+    assert [t["id"] for t in client(a.user).get("/api/nutrition-templates/").json()] == [tid]
+    assert client(other.user).get("/api/nutrition-templates/").json() == []
+    assert client(a.user).post(f"/api/nutrition-templates/{tid}/assign/", {"athleteIds": [dst.pk]}, format="json").status_code == 200
+    got = client(a.user).get(f"/api/nutrition-plans/{dst.pk}/").json()
+    assert got["targets"]["kcal"] == 2500 and got["meals"][0]["name"] == "صبحانه"

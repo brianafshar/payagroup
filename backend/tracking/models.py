@@ -19,6 +19,21 @@ class NutritionPlan(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class NutritionTemplate(models.Model):
+    """A reusable nutrition plan (targets, meals, supplements) shared by the whole gym, like program templates.
+    `payload` is the plan in the API's shape without ids/totals; assigning copies it onto an athlete."""
+
+    coach = models.ForeignKey(Coach, on_delete=models.CASCADE, related_name="nutrition_templates")
+    name = models.CharField(max_length=80)
+    description = models.CharField(max_length=200, blank=True)
+    payload = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+
+
 class Food(models.Model):
     """The food bank: shared Persian foods (owner empty, loaded from data/foods_fa.json) and each coach's
     own foods (visible to that coach only). Nutrition is per 100 g; units say how many grams one unit is."""

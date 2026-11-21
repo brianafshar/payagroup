@@ -10,6 +10,8 @@ import { AthleteSwitcher } from './AthleteSwitcher';
 import { param } from '@/lib/nav';
 import { panelUser } from '@/data/session';
 import { Screen } from '../Screen';
+import { foodIcon } from '@/lib/foodIcons';
+import { NutritionTemplateButtons } from './NutritionTemplates';
 import { CustomFoodModal, FoodNameInput, inputStyle } from './FoodPicker';
 import { ProgramPdfButtons } from './ProgramPdf';
 
@@ -476,6 +478,7 @@ class CoachNutritionPlan extends Screen {
             <Button variant="secondary" icon="copy" onClick={v.openCopy}>
               کپی برنامه برای…
             </Button>
+            <NutritionTemplateButtons athleteId={v.whoId} athleteName={v.whoName} onApplied={() => window.location.reload()} />
             {v.viewing ? (
               <>
                 <ProgramPdfButtons athleteId={v.whoId} name={v.whoName} />
@@ -658,7 +661,10 @@ class CoachNutritionPlan extends Screen {
                             >
                               {v.viewing ? (
                                 <>
-                                  <span style={{ fontSize: '14px', lineHeight: '22px', minWidth: '0' }}>{f?.name}</span>
+                                  <span style={{ fontSize: '14px', lineHeight: '22px', minWidth: '0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <img src={foodIcon(f?.name || '')} alt="" width={24} height={24} loading="lazy" />
+                                    {f?.name}
+                                  </span>
                                   <span style={{ font: "400 14px/22px 'Vazirmatn',sans-serif", color: 'var(--text-secondary)' }}>{f?.gFa}</span>
                                   <span style={{ font: "400 14px/22px 'Vazirmatn',sans-serif", color: 'var(--text-secondary)' }}>{f?.k100Fa}</span>
                                   <span style={{ display: 'flex', flexDirection: 'column' }}>
