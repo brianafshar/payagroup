@@ -6,9 +6,9 @@ Bilingual (fa / en) club website: landing, Basketball, Bodybuilding, Contact, an
 This branch (`website`) is independent of the app code. Nothing here touches `apps/`, `backend/` or `packages/`.
 
 - Stack: React 19 + Vite + TypeScript + React Router (no UI framework). Fonts: Vazirmatn, Anton.
-- Look: Awwwards "project navigation" style: full-screen numbered menu, page wipe transitions, scroll reveals.
+- Look: Awwwards "project navigation" style: pages side by side with thin dividers, small top menu, vertical tick indicator + up/down arrows on the right, wheel/keys/arrows/swipe move sideways, orange wipe between routes.
 - Routes (language prefix `/fa` or `/en`):
-  `/` · `/basketball` · `/bodybuilding` · `/exercises` (filters: `?sport=&cat=&q=`) · `/exercises/:id-slug` · `/contact`
+  `/` · `/basketball` · `/elite` (bodybuilding; `/bodybuilding` redirects) · `/exercises` (filters: `?sport=&cat=&q=`) · `/exercises/:id-slug` · `/contact`
 - Exercise links for PDFs: `https://payagroup.org/fa/exercises/42-barbell-squat` (only the leading id matters;
   `https://payagroup.org/fa/exercises/42` also works).
 

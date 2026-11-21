@@ -57,7 +57,7 @@ export default function Home() {
             <span><span className="disc-t">{tr(S.nav.basketball, lang)}</span><small>{t(H.basketballSub)}</small></span>
             <span className="disc-go">{t(H.explore)} →</span>
           </Link>
-          <Link to={`/${lang}/bodybuilding`} className="disc-card bbuild" data-reveal>
+          <Link to={`/${lang}/elite`} className="disc-card bbuild" data-reveal>
             <span className="disc-n">02</span>
             <span><span className="disc-t">{tr(S.nav.bodybuilding, lang)}</span><small>{t(H.bodybuildingSub)}</small></span>
             <span className="disc-go">{t(H.explore)} →</span>

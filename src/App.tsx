@@ -25,7 +25,8 @@ export default function App() {
       <Route path="/:lang" element={<LangShell />}>
         <Route index element={<Home />} />
         <Route path="basketball" element={<Sport kind="basketball" />} />
-        <Route path="bodybuilding" element={<Sport kind="bodybuilding" />} />
+        <Route path="elite" element={<Sport kind="bodybuilding" />} />
+        <Route path="bodybuilding" element={<Navigate to="../elite" replace />} />
         <Route path="exercises" element={<Exercises />} />
         <Route path="exercises/:slug" element={<ExerciseDetail />} />
         <Route path="contact" element={<Contact />} />

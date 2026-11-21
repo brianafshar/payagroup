@@ -1,16 +1,42 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
   <defs>
-    <radialGradient id="g" cx="30%" cy="60%" r="80%"><stop offset="0" stop-color="#2a1a05"/><stop offset="1" stop-color="#0b0b0b"/></radialGradient>
+    <radialGradient id="bg" cx="32%" cy="45%" r="85%"><stop offset="0" stop-color="#3a2410"/><stop offset=".5" stop-color="#14100c"/><stop offset="1" stop-color="#050505"/></radialGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a8a8a"/><stop offset=".35" stop-color="#e8e8e8"/><stop offset=".65" stop-color="#8d8d8d"/><stop offset="1" stop-color="#3b3b3b"/></linearGradient>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#050505"/><stop offset=".25" stop-color="#2b2b2b"/><stop offset=".5" stop-color="#151515"/><stop offset="1" stop-color="#000"/></linearGradient>
+    <linearGradient id="plateO" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a3a00"/><stop offset=".3" stop-color="#ff9a1f"/><stop offset=".6" stop-color="#b85a00"/><stop offset="1" stop-color="#4a2200"/></linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd9a0" stop-opacity=".35"/><stop offset="1" stop-color="#ffd9a0" stop-opacity="0"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="16"/></filter>
+    <filter id="blur1"><feGaussianBlur stdDeviation="2"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0"/></filter>
   </defs>
-  <rect width="1600" height="900" fill="url(#g)"/>
-  <g fill="none" stroke="#ff9a1f" stroke-width="4" opacity=".7" transform="translate(0 20)">
-    <line x1="120" y1="450" x2="1480" y2="450" stroke-width="14"/>
-    <rect x="360" y="250" width="70" height="400" rx="14"/><rect x="440" y="300" width="60" height="300" rx="12"/><rect x="510" y="340" width="46" height="220" rx="10"/>
-    <rect x="1170" y="250" width="70" height="400" rx="14"/><rect x="1100" y="300" width="60" height="300" rx="12"/><rect x="1044" y="340" width="46" height="220" rx="10"/>
-    <rect x="300" y="395" width="50" height="110" rx="8"/><rect x="1250" y="395" width="50" height="110" rx="8"/>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <polygon points="600,0 1000,0 1300,900 300,900" fill="url(#beam)" filter="url(#blur)"/>
+  <!-- floor -->
+  <rect y="690" width="1600" height="210" fill="#0b0805"/>
+  <line x1="0" y1="690" x2="1600" y2="690" stroke="#ff9a1f" stroke-opacity=".25" stroke-width="2"/>
+  <ellipse cx="800" cy="720" rx="640" ry="40" fill="#ff9a1f" fill-opacity=".18" filter="url(#blur)"/>
+  <!-- barbell -->
+  <g transform="translate(0 20)">
+    <rect x="-20" y="440" width="1640" height="24" rx="6" fill="url(#steel)"/>
+    <g stroke="#000" stroke-opacity=".35" stroke-width="1">
+      <path d="M250 444v16M262 444v16M274 444v16M286 444v16M298 444v16M310 444v16M322 444v16M334 444v16M346 444v16M358 444v16M370 444v16"/>
+    </g>
+    <!-- left stack -->
+    <rect x="470" y="190" width="54" height="524" rx="10" fill="url(#plate)" stroke="#ff9a1f" stroke-opacity=".5"/>
+    <rect x="532" y="250" width="44" height="404" rx="9" fill="url(#plateO)"/>
+    <rect x="584" y="300" width="34" height="304" rx="8" fill="url(#plate)" stroke="#ff9a1f" stroke-opacity=".4"/>
+    <rect x="626" y="425" width="46" height="54" rx="6" fill="url(#steel)"/>
+    <!-- right stack -->
+    <rect x="1076" y="190" width="54" height="524" rx="10" fill="url(#plate)" stroke="#ff9a1f" stroke-opacity=".5"/>
+    <rect x="1024" y="250" width="44" height="404" rx="9" fill="url(#plateO)"/>
+    <rect x="982" y="300" width="34" height="304" rx="8" fill="url(#plate)" stroke="#ff9a1f" stroke-opacity=".4"/>
+    <rect x="928" y="425" width="46" height="54" rx="6" fill="url(#steel)"/>
+    <!-- plate highlights -->
+    <g stroke="#fff" stroke-opacity=".18" stroke-width="2"><path d="M484 205v494M1090 205v494"/></g>
   </g>
-  <g fill="none" stroke="#ff9a1f" stroke-width="2" opacity=".25">
-    <path d="M0 780 H1600 M0 820 H1600 M0 860 H1600"/>
-    <path d="M200 700 V900 M500 700 V900 M800 700 V900 M1100 700 V900 M1400 700 V900"/>
+  <!-- chalk dust -->
+  <g fill="#fff" filter="url(#blur1)" opacity=".5">
+    <circle cx="700" cy="330" r="3"/><circle cx="760" cy="280" r="2"/><circle cx="820" cy="350" r="3.5"/><circle cx="880" cy="300" r="2"/><circle cx="930" cy="390" r="2.5"/><circle cx="650" cy="400" r="2"/><circle cx="1000" cy="340" r="2"/><circle cx="580" cy="250" r="2.5"/>
   </g>
+  <rect width="1600" height="900" filter="url(#grain)" opacity=".16"/>
 </svg>

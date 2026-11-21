@@ -15,7 +15,7 @@ export default function Footer() {
         </div>
         <div className="footer-links">
           <Link to={`/${lang}/basketball`}>{tr(S.nav.basketball, lang)}</Link>
-          <Link to={`/${lang}/bodybuilding`}>{tr(S.nav.bodybuilding, lang)}</Link>
+          <Link to={`/${lang}/elite`}>{tr(S.nav.bodybuilding, lang)}</Link>
           <Link to={`/${lang}/exercises`}>{tr(S.nav.exercises, lang)}</Link>
         </div>
       </div>
