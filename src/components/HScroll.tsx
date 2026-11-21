@@ -91,11 +91,68 @@ export default function HScroll({ children }: { children: ReactNode }) {
       moveTo(Math.abs(el.scrollLeft + kids[i].getBoundingClientRect().left - er.left));
     };
 
+    const mouseDown = (e: MouseEvent) => {
+      if (coarse.matches || e.button !== 0) return;
+      if ((e.target as HTMLElement).closest("input, textarea, select, button, a, [data-nodrag]")) return;
+
+      stop(); // cancel any running easing
+      const kids = Array.from(el.firstElementChild!.children);
+      const startIdx = Math.max(0, kids.indexOf(nearest().p as HTMLElement));
+      const startX = e.clientX;
+      const startPos = Math.abs(el.scrollLeft);
+      let moved = false, lastX = startX, lastT = performance.now(), v = 0;
+
+      const onMove = (ev: MouseEvent) => {
+        const dx = ev.clientX - startX;
+        if (!moved) {
+          if (Math.abs(dx) < 4) return; // small threshold so normal clicks still work
+          moved = true;
+          el.classList.add("dragging");
+          window.getSelection()?.removeAllRanges();
+        }
+        const now = performance.now();
+        const dt = now - lastT;
+        if (dt > 0) v = 0.8 * v + 0.2 * ((ev.clientX - lastX) / dt); // px/ms, smoothed
+        lastX = ev.clientX;
+        lastT = now;
+
+        // content follows the cursor; in RTL the scroll axis is inverted
+        cur = target = Math.max(0, Math.min(max(), startPos - dir * dx));
+        el.scrollLeft = dir * cur;
+      };
+
+      const onUp = () => {
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", onUp);
+        el.classList.remove("dragging");
+        if (!moved) return;
+
+        // swallow the click that follows a drag
+        const block = (ev: MouseEvent) => { ev.stopPropagation(); ev.preventDefault(); };
+        window.addEventListener("click", block, { capture: true, once: true });
+        setTimeout(() => window.removeEventListener("click", block, true), 0);
+
+        if (performance.now() - lastT > 80) v = 0; // held still before release → no flick
+        if (Math.abs(v) > 0.5) {
+          const d = -dir * Math.sign(v);
+          const i = Math.max(0, Math.min(kids.length - 1, startIdx + d));
+          const er = el.getBoundingClientRect();
+          moveTo(Math.abs(el.scrollLeft + kids[i].getBoundingClientRect().left - er.left));
+        } else {
+          snap(); // settle on nearest page
+        }
+      };
+
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+    };
+
     setTotal(el.firstElementChild!.children.length);
     onScroll();
     el.addEventListener("wheel", onWheel, { passive: false });
     el.addEventListener("touchstart", stop, { passive: true });
     el.addEventListener("scroll", onScroll, { passive: true });
+    el.addEventListener("mousedown", mouseDown)
     window.addEventListener("keydown", onKey);
     return () => {
       clearTimeout(snapT);
@@ -104,6 +161,7 @@ export default function HScroll({ children }: { children: ReactNode }) {
       el.removeEventListener("touchstart", stop);
       el.removeEventListener("scroll", onScroll);
       window.removeEventListener("keydown", onKey);
+      el.removeEventListener("mousedown", mouseDown);
     };
   }, [dir]);
 
