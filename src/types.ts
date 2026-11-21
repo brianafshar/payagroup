@@ -20,4 +20,5 @@ export interface Exercise {
   tips_en?: string[];
   muscles_primary?: string[];
   muscles_secondary?: string[];
+  updated_at?: string;
 }

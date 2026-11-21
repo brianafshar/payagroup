@@ -7,6 +7,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { pipeline } from "node:stream/promises";
 import Busboy from "busboy";
+import { exerciseSeo, fillShell, notFoundHead, sitemap } from "./seo.js";
 
 const env = process.env;
 const PORT = Number(env.PORT || 3000);
@@ -16,6 +17,8 @@ const DATA_DIR = path.resolve(env.DATA_DIR || "./data");
 const MAX_VIDEO = Number(env.MAX_VIDEO_MB || 2048) * 1024 * 1024;
 const MAX_IMAGE = Number(env.MAX_IMAGE_MB || 20) * 1024 * 1024;
 const MAX_PDF = Number(env.MAX_PDF_MB || 30) * 1024 * 1024;
+const SHELL_URL = env.SHELL_URL || "http://paya-site/__shell.html"; // the site's index.html (for exercise pages)
+const SHELL_FILE = env.SHELL_FILE || ""; // optional: read the shell from disk instead
 const PDF_TTL_MS = Number(env.PDF_TTL_DAYS || 90) * 86400_000;
 
 if (!API_KEY || API_KEY.length < 16) {
@@ -107,7 +110,7 @@ function publicView(e) {
   if (!video_url) return null;
   const out = {
     id: e.id, name: e.name, description: e.description, category: e.category, sport: e.sport,
-    equipment: e.equipment, difficulty: e.difficulty, video_url,
+    equipment: e.equipment, difficulty: e.difficulty, video_url, updated_at: new Date(e.updated_at).toISOString(),
     muscles_primary: e.muscles_primary, muscles_secondary: e.muscles_secondary,
     steps: e.steps, tips: e.tips,
   };
@@ -262,6 +265,23 @@ async function serveFile(req, res, file, type, extra = {}) {
   await pipeline(fs.createReadStream(file, { start, end }), res).catch(() => {});
 }
 
+let shellCache = { at: 0, html: "" };
+async function getShell() {
+  if (shellCache.html && Date.now() - shellCache.at < 300_000) return shellCache.html;
+  try {
+    const html = SHELL_FILE ? await fsp.readFile(SHELL_FILE, "utf8") : await (async () => {
+      const r = await fetch(SHELL_URL, { signal: AbortSignal.timeout(5000) });
+      if (!r.ok) throw new Error(`shell ${r.status}`);
+      return r.text();
+    })();
+    shellCache = { at: Date.now(), html };
+  } catch (e) {
+    if (!shellCache.html) throw new HttpError(503, "site shell unavailable");
+  }
+  return shellCache.html;
+}
+const publicList = () => [...exercises.values()].sort((a, b) => b.updated_at - a.updated_at).map(publicView).filter(Boolean);
+
 const IMMUTABLE = { "Cache-Control": "public, max-age=31536000, immutable" };
 
 async function route(req, res) {
@@ -272,11 +292,23 @@ async function route(req, res) {
   if (p === "/api/health") return send(res, 200, { ok: true });
 
   if (p === "/api/public/exercises" && (m === "GET" || m === "HEAD")) {
-    const list = [...exercises.values()].sort((a, b) => b.updated_at - a.updated_at).map(publicView).filter(Boolean);
-    return send(res, 200, list, { "Cache-Control": "public, max-age=30", "Access-Control-Allow-Origin": "*" });
+    return send(res, 200, publicList(), { "Cache-Control": "public, max-age=30", "Access-Control-Allow-Origin": "*" });
+  }
+
+  if (p === "/sitemap.xml" && (m === "GET" || m === "HEAD")) {
+    return send(res, 200, sitemap(PUBLIC_URL, publicList()), { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=900" });
   }
 
   let r;
+  // exercise pages are rendered here so crawlers get a real title / description / video markup
+  if (m === "GET" && (r = /^\/(fa|en)\/exercises\/([0-9]{1,9})$/.exec(p))) {
+    const lang = r[1];
+    const shell = await getShell();
+    const ex = exercises.get(Number(r[2]));
+    const view = ex && publicView(ex);
+    const html = view ? fillShell(shell, lang, exerciseSeo(PUBLIC_URL, lang, view)) : fillShell(shell, lang, notFoundHead(lang));
+    return send(res, view ? 200 : 404, html, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" });
+  }
   if ((r = /^\/media\/videos\/([0-9]+-[a-z0-9]+\.[a-z0-9]+)$/.exec(p))) {
     const type = VIDEO_EXT[path.extname(r[1])];
     return type ? serveFile(req, res, path.join(DIRS.videos, r[1]), type, { ...IMMUTABLE, "Access-Control-Allow-Origin": "*" }) : send(res, 404, "Not found");

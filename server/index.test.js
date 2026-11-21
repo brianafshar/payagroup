@@ -12,7 +12,9 @@ let proc, dir;
 
 before(async () => {
   dir = fs.mkdtempSync(path.join(os.tmpdir(), "paya-"));
-  proc = spawn("node", ["index.js"], { env: { ...process.env, PORT, API_KEY: KEY, DATA_DIR: dir, PUBLIC_URL: BASE }, stdio: "inherit" });
+  const shell = path.join(dir, "shell.html");
+  fs.writeFileSync(shell, '<!doctype html><html lang="fa" dir="rtl"><head><title>x</title></head><body><div id="root"></div></body></html>');
+  proc = spawn("node", ["index.js"], { env: { ...process.env, PORT, API_KEY: KEY, DATA_DIR: path.join(dir, "data"), SHELL_FILE: shell, PUBLIC_URL: BASE }, stdio: "inherit" });
   for (let i = 0; i < 50; i++) { try { await fetch(`${BASE}/api/health`); return; } catch { await new Promise((r) => setTimeout(r, 100)); } }
   throw new Error("server did not start");
 });
@@ -57,13 +59,13 @@ test("re-sending metadata without a file keeps the stored video; replacing swaps
   assert.equal(r.status, 204);
   let [e] = await (await fetch(`${BASE}/api/public/exercises`)).json();
   assert.equal(e.name, "اسکوات ۲"); assert.match(e.video_url, /\/media\/videos\//);
-  const oldFiles = fs.readdirSync(path.join(dir, "videos"));
+  const oldFiles = fs.readdirSync(path.join(dir, "data", "videos"));
   await new Promise((r) => setTimeout(r, 5));
   r = await fetch(`${BASE}/api/exercises/7`, { method: "PUT", headers: hdr, body: form(meta(), { video: [video, "b.webm", "video/webm"] }) });
   assert.equal(r.status, 204);
   [e] = await (await fetch(`${BASE}/api/public/exercises`)).json();
   assert.match(e.video_url, /\.webm$/);
-  const now = fs.readdirSync(path.join(dir, "videos"));
+  const now = fs.readdirSync(path.join(dir, "data", "videos"));
   assert.equal(now.length, 1); assert.notDeepEqual(now, oldFiles);
 });
 
@@ -72,7 +74,7 @@ test("external link replaces uploaded file; exercise without any video is reject
   assert.equal(r.status, 204);
   const [e] = await (await fetch(`${BASE}/api/public/exercises`)).json();
   assert.equal(e.video_url, "https://youtu.be/x");
-  assert.equal(fs.readdirSync(path.join(dir, "videos")).length, 0);
+  assert.equal(fs.readdirSync(path.join(dir, "data", "videos")).length, 0);
   r = await fetch(`${BASE}/api/exercises/8`, { method: "PUT", headers: hdr, body: form(meta({ id: 8 })) });
   assert.equal(r.status, 400);
   r = await fetch(`${BASE}/api/exercises/8`, { method: "PUT", headers: hdr, body: form(meta({ id: 8 }), { video: [video, "x.exe", "application/octet-stream"] }) });
@@ -100,4 +102,29 @@ test("PDF upload returns a public link", async () => {
   const bad = new FormData(); bad.append("token", token + "2"); bad.append("file", new Blob(["nope"]), "x.pdf");
   assert.equal((await fetch(`${BASE}/api/pdfs`, { method: "POST", headers: hdr, body: bad })).status, 415);
   assert.equal((await fetch(`${BASE}/files/pdf/..%2f..%2fexercises.json`)).status, 404);
+});
+
+test("exercise pages and sitemap are crawler-friendly", async () => {
+  const r = await fetch(`${BASE}/api/exercises/21`, { method: "PUT", headers: hdr, body: form(meta({ id: 21, name: "پرس سینه", name_en: "Bench Press", description: "حرکت پایه سینه", description_en: "Chest basics" }), { video: [video, "a.mp4", "video/mp4"] }) });
+  assert.equal(r.status, 204);
+  const fa = await fetch(`${BASE}/fa/exercises/21`);
+  assert.equal(fa.status, 200);
+  const html = await fa.text();
+  assert.match(html, /<html lang="fa" dir="rtl">/);
+  assert.match(html, /<title>پرس سینه \| آموزش حرکت \| Paya<\/title>/);
+  assert.match(html, /<link rel="canonical" href="http:\/\/localhost:3999\/fa\/exercises\/21"/);
+  assert.match(html, /hreflang="en" href="http:\/\/localhost:3999\/en\/exercises\/21"/);
+  assert.match(html, /"@type":"VideoObject"/);
+  assert.match(html, /"contentUrl":"http:\/\/localhost:3999\/media\/videos\/21-/);
+  assert.match(html, /<noscript>.*<h1>پرس سینه<\/h1>/s);
+  const en = await (await fetch(`${BASE}/en/exercises/21`)).text();
+  assert.match(en, /<title>Bench Press \| exercise tutorial \| Paya<\/title>/);
+  assert.match(en, /<html lang="en" dir="ltr">/);
+  const missing = await fetch(`${BASE}/fa/exercises/999`);
+  assert.equal(missing.status, 404);
+  assert.match(await missing.text(), /noindex/);
+  const sm = await (await fetch(`${BASE}/sitemap.xml`)).text();
+  assert.match(sm, /<loc>http:\/\/localhost:3999\/fa\/exercises\/21<\/loc>/);
+  assert.match(sm, /<loc>http:\/\/localhost:3999\/en\/elite\/<\/loc>/);
+  assert.match(sm, /hreflang="x-default"/);
 });

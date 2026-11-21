@@ -19,7 +19,7 @@ export default function Footer() {
           <Link to={`/${lang}/exercises`}>{tr(S.nav.exercises, lang)}</Link>
         </div>
       </div>
-      <p className="copy">© {new Date().getFullYear()} Paya Group. {tr(S.footer.rights, lang)}</p>
+      <p className="copy">© <span suppressHydrationWarning>{new Date().getFullYear()}</span> Paya Group. {tr(S.footer.rights, lang)}</p>
     </footer>
   );
 }

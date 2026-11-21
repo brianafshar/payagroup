@@ -1,14 +1,14 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { S, tr, useLang } from "../i18n";
-import { useExercises, useLocalized, useTitle } from "../hooks";
+import { useExercises, useLocalized, usePageSeo } from "../hooks";
 import { CATEGORY, SPORT, label } from "../data/labels";
 import ExerciseCard from "../components/ExerciseCard";
 
 export default function Exercises() {
   const lang = useLang();
   const L = useLocalized();
-  useTitle(tr(S.ex.title, lang));
+  usePageSeo("exercises");
   const { data, error, retry } = useExercises();
   const [sp, setSp] = useSearchParams();
   const sport = sp.get("sport") ?? "";

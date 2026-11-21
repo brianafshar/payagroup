@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { S, tr, useLang } from "../i18n";
-import { useExercises, useTitle } from "../hooks";
+import { useExercises, usePageSeo } from "../hooks";
 import { BASKETBALL, BODYBUILDING, HOME } from "../data/content";
 import ExerciseCard from "../components/ExerciseCard";
 import HScroll from "../components/HScroll";
@@ -10,7 +10,7 @@ export default function Sport({ kind }: { kind: "basketball" | "bodybuilding" })
   const lang = useLang();
   const c = kind === "basketball" ? BASKETBALL : BODYBUILDING;
   const t = (b: { fa: string; en: string }) => b[lang];
-  useTitle(t(c.title));
+  usePageSeo(kind === "basketball" ? "basketball" : "elite");
   const { data } = useExercises();
   const related = (data ?? []).filter((e) => e.sport === c.sport).slice(0, 5);
 

@@ -46,14 +46,31 @@ docker compose up -d --build         # starts paya-site (static + proxy) and pay
 Then add this block to your **existing** Caddyfile (that Caddy must be on the same Docker network):
 
 ```caddy
-payagroup.org, www.payagroup.org {
+payagroup.org {
 	reverse_proxy paya-site:80
+}
+www.payagroup.org {
+	redir https://payagroup.org{uri} permanent
 }
 ```
 
 If your Caddy runs on the host (not in Docker), add `ports: ["127.0.0.1:8081:80"]` to the `paya-site` service and use `reverse_proxy 127.0.0.1:8081`.
 
 In the gym app set `SITE_URL=https://payagroup.org`, `SITE_API_URL=https://payagroup.org/api`, `SITE_API_KEY=<the same key>`.
+
+## SEO (search engines)
+
+Built in:
+- **Prerendered HTML**: `npm run build` renders every page (fa + en) to real HTML (`scripts/prerender.mjs`), so crawlers see the text without running JavaScript; the browser then hydrates it.
+- Per page: unique `<title>` and description, canonical URL, `hreflang` (fa / en / x-default), Open Graph + Twitter cards (`public/og.jpg`), JSON-LD (`SportsClub`, `WebSite`, `BreadcrumbList`).
+- **Exercise pages** (`/fa/exercises/{id}`) are rendered by `server/` with their own title/description, `VideoObject` JSON-LD and a `<noscript>` text version. They are listed in `/sitemap.xml` (generated from the stored exercises, both languages with hreflang).
+- `robots.txt`, a real `404` page with status 404 (no soft-404s), `/` → `/fa/` (301), `www` → apex (301).
+
+To do after deploy:
+1. Fill in the real address, phone and social links in `BUSINESS` (`src/seo.ts`); they go into the structured data (left out while empty), then rebuild.
+2. Register `https://payagroup.org` in **Google Search Console** and **Bing Webmaster Tools** (DNS or HTML-tag verification), submit `https://payagroup.org/sitemap.xml`, and use "URL inspection" on `/fa/` to request indexing.
+3. Replace the sample texts with real content (search engines rank real, specific text) and add a Google Maps / Business Profile for the club.
+4. If you change the domain, set `VITE_SITE_URL` at build time (and `PUBLIC_URL` for the API) and update `public/robots.txt`.
 
 ## Placeholder content to replace later
 

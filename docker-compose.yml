@@ -17,6 +17,7 @@ services:
       API_KEY: ${SITE_API_KEY:?set SITE_API_KEY in .env (16+ random characters)}
       PUBLIC_URL: ${PUBLIC_URL:-https://payagroup.org}
       MAX_VIDEO_MB: ${MAX_VIDEO_MB:-2048}
+      SHELL_URL: http://paya-site/__shell.html
     volumes:
       - paya-data:/data
     networks: [internal]

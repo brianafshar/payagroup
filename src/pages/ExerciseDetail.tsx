@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { S, tr, useLang } from "../i18n";
 import { loadExercise, parseSlug } from "../api";
-import { useLocalized, useTitle } from "../hooks";
+import { useExerciseSeo, useLocalized } from "../hooks";
 import { CATEGORY, DIFFICULTY, EQUIPMENT, SPORT, label } from "../data/labels";
 import type { Exercise } from "../types";
 
@@ -19,7 +19,7 @@ export default function ExerciseDetail() {
     loadExercise(id).then(setEx, () => setEx(null));
   }, [slug]);
 
-  useTitle(ex ? L.name(ex) : "");
+  useExerciseSeo(ex);
   const back = <Link to={`/${lang}/exercises`} className="link">← {tr(S.ex.back, lang)}</Link>;
 
   if (ex === undefined) return <section className="wrap section page-head"><p className="state">{tr(S.ex.loading, lang)}</p></section>;

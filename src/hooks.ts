@@ -2,11 +2,24 @@ import { useEffect, useState } from "react";
 import { useLang } from "./i18n";
 import type { Exercise } from "./types";
 import { loadExercises } from "./api";
+import { applyTags, exerciseHead, pageHead, type PageKey } from "./seo";
 
-export function useTitle(title: string) {
+/** Title, description, canonical, hreflang, Open Graph and JSON-LD for a static page. */
+export function usePageSeo(key: PageKey) {
+  const lang = useLang();
   useEffect(() => {
-    document.title = title ? `${title} — Paya` : "Paya Group";
-  }, [title]);
+    const h = pageHead(lang, key);
+    applyTags(h.title, h.tags);
+  }, [lang, key]);
+}
+
+export function useExerciseSeo(ex: Exercise | null | undefined) {
+  const lang = useLang();
+  useEffect(() => {
+    if (!ex) return;
+    const h = exerciseHead(lang, ex);
+    applyTags(h.title, h.tags);
+  }, [lang, ex]);
 }
 
 export function useExercises() {

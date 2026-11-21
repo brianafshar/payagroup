@@ -1,10 +1,14 @@
-# Inner Caddy: serves the static site on :80 and forwards the data routes to the API container.
+# Inner Caddy: serves the prerendered site on :80 and forwards data/SEO routes to the API container.
 # TLS / domain is handled by your existing Caddy on the server (see README).
 :80 {
 	root * /srv
 	encode zstd gzip
 
-	@data path /api/* /media/* /files/*
+	@root path /
+	redir @root /fa/ 301
+
+	# uploads from the gym app, media, PDFs, sitemap
+	@data path /api/* /media/* /files/* /sitemap.xml
 	handle @data {
 		request_body {
 			max_size 3GB
@@ -18,12 +22,23 @@
 		}
 	}
 
+	# exercise pages are rendered by the API so search engines get title/description/video markup
+	@exercise path_regexp exercise ^/(fa|en)/exercises/[0-9]+/?$
+	handle @exercise {
+		reverse_proxy api:3000
+	}
+
 	handle {
-		try_files {path} /index.html
-		file_server
-		@assets path /assets/* /brand/* /images/*
+		@assets path /assets/*
 		header @assets Cache-Control "public, max-age=31536000, immutable"
-		header /index.html Cache-Control "no-cache"
+		@static path /brand/* /images/* /og.jpg /favicon*
+		header @static Cache-Control "public, max-age=86400"
+		file_server
+	}
+
+	handle_errors {
+		rewrite * /404.html
+		file_server
 	}
 
 	header {

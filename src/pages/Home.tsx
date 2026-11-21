@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { S, tr, useLang } from "../i18n";
-import { useExercises, useTitle } from "../hooks";
+import { useExercises, usePageSeo } from "../hooks";
 import { HOME as H } from "../data/content";
 import ExerciseCard from "../components/ExerciseCard";
 import HScroll from "../components/HScroll";
@@ -8,7 +8,7 @@ import { Panel, PanelHead } from "../components/Panel";
 
 export default function Home() {
   const lang = useLang();
-  useTitle("");
+  usePageSeo("home");
   const { data } = useExercises();
   const t = (b: { fa: string; en: string }) => b[lang];
 
@@ -120,7 +120,7 @@ export default function Home() {
           <p>{t(H.hours)}</p>
           <p>{H.email} · payagroup.org</p>
         </div>
-        <p className="copy-l">© {new Date().getFullYear()} Paya Group. {tr(S.footer.rights, lang)}</p>
+        <p className="copy-l">© <span suppressHydrationWarning>{new Date().getFullYear()}</span> Paya Group. {tr(S.footer.rights, lang)}</p>
       </Panel>
     </HScroll>
   );
