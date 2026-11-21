@@ -100,6 +100,11 @@ class SmsSettings(models.Model):
     sender = models.CharField(max_length=32, blank=True)
     account_text = models.TextField(default=DEFAULT_ACCOUNT_SMS)
     program_text = models.TextField(default=DEFAULT_PROGRAM_SMS)
+    # Bale messenger bot: the same texts go to athletes who started the bot (see core/bale.py).
+    bale_token = models.CharField(max_length=200, blank=True)
+    bale_enabled = models.BooleanField(default=False)
+    bale_username = models.CharField(max_length=64, blank=True)
+    bale_offset = models.BigIntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

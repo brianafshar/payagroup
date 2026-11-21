@@ -12,14 +12,26 @@ import secrets
 from django.core.files.base import ContentFile
 
 from coaching.models import Athlete, ProgramShare
-from core import site, sms
+from core import bale, site, sms
 from core.models import SmsSettings
 from core.pdf.program import filename, render_pdf
 
 log = logging.getLogger(__name__)
 
 
-def _send(phone: str, text: str, detail: list | None = None) -> str:
+def _bale_link() -> str:
+    u = SmsSettings.load().bale_username.strip().lstrip("@")
+    return f"https://ble.ir/{u}" if u else ""
+
+
+def _send(phone: str, text: str, detail: list | None = None, athlete: Athlete | None = None) -> str:
+    """SMS (the returned status) and, in parallel, Bale when it's on. Athletes who haven't linked Bale yet get the
+    bot's link at the end of the SMS so they can start it."""
+    if athlete is not None and bale.token():
+        if athlete.bale_chat_id:
+            bale.send_to_athlete(athlete, text)
+        elif _bale_link():
+            text += "\nدریافت پیام در بله: " + _bale_link()
     if not phone:
         return "no_phone"
     try:
@@ -66,7 +78,7 @@ def render_text(template: str, **values: str) -> str:
 
 
 def send_account_created(athlete: Athlete) -> str:
-    return _send(athlete.phone, render_text(SmsSettings.load().account_text, name=athlete.name, brand=brand_of(athlete)))
+    return _send(athlete.phone, render_text(SmsSettings.load().account_text, name=athlete.name, brand=brand_of(athlete)), athlete=athlete)
 
 
 def send_program_assigned(athlete: Athlete, *, sent_by=None, base_url: str = "") -> str:
@@ -78,7 +90,7 @@ def send_program_assigned(athlete: Athlete, *, sent_by=None, base_url: str = "")
         log.warning("Could not publish the program PDF", exc_info=True)
         return "failed"
     text = render_text(SmsSettings.load().program_text, name=athlete.name, brand=brand_of(athlete), link=share.url)
-    status = _send(athlete.phone, text)
+    status = _send(athlete.phone, text, athlete=athlete)
     if status == "sent":
         share.sms_sent = True
         share.save(update_fields=["sms_sent"])

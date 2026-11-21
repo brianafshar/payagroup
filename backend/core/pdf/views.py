@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from coaching.models import AccountStatus, Athlete, ProgramShare
-from core import notify, site, sms
+from core import bale, notify, site, sms
 from core.models import SmsSettings
 from core.permissions import IsAthlete, IsCoach
 
@@ -147,6 +147,8 @@ class SendProgramSmsView(APIView):
         share = ProgramShare(athlete=athlete, sent_by=request.user, token=token, url=url)
         share.pdf.save(f"{token}.pdf", ContentFile(data), save=False)
         text = notify.render_text(SmsSettings.load().program_text, name=athlete.name, brand=notify.brand_of(athlete), link=url)
+        if athlete.bale_chat_id:
+            bale.send_to_athlete(athlete, text)
         try:
             sms.send_sms(athlete.phone, text)
         except sms.SmsNotConfigured:

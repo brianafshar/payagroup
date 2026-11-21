@@ -186,6 +186,7 @@ class Athlete(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="athlete")
     name = models.CharField(max_length=120)
     email = models.EmailField(blank=True)
+    bale_chat_id = models.BigIntegerField(null=True, blank=True, editable=False)  # set when the athlete shares their number with the Bale bot
     phone = models.CharField(max_length=20, blank=True)
     status = models.CharField(max_length=10, choices=AccountStatus.choices, default=AccountStatus.DRAFT)
     goal = models.CharField(max_length=4, choices=Goal.choices, blank=True)

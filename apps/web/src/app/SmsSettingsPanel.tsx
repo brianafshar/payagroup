@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ApiError, faError, remote } from '@/data/api';
-import { Button, TextField } from '@/ds';
+import { Button, Switch, TextField } from '@/ds';
 import { toast } from '@/lib/toast';
 
 interface Sms {
@@ -24,6 +24,99 @@ const card = {
 };
 const h3 = { margin: 0, fontSize: 16, lineHeight: '24px', fontWeight: 600 };
 const muted = { margin: 0, fontSize: 13, lineHeight: '22px', color: 'var(--text-muted)' };
+
+interface Bale {
+  enabled: boolean;
+  tokenSet: boolean;
+  tokenHint: string;
+  username: string;
+  link: string;
+  linked: number;
+  total: number;
+}
+
+/** Bale bot: token, on/off, the link athletes open to start the bot, and how many have linked. */
+function BalePanel() {
+  const [b, setB] = useState<Bale | null>(null);
+  const [token, setToken] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [round, setRound] = useState(0);
+  const load = () => remote.baleSettings().then((r) => setB(r as unknown as Bale)).catch((e) => setErr(faError(e)));
+  useEffect(() => {
+    void load();
+  }, []);
+
+  const save = async (data: Record<string, unknown>, ok: string) => {
+    setBusy(true);
+    setErr(null);
+    try {
+      setB((await remote.saveBaleSettings(data)) as unknown as Bale);
+      setToken('');
+      setRound((n) => n + 1);
+      toast(ok);
+    } catch (e) {
+      setErr(e instanceof ApiError && e.fields.token ? 'بله این توکن را نپذیرفت. توکن را دوباره از @botfather کپی کنید.' : faError(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const refresh = async () => {
+    setBusy(true);
+    try {
+      await remote.balePoll();
+      await load();
+      toast('وضعیت به‌روز شد');
+    } catch (e) {
+      toast('به‌روزرسانی نشد', faError(e), 'error');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!b) return <div style={card}>{err ?? 'در حال بارگذاری…'}</div>;
+  return (
+    <div key={round} style={card}>
+      <h3 style={h3}>پیام در بله (هم‌زمان با پیامک)</h3>
+      <p style={muted}>
+        با فعال بودن، هر پیامی که پیامک می‌شود (ساخت حساب، اختصاص برنامه، ارسال PDF) هم‌زمان در بله هم برای شاگردی که ربات را استارت کرده می‌رود. متن پیام همان متن‌های پیامک است.
+      </p>
+      <ol style={{ ...muted, paddingInlineStart: 20 }}>
+        <li>در بله به <bdi>@botfather</bdi> پیام بدهید، با <bdi>/newbot</bdi> یک ربات بسازید و توکنش را بگیرید.</li>
+        <li>توکن را همین‌جا وارد و ذخیره کنید.</li>
+        <li>لینک ربات را به شاگردها بدهید؛ آن‌ها ربات را باز می‌کنند و «اشتراک شماره من» را می‌زنند. شماره باید همان شماره‌ی ثبت‌شده‌ی شاگرد باشد.</li>
+      </ol>
+      <p style={muted}>{b.tokenSet ? 'توکن ذخیره شده است (…' + b.tokenHint + '). برای تغییر، توکن جدید را وارد کنید.' : 'هنوز توکنی ثبت نشده است.'}</p>
+      <TextField label="توکن ربات بله" type="password" dir="ltr" placeholder={b.tokenSet ? '••••••••' : 'توکن را از BotFather کپی کنید'} onChange={setToken} error={err ?? undefined} />
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Button variant="primary" icon="save" loading={busy} disabled={!token.trim()} onClick={() => void save({ token }, 'ربات بله ذخیره و فعال شد')}>
+          ذخیره توکن
+        </Button>
+        {b.tokenSet ? (
+          <Button variant="ghost" onClick={() => void save({ clearToken: true }, 'ربات بله حذف شد')}>
+            حذف ربات
+          </Button>
+        ) : null}
+      </div>
+      {b.tokenSet ? (
+        <>
+          <Switch label="ارسال هم‌زمان در بله" checked={b.enabled} onChange={(v: boolean) => void save({ enabled: v }, v ? 'ارسال در بله فعال شد' : 'ارسال در بله خاموش شد')} />
+          {b.link ? (
+            <p style={muted}>
+              لینک ربات برای شاگردها: <bdi dir="ltr">{b.link}</bdi>
+            </p>
+          ) : null}
+          <p style={muted}>
+            {b.linked} از {b.total} شاگردِ دارای شماره، ربات را فعال کرده‌اند.{' '}
+            <Button variant="ghost" size="sm" loading={busy} onClick={() => void refresh()}>
+              به‌روزرسانی
+            </Button>
+          </p>
+        </>
+      ) : null}
+    </div>
+  );
+}
 
 /** Head coach: Kavenegar key + sender line, the two message texts, and a test send. */
 export function SmsSettingsPanel() {
@@ -80,6 +173,7 @@ export function SmsSettingsPanel() {
   if (!s) return <div style={card}>{err ?? 'در حال بارگذاری…'}</div>;
   return (
     <div key={round} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <BalePanel />
       <div style={card}>
         <h3 style={h3}>اتصال به کاوه‌نگار</h3>
         <p style={muted}>

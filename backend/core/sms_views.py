@@ -7,7 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core import notify, sms
+from core import bale, notify, sms
 from core.models import DEFAULT_ACCOUNT_SMS, DEFAULT_PROGRAM_SMS, SmsSettings
 from core.permissions import IsCoach
 
@@ -94,3 +94,74 @@ class SmsTestView(APIView):
         detail: list = []
         status = notify._send(s.validated_data["phone"], text, detail)
         return Response({"status": status, "detail": detail[0] if detail else ""})
+
+
+def _bale_out(request) -> dict:
+    from coaching.models import Athlete
+
+    row = SmsSettings.load()
+    scope = Athlete.objects.filter(coach_id__in=request.user.coach.athlete_scope_ids()).exclude(phone="")
+    u = row.bale_username.lstrip("@")
+    return {
+        "enabled": row.bale_enabled,
+        "token_set": bool(row.bale_token.strip()),
+        "token_hint": row.bale_token.strip()[-4:] if row.bale_token.strip() else "",
+        "username": u,
+        "link": f"https://ble.ir/{u}" if u else "",
+        "linked": scope.filter(bale_chat_id__isnull=False).count(),
+        "total": scope.count(),
+    }
+
+
+class BaleSettingsView(APIView):
+    """`GET/PUT bale-settings/`: the Bale bot token (write-only, like the SMS key) and the on/off switch. Saving a
+    new token checks it with Bale and stores the bot's username."""
+
+    permission_classes = [IsCoach]
+
+    class Input(serializers.Serializer):
+        token = serializers.CharField(max_length=200, required=False, allow_blank=True)
+        clear_token = serializers.BooleanField(required=False)
+        enabled = serializers.BooleanField(required=False)
+
+    @extend_schema(responses=dict)
+    def get(self, request):
+        return Response(_bale_out(request))
+
+    @extend_schema(request=Input, responses=dict)
+    def put(self, request):
+        _guard(request)
+        s = self.Input(data=request.data)
+        s.is_valid(raise_exception=True)
+        d = s.validated_data
+        row = SmsSettings.load()
+        if d.get("clear_token"):
+            row.bale_token, row.bale_username, row.bale_enabled, row.bale_offset = "", "", False, 0
+        elif d.get("token", "").strip():
+            tok = d["token"].strip()
+            try:
+                me = bale.get_me(tok)
+            except bale.BaleError as e:
+                raise serializers.ValidationError({"token": f"Bale did not accept this token: {e}"}) from e
+            row.bale_token, row.bale_username, row.bale_offset = tok, me.get("username") or "", 0
+            row.bale_enabled = d.get("enabled", True)
+        if "enabled" in d and not d.get("clear_token") and not d.get("token", "").strip():
+            if d["enabled"] and not row.bale_token.strip():
+                raise serializers.ValidationError({"enabled": "Save the bot token first."})
+            row.bale_enabled = d["enabled"]
+        row.save()
+        return Response(_bale_out(request))
+
+
+class BalePollView(APIView):
+    """`POST bale-settings/poll/`: read the bot's new messages now (the app also does it every few seconds)."""
+
+    permission_classes = [IsCoach]
+
+    @extend_schema(request=None, responses=dict)
+    def post(self, request):
+        try:
+            n = bale.poll_once()
+        except bale.BaleError as e:
+            return Response({"detail": str(e), **_bale_out(request)}, status=502)
+        return Response({"read": n, **_bale_out(request)})

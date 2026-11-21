@@ -78,6 +78,9 @@ def main() -> None:
             pass
 
     threading.Thread(target=fill_illustrations, daemon=True).start()
+    from core import bale
+
+    bale.start_polling()
     from daphne.cli import CommandLineInterface
 
     CommandLineInterface().run(["-b", "127.0.0.1", "-p", port, "config.asgi:application"])
