@@ -194,6 +194,21 @@ cite { display: block; margin-top: 1rem; color: var(--mute); font-style: normal;
 .faq summary { cursor: pointer; font-weight: 700; font-size: 1.15rem; }
 .faq p { color: var(--mute); margin-top: .5rem; }
 
+
+/* ---------- map + contact ---------- */
+.contact-grid { display: grid; grid-template-columns: minmax(320px, 1.1fr) minmax(300px, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: center; width: min(1200px, 88vw); direction: ltr; }
+.contact-grid > .contact-info { direction: ltr; }
+[dir="rtl"] .contact-grid > .contact-info { direction: rtl; }
+.contact-grid.light { width: 100%; }
+.mapcard { margin: 0; }
+.map-frame { position: relative; height: min(56vh, 460px); border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #e9e5db url(/images/map-fallback.svg) center / cover; box-shadow: 0 20px 50px -25px rgba(0, 0, 0, .6); }
+.map-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.mapcard figcaption { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: .8rem; font-size: .95rem; direction: inherit; }
+[dir="rtl"] .mapcard figcaption { direction: rtl; }
+.map-open { color: var(--orange); font-weight: 700; } .map-open:hover { text-decoration: underline; }
+.light .map-open { color: var(--accent); }
+.p-contact .contact-info .phead { margin-bottom: .5rem; }
+
 /* ---------- exercise cards ---------- */
 .cards-row { display: flex; gap: 1.2rem; }
 .cards-row .card { flex: 0 0 300px; }
@@ -273,6 +288,9 @@ cite { display: block; margin-top: 1rem; color: var(--mute); font-style: normal;
   .detail-grid { grid-template-columns: 1fr; }
   .sched li { grid-template-columns: 1fr 1fr; padding: .8rem 0; font-size: 1rem; } .sched em { grid-column: 1 / -1; }
   .plan, .level, blockquote { padding: 1.1rem; }
+  .contact-grid { grid-template-columns: 1fr; width: 100%; gap: 1.2rem; direction: inherit; }
+  .contact-grid > .contact-info { order: -1; }
+  .map-frame { height: 240px; }
   .sport-bg { transform: none; inset: 0; background-repeat: no-repeat; background-size: 240% auto; background-position: center 26%; }
   .p-sport.basketball .sport-bg { background-position: 80% 26%; }
   /* indicator becomes small dots along the bottom */

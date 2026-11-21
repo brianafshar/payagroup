@@ -9,7 +9,9 @@ export const BUSINESS = {
   telephone: "",
   email: "",
   address: { streetAddress: "", addressLocality: "", addressRegion: "", addressCountry: "IR" },
-  sameAs: [] as string[], // Instagram / Telegram / Google Maps page URLs
+  sameAs: [] as string[], // Instagram / Telegram / Google Business Profile URLs
+  geo: { latitude: 35.7607523, longitude: 51.3785358 },
+  mapUrl: "https://maps.app.goo.gl/tvA97GdXmZ4Egn6q9",
 };
 
 export type PageKey = "home" | "basketball" | "elite" | "exercises" | "contact";
@@ -133,6 +135,8 @@ function clubLd(lang: Lang, description: string) {
     foundingDate: "2007",
     sport: ["Basketball", "Bodybuilding"],
     inLanguage: ["fa", "en"],
+    geo: { "@type": "GeoCoordinates", ...b.geo },
+    hasMap: b.mapUrl,
     ...(b.telephone ? { telephone: b.telephone } : {}),
     ...(b.email ? { email: b.email } : {}),
     ...(a.streetAddress ? { address: { "@type": "PostalAddress", ...a } } : {}),

@@ -84,7 +84,8 @@ export const S = {
   },
   footer: {
     contact: { fa: "تماس با ما", en: "Contact us" },
-    address: { fa: "آدرس: (نمونه) تهران، خیابان نمونه، پلاک ۱", en: "Address: (sample) 1 Sample St, Tehran" },
+    address: { fa: "آدرس: تهران، مجموعه ورزشی گلبانگ", en: "Address: Golbang Sport Complex, Tehran" },
+    openMap: { fa: "مسیریابی در گوگل‌مپ", en: "Open in Google Maps" },
     phone: { fa: "تلفن: ۰۲۱-۰۰۰۰۰۰۰۰", en: "Phone: +98 21 0000 0000" },
     rights: { fa: "تمامی حقوق محفوظ است.", en: "All rights reserved." },
   },

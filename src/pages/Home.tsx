@@ -4,6 +4,7 @@ import { useExercises, usePageSeo } from "../hooks";
 import { HOME as H } from "../data/content";
 import ExerciseCard from "../components/ExerciseCard";
 import HScroll from "../components/HScroll";
+import MapCard from "../components/MapCard";
 import { Panel, PanelHead } from "../components/Panel";
 
 export default function Home() {
@@ -112,13 +113,18 @@ export default function Home() {
       </Panel>
 
       <Panel className="p-contact dark">
-        <PanelHead n="09" title={t(H.contactTitle)} />
-        <p className="body-lg" data-reveal>{t(H.contactText)}</p>
-        <div className="contact-lines" data-reveal>
-          <p>{tr(S.footer.address, lang)}</p>
-          <p>{tr(S.footer.phone, lang)}</p>
-          <p>{t(H.hours)}</p>
-          <p>{H.email} · payagroup.org</p>
+        <div className="contact-grid">
+          <MapCard />
+          <div className="contact-info">
+            <PanelHead n="09" title={t(H.contactTitle)} />
+            <p className="body-lg" data-reveal>{t(H.contactText)}</p>
+            <div className="contact-lines" data-reveal>
+              <p>{tr(S.footer.address, lang)}</p>
+              <p>{tr(S.footer.phone, lang)}</p>
+              <p>{t(H.hours)}</p>
+              <p>{H.email} · payagroup.org</p>
+            </div>
+          </div>
         </div>
         <p className="copy-l">© <span suppressHydrationWarning>{new Date().getFullYear()}</span> Paya Group. {tr(S.footer.rights, lang)}</p>
       </Panel>
