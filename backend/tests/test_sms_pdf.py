@@ -52,6 +52,4 @@ def test_pdf_exercise_names_link_to_the_site(settings):
 
     c, _ = coach_client()
     ex = Exercise.objects.create(coach=c, name="Squat", library_key="squat")
-    assert site.exercise_url(ex) == f"{settings.SITE_URL}/training/squat"
-    ex2 = Exercise.objects.create(coach=c, name="Mine")
-    assert site.exercise_url(ex2).endswith(f"/training/x{ex2.pk}")
+    assert site.exercise_url(ex) == f"{settings.SITE_URL}/fa/exercises/{ex.pk}"

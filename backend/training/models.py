@@ -55,6 +55,9 @@ class Exercise(models.Model):
     stock_image_start = models.CharField(max_length=200, blank=True, help_text="Start pose of the library illustration; `stock_image` is the end pose.")
     illustration_match = models.CharField(max_length=10, blank=True, help_text="exact · approx (a look-alike movement) · none")
     badge = models.CharField(max_length=20, blank=True, help_text="band: the picture shows the cable/dumbbell version.")
+    # Library → website (core.site.sync_exercise): when the exercise with a video last reached the site.
+    site_synced_at = models.DateTimeField(null=True, blank=True)
+    site_error = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

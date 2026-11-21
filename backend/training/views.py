@@ -1,5 +1,7 @@
+import threading
 from datetime import timedelta
 
+from django.conf import settings
 from django.db.models import Count, F, Max, Q
 from django.db.models.functions import Coalesce
 from django.utils import timezone
@@ -11,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from coaching.models import Athlete, program_week_of
-from core import notify
+from core import notify, site
 from core.permissions import CoachWritesAthleteReads, IsAthlete, IsCoach, IsCoachOrAthlete, is_athlete, is_coach
 from core.scoping import AthleteScopedMixin
 
@@ -49,7 +51,33 @@ class ExerciseViewSet(viewsets.ModelViewSet):
         return Exercise.objects.filter(coach__in=coach.gym_ids()).annotate(used=Count("programs", filter=Q(programs__archived=False), distinct=True))
 
     def perform_create(self, serializer):
-        serializer.save(coach=self.request.user.coach)
+        ex = serializer.save(coach=self.request.user.coach)
+        site.sync_in_background(ex.pk)  # a video → the site's tutorial page
+
+    def perform_update(self, serializer):
+        ex = serializer.save()
+        if site.has_video(ex):
+            site.sync_in_background(ex.pk)
+        else:
+            site.remove_exercise(ex.pk)  # the video was removed: the page leaves the site
+
+    @extend_schema(request=None, responses={200: dict})
+    @action(detail=False, methods=["post"], url_path="sync-site")
+    def sync_site(self, request):
+        """Push every library exercise that has a video to the site (head coach / owner): first-time setup or retry."""
+        c = request.user.coach
+        if c.gym_head.pk != c.pk:
+            raise PermissionDenied("Only the head coach can sync the library.")
+        if not settings.SITE_API_URL:
+            raise ValidationError({"detail": "The site connection (SITE_API_URL) is not configured."}, code="site_not_configured")
+        ids = [e.pk for e in Exercise.objects.filter(coach__in=c.gym_ids()) if site.has_video(e)]
+
+        def run():
+            for e in Exercise.objects.filter(pk__in=ids):
+                site.sync_exercise(e)
+
+        threading.Thread(target=run, daemon=True).start()
+        return Response({"queued": len(ids)})
 
     @extend_schema(responses={200: dict})
     @action(detail=True, methods=["get"])
@@ -81,7 +109,9 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         if instance.programs.exists() or LoggedSet.objects.filter(exercise=instance).exists():
             raise ValidationError({"detail": "Exercise is used by programs or logs."}, code="in_use")
+        pk = instance.pk
         instance.delete()
+        site.remove_exercise(pk)  # its page leaves the site
 
 
 @extend_schema(parameters=[OpenApiParameter("kind", str, description="template · copy · customized"), OpenApiParameter("athlete", int)])

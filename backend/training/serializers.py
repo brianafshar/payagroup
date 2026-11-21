@@ -63,9 +63,11 @@ class ExerciseSerializer(serializers.ModelSerializer):
             "library_key",
             "image_start_src",
             "alternatives",
+            "site_synced_at",
+            "site_error",
             "updated_at",
         ]
-        read_only_fields = ["updated_at", "badge", "illustration_match", "library_key"]
+        read_only_fields = ["updated_at", "badge", "illustration_match", "library_key", "site_synced_at", "site_error"]
         extra_kwargs = {"video": {"write_only": True, "required": False}, "image": {"write_only": True, "required": False}}
 
     def update(self, ex, validated):

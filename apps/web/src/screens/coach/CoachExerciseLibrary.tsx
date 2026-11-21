@@ -5,7 +5,8 @@ import { PanelLayout } from '@/app/PanelLayout';
 import { toast } from '@/lib/toast';
 import { categoriesFor, EX_CATS, EX_EQUIP, EX_DIFF, ISSUES, LIBRARY_CREDIT, SPORT_LABEL, SPORTS } from '@/data/exercises';
 import { pending } from '@/app/pending';
-import { api, faError } from '@/data/api';
+import { api, faError, remote } from '@/data/api';
+import { currentUser } from '@/data/session';
 import { parseCsv } from '@/lib/csv';
 import { faDigits } from '@/lib/format';
 import { useQuery } from '@/data/hooks';
@@ -214,6 +215,22 @@ class CoachExerciseLibrary extends Screen {
             <Button variant="secondary" icon="upload" onClick={v.importCsv}>
               ورود فایل
             </Button>
+            {currentUser()?.isHeadCoach ? (
+              <Button
+                variant="secondary"
+                icon="upload"
+                onClick={async () => {
+                  try {
+                    const r = await remote.syncLibraryToSite();
+                    toast('ارسال به سایت شروع شد', faDigits(r.queued) + ' حرکت دارای ویدیو در حال ارسال است.');
+                  } catch (e) {
+                    toast('ارسال به سایت انجام نشد', faError(e), 'error');
+                  }
+                }}
+              >
+                ارسال ویدیوها به سایت
+              </Button>
+            ) : null}
             <Button variant="primary" icon="plus" to="coach:create-exercise">
               ایجاد حرکت
             </Button>

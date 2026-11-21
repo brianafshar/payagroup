@@ -456,6 +456,7 @@ export const remote = {
   saveNutritionPlan: (athleteId: ID, plan: Json) => mutate(http.put<Json>(`/nutrition-plans/${athleteId}/`, plan)),
   /** Food bank: shared Persian foods + the coach's own (with household units). */
   foods: (q: string) => http.get<BankFood[]>(`/foods/?q=${encodeURIComponent(q)}`),
+  syncLibraryToSite: () => http.post<{ queued: number }>('/exercises/sync-site/', {}),
   foodsByCategory: (category: string) => http.get<BankFood[]>(`/foods/?category=${encodeURIComponent(category)}`),
   foodCategories: () => http.get<Array<{ category: string; count: number }>>('/foods/categories/'),
   nutritionTemplates: () => http.get<NutritionTemplate[]>('/nutrition-templates/'),
