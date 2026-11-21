@@ -3,14 +3,30 @@ services:
     build:
       context: .
       args:
-        VITE_API_URL: ${VITE_API_URL:-}
+        VITE_API_URL: ${VITE_API_URL:-/api}
     container_name: paya-site
     restart: unless-stopped
-    networks: [web]
+    depends_on: [api]
+    networks: [web, internal]
 
-# Join the same Docker network as your existing Caddy.
-# Create it once if needed:  docker network create web
+  api:
+    build: ./server
+    container_name: paya-site-api
+    restart: unless-stopped
+    environment:
+      API_KEY: ${SITE_API_KEY:?set SITE_API_KEY in .env (16+ random characters)}
+      PUBLIC_URL: ${PUBLIC_URL:-https://payagroup.org}
+      MAX_VIDEO_MB: ${MAX_VIDEO_MB:-2048}
+    volumes:
+      - paya-data:/data
+    networks: [internal]
+
+volumes:
+  paya-data:
+
 networks:
+  internal:
+  # Same Docker network as your existing Caddy. Create once if needed:  docker network create web
   web:
     external: true
     name: ${CADDY_NETWORK:-web}

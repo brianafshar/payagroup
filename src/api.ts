@@ -8,7 +8,7 @@ let cache: Promise<Exercise[]> | null = null;
 function absolutize(url: string | undefined): string {
   if (!url) return "";
   if (/^https?:\/\//.test(url) || !API) return url;
-  const origin = new URL(API).origin;
+  const origin = API.startsWith("/") ? window.location.origin : new URL(API).origin;
   return url.startsWith("/") ? origin + url : url;
 }
 

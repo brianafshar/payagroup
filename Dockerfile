@@ -4,8 +4,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-# Public API base URL is baked in at build time (empty = sample data).
-ARG VITE_API_URL=""
+# "/api" = same origin, proxied to the api container by Caddy. Empty = built-in sample data.
+ARG VITE_API_URL="/api"
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 

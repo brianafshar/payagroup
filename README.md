@@ -16,26 +16,34 @@ This branch (`website`) is independent of the app code. Nothing here touches `ap
 
 ```bash
 npm install
-cp .env.example .env     # VITE_API_URL empty = built-in sample exercises
-npm run dev              # http://localhost:5174
-npm run build
+npm run dev              # site on http://localhost:5174 (sample exercises while VITE_API_URL is unset)
 ```
 
-## Exercise data
+With the real API locally (two terminals):
 
-The site reads `GET {VITE_API_URL}/public/exercises/` — see [docs/API-CONTRACT.md](docs/API-CONTRACT.md).
-That endpoint does **not** exist in the app yet. Until it does, leave `VITE_API_URL` empty (sample data).
+```bash
+cd server && npm install && API_KEY=dev-key-0123456789abcdef PUBLIC_URL=http://localhost:5174 npm start   # API on :3000
+# in the repo root, put VITE_API_URL=/api in .env  (Vite proxies /api, /media, /files to :3000)
+npm run dev
+```
+
+Tests of the API: `cd server && npm test`.
+
+## What is in this branch
+
+- `src/`: the website (React).
+- `server/`: the small API that **receives exercises, videos and program PDFs from the gym app** and serves them publicly
+  (`PUT/DELETE /api/exercises/{id}`, `POST /api/pdfs`, `GET /api/public/exercises/`). Contract: [docs/SITE-SYNC.md](docs/SITE-SYNC.md).
 
 ## Deploy (Docker + Caddy)
 
 ```bash
-# on the server, once: a shared network with your existing Caddy
-docker network create web            # skip if it exists; set CADDY_NETWORK to your network's name otherwise
-
-VITE_API_URL=https://api.payagroup.org/api docker compose up -d --build
+docker network create web            # once, if your Caddy's network does not exist yet (or set CADDY_NETWORK)
+cp .env.example .env                 # set SITE_API_KEY=<16+ random chars>   (openssl rand -hex 24)
+docker compose up -d --build         # starts paya-site (static + proxy) and paya-site-api (+ data volume)
 ```
 
-Then add this block to your **existing** Caddyfile (the container must be on the same Docker network as that Caddy):
+Then add this block to your **existing** Caddyfile (that Caddy must be on the same Docker network):
 
 ```caddy
 payagroup.org, www.payagroup.org {
@@ -43,11 +51,9 @@ payagroup.org, www.payagroup.org {
 }
 ```
 
-If your Caddy runs on the host (not in Docker), publish the port instead: add `ports: ["127.0.0.1:8081:80"]`
-to the service and use `reverse_proxy 127.0.0.1:8081`.
+If your Caddy runs on the host (not in Docker), add `ports: ["127.0.0.1:8081:80"]` to the `paya-site` service and use `reverse_proxy 127.0.0.1:8081`.
 
-`VITE_API_URL` is baked into the build, so rebuild after changing it. The API must allow CORS from
-`https://payagroup.org` (`CORS_ALLOWED_ORIGINS` in the Django settings).
+In the gym app set `SITE_URL=https://payagroup.org`, `SITE_API_URL=https://payagroup.org/api`, `SITE_API_KEY=<the same key>`.
 
 ## Placeholder content to replace later
 

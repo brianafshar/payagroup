@@ -1,14 +1,31 @@
-# Inner Caddy: serves the static site on :80 inside the container.
+# Inner Caddy: serves the static site on :80 and forwards the data routes to the API container.
 # TLS / domain is handled by your existing Caddy on the server (see README).
 :80 {
 	root * /srv
 	encode zstd gzip
-	try_files {path} /index.html
-	file_server
 
-	@assets path /assets/* /brand/*
-	header @assets Cache-Control "public, max-age=31536000, immutable"
-	header /index.html Cache-Control "no-cache"
+	@data path /api/* /media/* /files/*
+	handle @data {
+		request_body {
+			max_size 3GB
+		}
+		reverse_proxy api:3000 {
+			flush_interval -1
+			transport http {
+				read_timeout 15m
+				write_timeout 15m
+			}
+		}
+	}
+
+	handle {
+		try_files {path} /index.html
+		file_server
+		@assets path /assets/* /brand/* /images/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		header /index.html Cache-Control "no-cache"
+	}
+
 	header {
 		X-Content-Type-Options nosniff
 		Referrer-Policy strict-origin-when-cross-origin
