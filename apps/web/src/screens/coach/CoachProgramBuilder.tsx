@@ -4,7 +4,7 @@ import { Button, IconButton, Modal, PageHeader, SearchField, Select, Sidebar, Ta
 import { PanelLayout } from '@/app/PanelLayout';
 import { go, href, param } from '@/lib/nav';
 import { toast } from '@/lib/toast';
-import { BAND_LEVELS, categoriesFor, EX_CATS, EX_EQUIP, SPORT_LABEL, SPORTS } from '@/data/exercises';
+import { BAND_LEVELS, categoriesFor, EX_CATS, EX_EQUIP, PROGRAM_SPORTS, SPORT_LABEL } from '@/data/exercises';
 import { QuickExerciseModal } from './QuickExerciseModal';
 import { BuilderPreview } from './BuilderPreview';
 import { api, faError } from '@/data/api';
@@ -765,7 +765,7 @@ class CoachProgramBuilder extends Screen {
                   <Select
                     label="رشته"
                     value={this.state.metaEdit.sport}
-                    options={SPORTS.map(([value, label]) => ({ value, label }))}
+                    options={(PROGRAM_SPORTS.some(([k]) => k === this.state.metaEdit?.sport) ? PROGRAM_SPORTS : [...PROGRAM_SPORTS, [this.state.metaEdit?.sport, SPORT_LABEL[this.state.metaEdit?.sport ?? ''] ?? this.state.metaEdit?.sport]]).map(([value, label]) => ({ value: value as string, label: label as string }))}
                     onChange={(x) => this.setState({ metaEdit: { ...this.state.metaEdit, sport: x } })}
                   />
                   <Select

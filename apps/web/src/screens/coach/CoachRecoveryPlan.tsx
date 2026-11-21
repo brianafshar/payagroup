@@ -1,6 +1,6 @@
 // Ported from design handoff: project/C25 Coach Recovery Plan.dc.html
 import { Fragment } from 'react';
-import { Banner, Button, Card, IconButton, PageHeader, Select, Sidebar, Slider, Switch, Table, Tag, TextField, TopBar } from '@/ds';
+import { Banner, Button, Card, Checkbox, Modal, IconButton, PageHeader, Select, Sidebar, Slider, Switch, Table, Tag, TextField, TopBar } from '@/ds';
 import { PanelLayout } from '@/app/PanelLayout';
 import { toast } from '@/lib/toast';
 import { NoAthletePage, pending } from '@/app/pending';
@@ -63,17 +63,33 @@ class CoachRecoveryPlan extends Screen {
   constructor(p) {
     super(p);
     const plan = toState(p.livePlan);
-    this.state = { plan, saved: plan, saving: false };
+    this.state = { plan, saved: plan, saving: false, copy: false, pick: [] };
   }
   renderVals() {
     const fa = (n) =>
       String(n)
         .replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d])
         .replace('.', '٫');
-    const { plan, saved, saving } = this.state;
+    const { plan, saved, saving, copy, pick } = this.state;
     const who = this.props.athlete;
     const first = who.name.split(' ')[0];
     const set = (patch) => this.setState({ plan: { ...plan, ...patch } });
+    const others = (this.props.athletes || []).filter((a) => a.id !== who.id);
+    const payload = () => ({
+      sleepHours: plan.sleep,
+      waterL: plan.water,
+      stretchMin: plan.stretch,
+      restDays: plan.rest.map((d) => DAY[d]),
+      note: plan.note,
+      checks: [
+        ...Object.keys(CHECK)
+          .filter((k) => plan.checks[k])
+          .map((k) => CHECK[k]),
+        ...WATCH.filter(([k]) => plan.watch[k]).map(([k]) => k),
+      ],
+      customFields: plan.custom,
+      sorenessAlert: +plan.alertAt,
+    });
     const DAYS = [
       ['sa', 'شنبه'],
       ['su', 'یکشنبه'],
@@ -121,24 +137,27 @@ class CoachRecoveryPlan extends Screen {
       badges: dirty ? [{ label: 'ذخیره‌نشده', tone: 'warning', icon: 'edit' }] : [],
       clean: !dirty,
       saving,
+      copyOpen: copy,
+      openCopy: () => this.setState({ copy: true }),
+      closeCopy: () => this.setState({ copy: false, pick: [] }),
+      copyList: others.map((a) => ({ name: a.name, desc: a.programName || '', on: pick.includes(a.id), toggle: () => this.setState({ pick: pick.includes(a.id) ? pick.filter((x) => x !== a.id) : [...pick, a.id] }) })),
+      copyAll: others.length > 0 && pick.length === others.length,
+      toggleAll: () => this.setState({ pick: pick.length === others.length ? [] : others.map((a) => a.id) }),
+      copyLabel: 'کپی برای ' + fa(pick.length) + ' ورزشکار',
+      doCopy: async () => {
+        const names = others.filter((a) => pick.includes(a.id)).map((a) => a.name);
+        try {
+          await Promise.all(pick.map((aid) => remote.saveRecoveryPlan(aid, payload())));
+        } catch (e) {
+          return toast('کپی نشد', faError(e), 'error');
+        }
+        this.setState({ copy: false, pick: [] });
+        toast('برنامه ریکاوری کپی شد', names.join('، '));
+      },
       save: async () => {
         this.setState({ saving: true });
         try {
-          const savedPlan = await remote.saveRecoveryPlan(who.id, {
-            sleepHours: plan.sleep,
-            waterL: plan.water,
-            stretchMin: plan.stretch,
-            restDays: plan.rest.map((d) => DAY[d]),
-            note: plan.note,
-            checks: [
-              ...Object.keys(CHECK)
-                .filter((k) => plan.checks[k])
-                .map((k) => CHECK[k]),
-              ...WATCH.filter(([k]) => plan.watch[k]).map(([k]) => k),
-            ],
-            customFields: plan.custom,
-            sorenessAlert: +plan.alertAt,
-          });
+          const savedPlan = await remote.saveRecoveryPlan(who.id, payload());
           const next = toState(savedPlan);
           this.setState({ saving: false, plan: next, saved: next });
           toast('برنامه ریکاوری ذخیره شد', 'چک‌این فردای ' + first + ' با تنظیمات جدید است.');
@@ -206,9 +225,34 @@ class CoachRecoveryPlan extends Screen {
         theme={v.brand}
         sidebar={<Sidebar app="coach" active="recovery" brandSub="فضای کاری مربی" user={v.user} />}
         topBar={<TopBar breadcrumbs={v.crumbs} unread search />}
+        overlays={
+          v.copyOpen ? (
+            <div style={{ position: 'absolute', inset: '0' }}>
+              <Modal
+                title="کپی برنامه ریکاوری"
+                description="تنظیمات ریکاوری فعلی برای ورزشکاران انتخاب‌شده کپی می‌شود. برنامه ریکاوری فعلی آن‌ها جایگزین خواهد شد."
+                primaryLabel={v.copyLabel}
+                primaryDisabled={!v.copyList.some((c) => c.on)}
+                secondaryLabel="انصراف"
+                onPrimary={v.doCopy}
+                onClose={v.closeCopy}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <Checkbox label="کپی برای همه شاگردها" checked={v.copyAll} onChange={v.toggleAll} />
+                  {v.copyList.map((c, i) => (
+                    <Checkbox key={i} label={c.name} description={c.desc} checked={c.on} onChange={c.toggle} />
+                  ))}
+                </div>
+              </Modal>
+            </div>
+          ) : undefined
+        }
       >
         <div style={{ flex: '1 1 auto', padding: '24px 32px 48px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <PageHeader back={v.who.name} backTo={v.whoTo} title={v.title} subtitle="اهداف برنامه و چک‌این روزانه‌ای که در اپ پر می‌کند" badges={v.badges}>
+            <Button variant="secondary" icon="copy" onClick={v.openCopy}>
+              کپی برنامه برای…
+            </Button>
             <Button variant="primary" icon="save" disabled={v.clean} loading={v.saving} onClick={v.save}>
               ذخیره برنامه
             </Button>

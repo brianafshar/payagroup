@@ -394,6 +394,8 @@ class CoachNutritionPlan extends Screen {
         on: pick.includes(id),
         toggle: () => this.setState({ pick: pick.includes(id) ? pick.filter((x) => x !== id) : [...pick, id] }),
       })),
+      copyAll: ATH.length > 0 && pick.length === ATH.length,
+      toggleAll: () => this.setState({ pick: pick.length === ATH.length ? [] : ATH.map((a) => a[0]) }),
       copyNone: pick.length === 0,
       copyLabel: 'کپی برای ' + fa(pick.length) + ' ورزشکار',
       doCopy: async () => {
@@ -459,6 +461,7 @@ class CoachNutritionPlan extends Screen {
                     onClose={v.closeCopy}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <Checkbox label="کپی برای همه شاگردها" checked={v.copyAll} onChange={v.toggleAll} />
                       {(v.copyList || []).map((c: any, $index: number) => (
                         <Fragment key={$index}>
                           <Checkbox label={c?.name} description={c?.desc} checked={c?.on} onChange={c?.toggle} />

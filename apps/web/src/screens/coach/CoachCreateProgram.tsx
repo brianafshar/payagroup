@@ -1,6 +1,6 @@
 // Ported from design handoff: project/C18 Coach Create Program.dc.html
 import { Button, NumberStepper, PageHeader, ProgramDay, RadioGroup, SegmentedControl, Select, Sidebar, TextField, TopBar } from '@/ds';
-import { SPORTS } from '@/data/exercises';
+import { PROGRAM_SPORTS } from '@/data/exercises';
 import { PanelLayout } from '@/app/PanelLayout';
 import { go } from '@/lib/nav';
 import { api } from '@/data/api';
@@ -24,7 +24,7 @@ class CoachCreateProgram extends Screen {
     sport: 'fitness',
     name: '',
     goal: 'gain',
-    weeks: 10,
+    weeks: 1,
     sessions: '4',
     from: 'blank',
     src: null,
@@ -66,7 +66,7 @@ class CoachCreateProgram extends Screen {
         { value: 'gen', label: 'آمادگی عمومی' },
       ],
       setGoal: (v) => this.setState({ goal: v }),
-      sports: SPORTS.map(([value, label]) => ({ value, label })),
+      sports: PROGRAM_SPORTS.map(([value, label]) => ({ value, label })),
       sport: this.state.sport,
       setSport: (v) => this.setState({ sport: v }),
       weeks,

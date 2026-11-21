@@ -7,7 +7,7 @@ import { PanelLayout } from '@/app/PanelLayout';
 import { faError, remote } from '@/data/api';
 import { useQuery } from '@/data/hooks';
 import { panelUser } from '@/data/session';
-import { faDigits, getCalendar } from '@/lib/format';
+import { faDate, faDigits, getCalendar } from '@/lib/format';
 import { toast } from '@/lib/toast';
 
 interface Session {
@@ -93,39 +93,79 @@ function EditSets({ logId, title, onClose }: { logId: number; title: string; onC
 
 const FIELD_STYLE = { padding: '8px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--surface)', color: 'inherit' } as const;
 const isoOf = (d: Date) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const monthLen = (jy: number, jm: number) => (jm <= 6 ? 31 : jm <= 11 ? 30 : toJalali(new Date(fromJalali(jy + 1, 1, 1, 12).getTime() - 86400000)).jd);
+const WEEK = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+const navBtn = { width: 32, height: 32, borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', color: 'inherit', cursor: 'pointer', fontSize: 16 } as const;
 
-/** Date field following the calendar chosen in settings: Jalali (day / month / year) by default, native picker for Gregorian. Value is always ISO. */
+/** One date button that follows the calendar chosen in settings: a Jalali month popover by default, the native picker for Gregorian. Value is always ISO. */
 function DateField({ value, max, onChange }: { value: string; max: string; onChange: (iso: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const cur = toJalali(new Date(value + 'T12:00:00'));
+  const [view, setView] = useState({ jy: cur.jy, jm: cur.jm });
   if (getCalendar() === 'g') {
     return <input type="date" value={value} max={max} onChange={(e) => e.target.value && onChange(e.target.value)} style={FIELD_STYLE} />;
   }
-  const j = toJalali(new Date(value + 'T12:00:00'));
-  const top = toJalali(new Date(max + 'T12:00:00'));
-  const days = j.jm <= 6 ? 31 : j.jm <= 11 ? 30 : 29;
-  const set = (jy: number, jm: number, jd: number) => {
-    const len = jm <= 6 ? 31 : jm <= 11 ? 30 : 29;
-    let iso = isoOf(fromJalali(jy, jm, Math.min(jd, len), 12));
-    if (iso > max) iso = max;
+  const day = new Date(value + 'T12:00:00');
+  const todayIso = max;
+  const first = fromJalali(view.jy, view.jm, 1, 12);
+  const offset = (first.getDay() + 1) % 7; // the Persian week starts on Saturday
+  const len = monthLen(view.jy, view.jm);
+  const shift = (n: number) => setView((v) => { const m = v.jm - 1 + n; return { jy: v.jy + Math.floor(m / 12), jm: ((m % 12) + 12) % 12 + 1 }; });
+  const label = faDate(day, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const pick = (d: number) => {
+    const iso = isoOf(fromJalali(view.jy, view.jm, d, 12));
+    if (iso > max) return;
     onChange(iso);
+    setOpen(false);
   };
-  const years = Array.from({ length: 6 }, (_, i) => top.jy - i);
+  const step = (n: number) => {
+    const d = new Date(day.getTime() + n * 86400000);
+    if (isoOf(d) <= max) onChange(isoOf(d));
+  };
   return (
-    <div style={{ display: 'flex', gap: 6 }} dir="rtl" aria-label="تاریخ (شمسی)">
-      <select aria-label="روز" value={j.jd} onChange={(e) => set(j.jy, j.jm, +e.target.value)} style={FIELD_STYLE}>
-        {Array.from({ length: days }, (_, i) => i + 1).map((d) => (
-          <option key={d} value={d}>{faDigits(d)}</option>
-        ))}
-      </select>
-      <select aria-label="ماه" value={j.jm} onChange={(e) => set(j.jy, +e.target.value, j.jd)} style={FIELD_STYLE}>
-        {JALALI_MONTHS.map((m, i) => (
-          <option key={m} value={i + 1}>{m}</option>
-        ))}
-      </select>
-      <select aria-label="سال" value={j.jy} onChange={(e) => set(+e.target.value, j.jm, j.jd)} style={FIELD_STYLE}>
-        {years.map((y) => (
-          <option key={y} value={y}>{faDigits(y)}</option>
-        ))}
-      </select>
+    <div style={{ position: 'relative', display: 'flex', gap: 6, alignItems: 'center' }}>
+      <button type="button" aria-label="روز بعد" style={navBtn} disabled={value >= max} onClick={() => step(1)}>‹</button>
+      <button
+        type="button"
+        onClick={() => { setView({ jy: cur.jy, jm: cur.jm }); setOpen((o) => !o); }}
+        style={{ ...FIELD_STYLE, cursor: 'pointer', fontWeight: 600, minWidth: 190 }}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+      >
+        📅 {label}
+      </button>
+      <button type="button" aria-label="روز قبل" style={navBtn} onClick={() => step(-1)}>›</button>
+      {open ? (
+        <div role="dialog" aria-label="انتخاب تاریخ" style={{ position: 'absolute', top: 44, insetInlineEnd: 0, zIndex: 30, width: 292, padding: 14, borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 12px 32px rgba(0,0,0,.18)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <button type="button" aria-label="ماه بعد" style={navBtn} onClick={() => shift(1)}>‹</button>
+            <strong style={{ fontSize: 15 }}>{JALALI_MONTHS[view.jm - 1] + ' ' + faDigits(view.jy)}</strong>
+            <button type="button" aria-label="ماه قبل" style={navBtn} onClick={() => shift(-1)}>›</button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4, textAlign: 'center', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}>
+            {WEEK.map((w, i) => <span key={w} style={{ color: i === 6 ? 'var(--danger, #dc2626)' : undefined }}>{w}</span>)}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4 }}>
+            {Array.from({ length: offset }, (_, i) => <span key={'e' + i} />)}
+            {Array.from({ length: len }, (_, i) => i + 1).map((d) => {
+              const iso = isoOf(fromJalali(view.jy, view.jm, d, 12));
+              const sel = iso === value, off = iso > max, now = iso === todayIso;
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  disabled={off}
+                  onClick={() => pick(d)}
+                  style={{ height: 34, borderRadius: 10, border: now && !sel ? '1px solid var(--brand, #2563eb)' : '1px solid transparent', background: sel ? 'var(--brand, #2563eb)' : 'transparent', color: sel ? '#fff' : 'inherit', fontWeight: sel || now ? 700 : 400, opacity: off ? 0.35 : 1, cursor: off ? 'default' : 'pointer' }}
+                >
+                  {faDigits(d)}
+                </button>
+              );
+            })}
+          </div>
+          <button type="button" onClick={() => { onChange(max); setOpen(false); }} style={{ ...navBtn, width: '100%', marginTop: 10, fontSize: 13 }}>امروز</button>
+        </div>
+      ) : null}
     </div>
   );
 }

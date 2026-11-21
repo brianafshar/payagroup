@@ -90,6 +90,8 @@ export const SPORTS: Array<[string, string]> = [
   ['martial', 'هنرهای رزمی'],
   ['endurance', 'استقامتی'],
 ];
+/** Sports a program can be made for (the rest stay available for exercises). */
+export const PROGRAM_SPORTS: Array<[string, string]> = SPORTS.filter(([k]) => ['fitness', 'running', 'basketball', 'endurance'].includes(k));
 /** Required credit for the library illustrations (RepDB free tier licence). */
 export const LIBRARY_CREDIT = { text: 'Exercise data by RepDB (repdb.co)', href: 'https://repdb.co/' };
 
