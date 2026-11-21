@@ -1857,7 +1857,7 @@
   }
  },
  {
-  "name": "لانج راه‌رفتنی",
+  "name": "واکینگ لانج",
   "sport": "fitness",
   "category": "legs",
   "equipment": "bodyweight",
@@ -1897,10 +1897,13 @@
    "زانوی عقب به زمین نکوبد."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "لانج راه‌رفتنی"
+  ]
  },
  {
-  "name": "لانج معکوس دمبل",
+  "name": "ریورس لانج دمبل",
   "sport": "fitness",
   "category": "legs",
   "equipment": "dumbbell",
@@ -1941,7 +1944,10 @@
    "تنه صاف."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "لانج معکوس دمبل"
+  ]
  },
  {
   "name": "اسپلیت اسکوات دمبل (بلغاری)",
@@ -2244,7 +2250,7 @@
   }
  },
  {
-  "name": "پل باسن هالتر",
+  "name": "گلوت بریج هالتر",
   "sport": "fitness",
   "category": "legs",
   "equipment": "barbell",
@@ -2289,10 +2295,13 @@
    "band": [
     "banded-glute-bridge"
    ]
-  }
+  },
+  "aka": [
+   "پل باسن هالتر"
+  ]
  },
  {
-  "name": "پل باسن تک‌پا",
+  "name": "گلوت بریج تک‌پا",
   "sport": "fitness",
   "category": "legs",
   "equipment": "bodyweight",
@@ -2333,7 +2342,10 @@
   "issues": [
    "knee_valgus"
   ],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "پل باسن تک‌پا"
+  ]
  },
  {
   "name": "دستگاه داخل ران",
@@ -3895,7 +3907,7 @@
   "is_new": false
  },
  {
-  "name": "پلانک پهلو",
+  "name": "ساید پلانک",
   "sport": "fitness",
   "category": "core",
   "equipment": "bodyweight",
@@ -3936,7 +3948,10 @@
   "issues": [
    "lower_back"
   ],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "پلانک پهلو"
+  ]
  },
  {
   "name": "کرانچ شکم",
@@ -4029,7 +4044,7 @@
   }
  },
  {
-  "name": "بالا آوردن پا در حالت آویزان",
+  "name": "هنگینگ لگ ریز",
   "sport": "fitness",
   "category": "core",
   "equipment": "bodyweight",
@@ -4069,10 +4084,13 @@
    "تصویر زانوی خم را نشان می‌دهد؛ با پای صاف سخت‌تر است."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "بالا آوردن پا در حالت آویزان"
+  ]
  },
  {
-  "name": "چرخش روسی",
+  "name": "راشن توئیست",
   "sport": "fitness",
   "category": "core",
   "equipment": "bodyweight",
@@ -4111,10 +4129,13 @@
    "کمر گرد نشود."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "چرخش روسی"
+  ]
  },
  {
-  "name": "چرخ شکم",
+  "name": "اب ویل",
   "sport": "fitness",
   "category": "core",
   "equipment": "bodyweight",
@@ -4156,7 +4177,10 @@
    "دامنه را کم‌کم بیشتر کن."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "چرخ شکم"
+  ]
  },
  {
   "name": "دد باگ",
@@ -4342,7 +4366,7 @@
   "is_new": false
  },
  {
-  "name": "کوهنورد",
+  "name": "مانتین کلایمبر",
   "sport": "fitness",
   "category": "core",
   "equipment": "bodyweight",
@@ -4382,7 +4406,10 @@
    "دست‌ها زیر شانه."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "کوهنورد"
+  ]
  },
  {
   "name": "پاور کلین",
@@ -4650,7 +4677,7 @@
   "is_new": false
  },
  {
-  "name": "راه رفتن کشاورز",
+  "name": "فارمرز واک",
   "sport": "fitness",
   "category": "conditioning",
   "equipment": "dumbbell",
@@ -4693,10 +4720,13 @@
    "برای قدرت گرفتن و میان‌تنه."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "راه رفتن کشاورز"
+  ]
  },
  {
-  "name": "هل دادن سورتمه",
+  "name": "اسلد پوش",
   "sport": "fitness",
   "category": "conditioning",
   "equipment": "machine",
@@ -4729,10 +4759,13 @@
    "برای آمادگی بدون ضربه به مفاصل."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "هل دادن سورتمه"
+  ]
  },
  {
-  "name": "طناب نبرد",
+  "name": "بتل روپ",
   "sport": "fitness",
   "category": "conditioning",
   "equipment": "cardio",
@@ -4775,10 +4808,13 @@
    "برای اینتروال."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "طناب نبرد"
+  ]
  },
  {
-  "name": "طناب زدن",
+  "name": "جامپ روپ",
   "sport": "fitness",
   "category": "conditioning",
   "equipment": "bodyweight",
@@ -4818,7 +4854,10 @@
    "پرش کوتاه."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "طناب زدن"
+  ]
  },
  {
   "name": "روئینگ (قایق‌رانی ثابت)",
@@ -6412,7 +6451,7 @@
   "is_new": false
  },
  {
-  "name": "اسکوات پرشی",
+  "name": "جامپ اسکوات",
   "sport": "fitness",
   "category": "power",
   "equipment": "bodyweight",
@@ -6452,7 +6491,10 @@
    "فرود نرم."
   ],
   "issues": [],
-  "is_new": false
+  "is_new": false,
+  "aka": [
+   "اسکوات پرشی"
+  ]
  },
  {
   "name": "رکاب‌زنی استقامتی",
@@ -11544,7 +11586,7 @@
  },
  {
   "key": "sled-row",
-  "name": "کشیدن سورتمه",
+  "name": "اسلد دراگ",
   "name_en": "Sled Row",
   "sport": "fitness",
   "category": "back",
@@ -11588,7 +11630,10 @@
    "trapezius"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "کشیدن سورتمه"
+  ]
  },
  {
   "key": "chest-supported-smith-machine-row",
@@ -17902,7 +17947,7 @@
  },
  {
   "key": "plyo-lunge",
-  "name": "لانج پرشی",
+  "name": "جامپ لانج",
   "name_en": "Plyo Lunge",
   "sport": "fitness",
   "category": "power",
@@ -17942,11 +17987,14 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "لانج پرشی"
+  ]
  },
  {
   "key": "bodyweight-reverse-lunge",
-  "name": "لانج معکوس وزن بدن",
+  "name": "ریورس لانج وزن بدن",
   "name_en": "Bodyweight Reverse Lunge",
   "sport": "fitness",
   "category": "legs",
@@ -17985,7 +18033,10 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "لانج معکوس وزن بدن"
+  ]
  },
  {
   "key": "box-squat",
@@ -18162,7 +18213,7 @@
  },
  {
   "key": "cossack-squat",
-  "name": "اسکوات قزاقی",
+  "name": "کازاک اسکوات",
   "name_en": "Cossack Squat",
   "sport": "fitness",
   "category": "legs",
@@ -18204,7 +18255,10 @@
   "issues": [
    "hip_mobility"
   ],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "اسکوات قزاقی"
+  ]
  },
  {
   "key": "crescent-lunge",
@@ -18342,7 +18396,7 @@
  },
  {
   "key": "glute-bridge",
-  "name": "پل باسن",
+  "name": "گلوت بریج",
   "name_en": "Glute Bridge",
   "sport": "fitness",
   "category": "legs",
@@ -18383,11 +18437,14 @@
    "lower_back",
    "anterior_pelvic_tilt"
   ],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "پل باسن"
+  ]
  },
  {
   "key": "glute-bridge-hold",
-  "name": "پل باسن ایستا",
+  "name": "گلوت بریج ایستا",
   "name_en": "Glute Bridge Hold",
   "sport": "fitness",
   "category": "legs",
@@ -18423,7 +18480,10 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "پل باسن ایستا"
+  ]
  },
  {
   "key": "glute-kickback",
@@ -18513,7 +18573,7 @@
  },
  {
   "key": "lunge",
-  "name": "لانج درجا",
+  "name": "استیشنری لانج",
   "name_en": "Lunge",
   "sport": "fitness",
   "category": "legs",
@@ -18554,7 +18614,10 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "لانج درجا"
+  ]
  },
  {
   "key": "pistol-squat",
@@ -18689,7 +18752,7 @@
  },
  {
   "key": "side-lunge",
-  "name": "لانج جانبی",
+  "name": "لترال لانج",
   "name_en": "Side Lunge",
   "sport": "fitness",
   "category": "legs",
@@ -18730,11 +18793,14 @@
    "hip_flexors"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "لانج جانبی"
+  ]
  },
  {
   "key": "side-lying-hip-abduction",
-  "name": "ابداکشن ران خوابیده به پهلو",
+  "name": "ساید لایینگ هیپ ابداکشن",
   "name_en": "Side-Lying Hip Abduction",
   "sport": "fitness",
   "category": "legs",
@@ -18773,11 +18839,14 @@
   "issues": [
    "knee_valgus"
   ],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "ابداکشن ران خوابیده به پهلو"
+  ]
  },
  {
   "key": "side-lying-hip-abduction-hold",
-  "name": "ابداکشن ران ایستا",
+  "name": "استندینگ هیپ ابداکشن",
   "name_en": "Side-Lying Hip Abduction Hold",
   "sport": "fitness",
   "category": "legs",
@@ -18812,11 +18881,14 @@
   ],
   "muscles_secondary": [],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "ابداکشن ران ایستا"
+  ]
  },
  {
   "key": "side-lying-hip-adduction",
-  "name": "اداکشن ران خوابیده به پهلو",
+  "name": "ساید لایینگ هیپ اداکشن",
   "name_en": "Side Lying Hip Adduction",
   "sport": "fitness",
   "category": "legs",
@@ -18853,11 +18925,14 @@
   "muscles_secondary": [],
   "issues": [],
   "is_new": true,
-  "illustration_note_dev": "looks like the top leg lifts"
+  "illustration_note_dev": "looks like the top leg lifts",
+  "aka": [
+   "اداکشن ران خوابیده به پهلو"
+  ]
  },
  {
   "key": "side-lying-hip-adduction-hold",
-  "name": "اداکشن ران ایستا",
+  "name": "استندینگ هیپ اداکشن",
   "name_en": "Side-Lying Hip Adduction Hold",
   "sport": "fitness",
   "category": "legs",
@@ -18891,11 +18966,14 @@
   ],
   "muscles_secondary": [],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "اداکشن ران ایستا"
+  ]
  },
  {
   "key": "single-leg-glute-bridge-hold",
-  "name": "پل باسن تک‌پا ایستا",
+  "name": "گلوت بریج تک‌پا ایستا",
   "name_en": "Single-Leg Glute Bridge Hold",
   "sport": "fitness",
   "category": "legs",
@@ -18932,7 +19010,10 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "پل باسن تک‌پا ایستا"
+  ]
  },
  {
   "key": "single-leg-rdl-hold",
@@ -19242,7 +19323,7 @@
  },
  {
   "key": "barbell-bulgarian-split-squat",
-  "name": "اسپلیت اسکوات بلغاری هالتر",
+  "name": "بلغارین اسپلیت اسکوات هالتر",
   "name_en": "Barbell Bulgarian Split Squat",
   "sport": "fitness",
   "category": "legs",
@@ -19286,11 +19367,14 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "اسپلیت اسکوات بلغاری هالتر"
+  ]
  },
  {
   "key": "barbell-reverse-lunge",
-  "name": "لانج معکوس هالتر",
+  "name": "ریورس لانج هالتر",
   "name_en": "Barbell Reverse Lunge",
   "sport": "fitness",
   "category": "legs",
@@ -19333,7 +19417,10 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "لانج معکوس هالتر"
+  ]
  },
  {
   "key": "good-morning",
@@ -20183,7 +20270,7 @@
  },
  {
   "key": "kettlebell-bulgarian-split-squat",
-  "name": "اسپلیت اسکوات بلغاری کتل‌بل",
+  "name": "بلغارین اسپلیت اسکوات کتل‌بل",
   "name_en": "Kettlebell Bulgarian Split Squat",
   "sport": "fitness",
   "category": "legs",
@@ -20225,7 +20312,10 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "اسپلیت اسکوات بلغاری کتل‌بل"
+  ]
  },
  {
   "key": "kettlebell-goblet-lunge",
@@ -20367,7 +20457,7 @@
  },
  {
   "key": "kettlebell-reverse-lunge",
-  "name": "لانج معکوس کتل‌بل",
+  "name": "ریورس لانج کتل‌بل",
   "name_en": "Kettlebell Reverse Lunge",
   "sport": "fitness",
   "category": "legs",
@@ -20410,7 +20500,10 @@
    "obliques"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "لانج معکوس کتل‌بل"
+  ]
  },
  {
   "key": "kettlebell-rotational-lunge",
@@ -21094,7 +21187,7 @@
  },
  {
   "key": "banded-glute-bridge",
-  "name": "پل باسن با مینی‌بند",
+  "name": "گلوت بریج با مینی‌بند",
   "name_en": "Banded Glute Bridge",
   "sport": "fitness",
   "category": "legs",
@@ -21137,6 +21230,9 @@
   "is_new": true,
   "replaces": [
    "barbell-glute-bridge"
+  ],
+  "aka": [
+   "پل باسن با مینی‌بند"
   ]
  },
  {
@@ -21372,7 +21468,7 @@
  },
  {
   "key": "banded-seated-hip-abduction",
-  "name": "ابداکشن نشسته با مینی‌بند",
+  "name": "سیتد هیپ ابداکشن با مینی‌بند",
   "name_en": "Banded Seated Hip Abduction",
   "sport": "fitness",
   "category": "legs",
@@ -21414,6 +21510,9 @@
   "is_new": true,
   "replaces": [
    "hip-abduction"
+  ],
+  "aka": [
+   "ابداکشن نشسته با مینی‌بند"
   ]
  },
  {
@@ -21515,7 +21614,7 @@
  },
  {
   "key": "banded-standing-hip-abduction",
-  "name": "ابداکشن ایستاده با مینی‌بند",
+  "name": "استندینگ هیپ ابداکشن با مینی‌بند",
   "name_en": "Banded Standing Hip Abduction",
   "sport": "fitness",
   "category": "legs",
@@ -21559,11 +21658,14 @@
   "is_new": true,
   "replaces": [
    "hip-abduction"
+  ],
+  "aka": [
+   "ابداکشن ایستاده با مینی‌بند"
   ]
  },
  {
   "key": "banded-standing-hip-adduction",
-  "name": "اداکشن ایستاده با کش",
+  "name": "استندینگ هیپ اداکشن با کش",
   "name_en": "Banded Standing Hip Adduction",
   "sport": "fitness",
   "category": "legs",
@@ -21603,6 +21705,9 @@
   "is_new": true,
   "replaces": [
    "hip-adduction"
+  ],
+  "aka": [
+   "اداکشن ایستاده با کش"
   ]
  },
  {
@@ -21696,7 +21801,7 @@
  },
  {
   "key": "smith-machine-bulgarian-split",
-  "name": "اسپلیت اسکوات بلغاری اسمیت",
+  "name": "بلغارین اسپلیت اسکوات اسمیت",
   "name_en": "Smith Machine Bulgarian Split Squat",
   "sport": "fitness",
   "category": "legs",
@@ -21737,7 +21842,10 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "اسپلیت اسکوات بلغاری اسمیت"
+  ]
  },
  {
   "key": "smith-machine-front-squat",
@@ -21924,7 +22032,7 @@
  },
  {
   "key": "smith-machine-reverse-lunge",
-  "name": "لانج معکوس اسمیت",
+  "name": "ریورس لانج اسمیت",
   "name_en": "Smith Machine Reverse Lunge",
   "sport": "fitness",
   "category": "legs",
@@ -21966,7 +22074,10 @@
    "hamstrings"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "لانج معکوس اسمیت"
+  ]
  },
  {
   "key": "smith-machine-split-squat",
@@ -22105,7 +22216,7 @@
  },
  {
   "key": "stability-ball-hip-bridge",
-  "name": "پل باسن روی توپ سوئیسی",
+  "name": "گلوت بریج روی توپ سوئیسی",
   "name_en": "Stability Ball Hip Bridge",
   "sport": "fitness",
   "category": "legs",
@@ -22144,7 +22255,10 @@
    "rectus_abdominis"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "پل باسن روی توپ سوئیسی"
+  ]
  },
  {
   "key": "stability-ball-wall-squat",
@@ -24284,7 +24398,7 @@
  },
  {
   "key": "captains-chair-knee-raise",
-  "name": "بالا آوردن زانو صندلی رومن",
+  "name": "رومن چیر نی ریز",
   "name_en": "Captain's Chair Knee Raise",
   "sport": "fitness",
   "category": "core",
@@ -24324,11 +24438,14 @@
    "transverse_abdominis"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "بالا آوردن زانو صندلی رومن"
+  ]
  },
  {
   "key": "captains-chair-leg-raise",
-  "name": "بالا آوردن پا صاف صندلی رومن",
+  "name": "رومن چیر لگ ریز",
   "name_en": "Captain's Chair Leg Raise",
   "sport": "fitness",
   "category": "core",
@@ -24368,7 +24485,10 @@
    "transverse_abdominis"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "بالا آوردن پا صاف صندلی رومن"
+  ]
  },
  {
   "key": "cross-body-crunch",
@@ -25071,7 +25191,7 @@
  },
  {
   "key": "side-plank-leg-lift",
-  "name": "پلانک پهلو با بالا آوردن پا",
+  "name": "ساید پلانک با لگ ریز",
   "name_en": "Side Plank with Leg Lift",
   "sport": "fitness",
   "category": "core",
@@ -25111,11 +25231,14 @@
    "transverse_abdominis"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "پلانک پهلو با بالا آوردن پا"
+  ]
  },
  {
   "key": "side-plank-leg-lift-hold",
-  "name": "پلانک پهلو با پای بالا ایستا",
+  "name": "ساید پلانک با لگ هولد",
   "name_en": "Side Plank Leg Lift Hold",
   "sport": "fitness",
   "category": "core",
@@ -25154,7 +25277,10 @@
    "transverse_abdominis"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "پلانک پهلو با پای بالا ایستا"
+  ]
  },
  {
   "key": "sit-ups",
@@ -25596,7 +25722,7 @@
  },
  {
   "key": "kettlebell-russian-twist",
-  "name": "چرخش روسی کتل‌بل",
+  "name": "راشن توئیست کتل‌بل",
   "name_en": "Kettlebell Russian Twist",
   "sport": "fitness",
   "category": "core",
@@ -25637,11 +25763,14 @@
    "rectus_abdominis"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "چرخش روسی کتل‌بل"
+  ]
  },
  {
   "key": "suitcase-carry",
-  "name": "راه رفتن چمدانی",
+  "name": "سوت‌کیس کری",
   "name_en": "Suitcase Carry",
   "sport": "fitness",
   "category": "core",
@@ -25686,7 +25815,10 @@
   "issues": [
    "lower_back"
   ],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "راه رفتن چمدانی"
+  ]
  },
  {
   "key": "weighted-wall-crunch",
@@ -25733,7 +25865,7 @@
  },
  {
   "key": "hanging-knee-raise",
-  "name": "بالا آوردن زانو در حالت آویزان",
+  "name": "هنگینگ نی ریز",
   "name_en": "Hanging Knee Raise",
   "sport": "fitness",
   "category": "core",
@@ -25772,7 +25904,10 @@
    "obliques"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "بالا آوردن زانو در حالت آویزان"
+  ]
  },
  {
   "key": "hanging-l-sit",
@@ -25908,7 +26043,7 @@
  },
  {
   "key": "medicine-ball-slam",
-  "name": "کوبیدن توپ طبی",
+  "name": "مدیسین بال اسلم",
   "name_en": "Medicine Ball Slam",
   "sport": "fitness",
   "category": "power",
@@ -25950,7 +26085,10 @@
    "obliques"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "کوبیدن توپ طبی"
+  ]
  },
  {
   "key": "ball-pike",
@@ -26086,7 +26224,7 @@
  },
  {
   "key": "trx-side-plank",
-  "name": "پلانک پهلو TRX",
+  "name": "ساید پلانک TRX",
   "name_en": "TRX Side Plank",
   "sport": "fitness",
   "category": "core",
@@ -26124,7 +26262,10 @@
    "lateral_deltoid"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "پلانک پهلو TRX"
+  ]
  },
  {
   "key": "cobra-stretch",
@@ -26339,7 +26480,7 @@
  },
  {
   "key": "battle-rope-double-slam",
-  "name": "کوبیدن هم‌زمان طناب نبرد",
+  "name": "کوبیدن هم‌زمان بتل روپ",
   "name_en": "Battle Rope Double Slam",
   "sport": "fitness",
   "category": "power",
@@ -26383,7 +26524,10 @@
    "trapezius"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "کوبیدن هم‌زمان طناب نبرد"
+  ]
  },
  {
   "key": "ski-erg",
@@ -27171,7 +27315,7 @@
  },
  {
   "key": "kettlebell-farmers-walk",
-  "name": "راه رفتن کشاورز کتل‌بل",
+  "name": "فارمرز واک کتل‌بل",
   "name_en": "Kettlebell Farmer's Walk",
   "sport": "fitness",
   "category": "conditioning",
@@ -27213,7 +27357,10 @@
    "rectus_abdominis"
   ],
   "issues": [],
-  "is_new": true
+  "is_new": true,
+  "aka": [
+   "راه رفتن کشاورز کتل‌بل"
+  ]
  },
  {
   "key": "kettlebell-lunge-press",
@@ -29782,6 +29929,1300 @@
   "issues": [
    "hip_mobility"
   ],
+  "is_new": true
+ },
+ {
+  "name": "فرم شوت",
+  "name_en": "Form Shooting",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "beginner",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "شوت تک‌دست از نزدیک سبد برای تمیز کردن فرم پرتاب.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-form-shooting",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "triceps_brachii",
+   "anterior_deltoid"
+  ],
+  "muscles_secondary": [
+   "forearm_flexors"
+  ],
+  "steps": [
+   "یک قدم جلوتر از زیر سبد بایست، آرنج زیر توپ و زانوها کمی خم.",
+   "فقط با دست شوت‌زن و حرکت مچ توپ را به سمت سبد بفرست.",
+   "دنبال حرکت را تا انتها نگه دار (گردن قو) و توپ را برگردان."
+  ],
+  "tips": [
+   "آرنج در یک خط با سبد.",
+   "پشت توپ بچرخد (بک‌اسپین)."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "اسپات‌آپ شوت",
+  "name_en": "Spot-Up Shooting",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "intermediate",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "شوت ثابت از نقاط مشخص دور سبد.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-spot-up-shooting",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "triceps_brachii"
+  ],
+  "muscles_secondary": [
+   "gluteus_maximus",
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "پنج نقطه دور خط سه‌امتیازی یا میانی انتخاب کن.",
+   "توپ را بگیر و با پاهای آماده شوت بزن.",
+   "بعد از هر چند شوت نقطه را عوض کن."
+  ],
+  "tips": [
+   "پاها عرض شانه.",
+   "هدف را ثبت کن (مثلاً ۱۰ از ۱۵)."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "کچ‌اند‌شوت",
+  "name_en": "Catch and Shoot",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "intermediate",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "گرفتن پاس و شوت بدون دریبل.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-catch-and-shoot",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "triceps_brachii"
+  ],
+  "muscles_secondary": [
+   "gluteus_maximus",
+   "gastrocnemius"
+  ],
+  "steps": [
+   "در حرکت به سمت توپ برو و آماده بگیر.",
+   "با گرفتن توپ پاها را هماهنگ کن (هاپ یا یک‌دو).",
+   "سریع شوت بزن."
+  ],
+  "tips": [
+   "دست‌ها هدف بدهند.",
+   "قبل از رسیدن توپ آماده شو."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "جامپ شوت",
+  "name_en": "Jump Shot",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "intermediate",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "شوت پرشی استاندارد با تمام بدن.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-jump-shot",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gluteus_maximus",
+   "triceps_brachii"
+  ],
+  "muscles_secondary": [
+   "gastrocnemius",
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "زانوها را خم کن و توپ را به نقطه‌ی شوت بیاور.",
+   "با پاها بپر و در اوج توپ را رها کن.",
+   "در همان نقطه فرود بیا."
+  ],
+  "tips": [
+   "فرود نزدیک نقطه‌ی پرش.",
+   "دست شوت‌زن کامل باز شود."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "شوت سه‌امتیازی",
+  "name_en": "Three-Point Shooting",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "advanced",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "شوت از پشت خط سه‌امتیازی با ریتم بازی.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-three-point-shooting",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "triceps_brachii"
+  ],
+  "muscles_secondary": [
+   "gluteus_maximus",
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "از پنج نقطه دور خط شوت بزن.",
+   "هر شوت را با آمادگی کامل پا و خط بدن انجام بده.",
+   "تعداد موفق را ثبت کن."
+  ],
+  "tips": [
+   "قدرت از پا بیاید نه از دست.",
+   "خسته‌ای؟ فرم را فدا نکن."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "پول‌آپ جامپر",
+  "name_en": "Pull-Up Jumper",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "advanced",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "دریبل و شوت پرشی ناگهانی از دریبل.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-pull-up-jumper",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gluteus_maximus"
+  ],
+  "muscles_secondary": [
+   "hamstrings",
+   "triceps_brachii"
+  ],
+  "steps": [
+   "یک یا دو دریبل به سمت سبد بزن.",
+   "با توقف دوپا بپر.",
+   "شوت بزن و محکم فرود بیا."
+  ],
+  "tips": [
+   "توقف قبل از پرش کنترل‌شده.",
+   "شانه‌ها به سمت سبد."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "استپ‌بک شوت",
+  "name_en": "Step-Back Jumper",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "advanced",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "یک قدم عقب برای ساختن فضا و شوت.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-step-back-jumper",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gluteus_maximus"
+  ],
+  "muscles_secondary": [
+   "hamstrings",
+   "triceps_brachii"
+  ],
+  "steps": [
+   "دریبل به سمت مدافع.",
+   "با پای جلو هل بده و یک قدم عقب برو.",
+   "توپ را بالا بیاور و شوت بزن."
+  ],
+  "tips": [
+   "قدم عقب کوتاه و سریع.",
+   "تعادل روی هر دو پا."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "فلوتر",
+  "name_en": "Floater",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "advanced",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "شوت نرم و بلند روی مدافع نزدیک سبد.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-floater",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gastrocnemius"
+  ],
+  "muscles_secondary": [
+   "triceps_brachii"
+  ],
+  "steps": [
+   "با سرعت وارد دایره شو.",
+   "با یک پا بپر و توپ را بالا و نرم رها کن.",
+   "با انگشتان به توپ قوس بده."
+  ],
+  "tips": [
+   "قوس بلند.",
+   "مچ نرم."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "لی‌آپ",
+  "name_en": "Layup",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "beginner",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "ورود به سبد با پرش یک‌پا و گذاشتن توپ در سبد.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-layup",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gluteus_maximus"
+  ],
+  "muscles_secondary": [
+   "gastrocnemius",
+   "triceps_brachii"
+  ],
+  "steps": [
+   "دو قدم آخر را بردار (راست-چپ برای لی‌آپ راست).",
+   "با پای مخالف بپر و زانوی دیگر را بالا بیاور.",
+   "توپ را نرم روی تخته یا درون سبد بگذار."
+  ],
+  "tips": [
+   "چشم به مربع روی تخته.",
+   "دست دیگر محافظ توپ."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "فینگر رول",
+  "name_en": "Finger Roll",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "advanced",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "توپ را با غلتاندن روی انگشتان از بالای مدافع در سبد گذاشتن.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-finger-roll",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "forearm_flexors"
+  ],
+  "muscles_secondary": [
+   "triceps_brachii"
+  ],
+  "steps": [
+   "با سرعت نزدیک شو و بالا بپر.",
+   "دست را بالا ببر و توپ را روی انگشتان بغلتان.",
+   "انگشتان را رها کن تا توپ بالا برود."
+  ],
+  "tips": [
+   "تماس نرم با انگشتان.",
+   "کنترل قوس."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "هوک شوت",
+  "name_en": "Hook Shot",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "intermediate",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "شوت قلاب‌دار از کنار بدن، مخصوص بازیکنان داخل.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-hook-shot",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "triceps_brachii",
+   "anterior_deltoid"
+  ],
+  "muscles_secondary": [
+   "rectus_abdominis"
+  ],
+  "steps": [
+   "کنار بدن به سمت سبد بایست.",
+   "توپ را با دست دور از مدافع بالا ببر.",
+   "با مچ توپ را در قوس بیانداز."
+  ],
+  "tips": [
+   "شانه به سمت سبد.",
+   "دست دیگر بازو را حفظ کند."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "میکان درول",
+  "name_en": "Mikan Drill",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "beginner",
+  "measure": "time",
+  "unit": "min",
+  "metrics": [
+   "ست",
+   "مدت",
+   "استراحت"
+  ],
+  "description": "لی‌آپ‌های پشت‌سرهم دو طرف سبد برای لمس و پای کار.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-mikan-drill",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "forearm_flexors"
+  ],
+  "muscles_secondary": [
+   "gastrocnemius"
+  ],
+  "steps": [
+   "زیر سبد با یک لی‌آپ راست شروع کن.",
+   "توپ را بگیر و بدون دریبل لی‌آپ چپ بزن.",
+   "تا پایان زمان ادامه بده."
+  ],
+  "tips": [
+   "توپ همیشه بالای سر.",
+   "ریتم یکنواخت."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "پرتاب آزاد",
+  "name_en": "Free Throw",
+  "sport": "basketball",
+  "category": "shooting",
+  "equipment": "basketball",
+  "difficulty": "beginner",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "پرتاب آزاد از خط با ریتم ثابت.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-free-throw",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "triceps_brachii"
+  ],
+  "muscles_secondary": [
+   "forearm_flexors",
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "پاها پشت خط، توپ در دست.",
+   "یک دریبل یا نفس عمیق و روتین ثابت.",
+   "شوت بزن و دنبال حرکت را نگه دار."
+  ],
+  "tips": [
+   "همیشه یک روتین.",
+   "بعد از خستگی تمرین کن."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "دریبل درجا",
+  "name_en": "Stationary Dribble",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "beginner",
+  "measure": "time",
+  "unit": "min",
+  "metrics": [
+   "ست",
+   "مدت",
+   "استراحت"
+  ],
+  "description": "کنترل پایه‌ی توپ در جا.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-stationary-dribble",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "forearm_flexors"
+  ],
+  "muscles_secondary": [
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "زانو خم، سر بالا، توپ با نوک انگشتان.",
+   "دریبل بلند و کوتاه با هر دو دست.",
+   "نگاهت به توپ نباشد."
+  ],
+  "tips": [
+   "توپ با انگشتان، نه کف دست.",
+   "سر بالا."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "کراس‌اوور",
+  "name_en": "Crossover Dribble",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "intermediate",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "انتقال سریع توپ از یک دست به دست دیگر جلوی بدن.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-crossover-dribble",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "forearm_flexors",
+   "quadriceps"
+  ],
+  "muscles_secondary": [
+   "gastrocnemius"
+  ],
+  "steps": [
+   "توپ را در دست راست دریبل کن.",
+   "با یک پوش پایین و جلوی بدن به دست چپ ببر.",
+   "فوری جهت را عوض کن."
+  ],
+  "tips": [
+   "دریبل کوتاه و پایین.",
+   "شانه‌ها فریب بدهند."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "دریبل بین پا",
+  "name_en": "Between the Legs Dribble",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "intermediate",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "عبور توپ از بین پاها در حین حرکت.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-between-the-legs-dribble",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "forearm_flexors",
+   "quadriceps"
+  ],
+  "muscles_secondary": [
+   "gluteus_maximus"
+  ],
+  "steps": [
+   "پای جلو را جلو بگذار.",
+   "توپ را با یک دست از بین پاها به دست دیگر بفرست.",
+   "ادامه با ریتم راه‌رفتن."
+  ],
+  "tips": [
+   "توپ دور از پاها.",
+   "تعادل روی پای عقب."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "دریبل پشت کمر",
+  "name_en": "Behind the Back Dribble",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "advanced",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "انتقال توپ پشت کمر برای تغییر جهت.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-behind-the-back-dribble",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "forearm_flexors",
+   "rectus_abdominis"
+  ],
+  "muscles_secondary": [
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "توپ را کنار بدن دریبل کن.",
+   "با مچ توپ را پشت کمر به دست دیگر بفرست.",
+   "جهت حرکت را عوض کن."
+  ],
+  "tips": [
+   "مچ سریع.",
+   "بدن صاف."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "دریبل دو توپ",
+  "name_en": "Two-Ball Dribble",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "advanced",
+  "measure": "time",
+  "unit": "min",
+  "metrics": [
+   "ست",
+   "مدت",
+   "استراحت"
+  ],
+  "description": "دریبل هم‌زمان دو توپ برای هماهنگی دست‌ها.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-two-ball-dribble",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "forearm_flexors"
+  ],
+  "muscles_secondary": [
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "با هر دو دست دو توپ را همزمان بزن.",
+   "ریتم را عوض کن (متناوب و هم‌زمان).",
+   "سر بالا."
+  ],
+  "tips": [
+   "از آرام شروع کن.",
+   "دست ضعیف را بیشتر کار کن."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "اسپایدر دریبل",
+  "name_en": "Spider Dribble",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "intermediate",
+  "measure": "time",
+  "unit": "min",
+  "metrics": [
+   "ست",
+   "مدت",
+   "استراحت"
+  ],
+  "description": "دریبل سریع جلو و بین پاها با دو دست.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-spider-dribble",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "forearm_flexors"
+  ],
+  "muscles_secondary": [
+   "quadriceps"
+  ],
+  "steps": [
+   "توپ را جلو بزن، با یک دست.",
+   "با دست دیگر بین پاها بگیر و جابه‌جا کن.",
+   "سرعت را زیاد کن."
+  ],
+  "tips": [
+   "توپ پایین.",
+   "ریتم ثابت."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "دریبل مخروط",
+  "name_en": "Cone Dribble Course",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "cone",
+  "difficulty": "intermediate",
+  "measure": "interval",
+  "unit": "m",
+  "metrics": [
+   "تکرار",
+   "مسافت",
+   "استراحت"
+  ],
+  "description": "دریبل با تغییر جهت دور مخروط‌ها.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-cone-dribble-course",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "forearm_flexors"
+  ],
+  "muscles_secondary": [
+   "gastrocnemius"
+  ],
+  "steps": [
+   "۵ مخروط را با فاصله بچین.",
+   "بین مخروط‌ها با دریبل و تغییر جهت رد شو.",
+   "در برگشت دست دیگر را بزن."
+  ],
+  "tips": [
+   "توپ نزدیک بدن در تغییر جهت.",
+   "سرعت را به‌تدریج زیاد کن."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "چست پاس",
+  "name_en": "Chest Pass",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "beginner",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "پاس سینه‌ای تند و مستقیم.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-chest-pass",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "pectoralis_major",
+   "triceps_brachii"
+  ],
+  "muscles_secondary": [
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "توپ را مقابل سینه نگه دار.",
+   "آرنج‌ها را باز کن و دست‌ها را کامل دراز کن.",
+   "مچ را بچرخان و پاس بده."
+  ],
+  "tips": [
+   "پاس به دیوار تمرین کن.",
+   "انگشتان به سمت هدف."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "بانس پاس",
+  "name_en": "Bounce Pass",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "beginner",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "پاس زمینی برای رد کردن از دست مدافع.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-bounce-pass",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "pectoralis_major",
+   "triceps_brachii"
+  ],
+  "muscles_secondary": [
+   "forearm_flexors"
+  ],
+  "steps": [
+   "توپ را بزن به زمین در دو سوم فاصله.",
+   "پاس را کنار هدف ببر.",
+   "با دست و مچ هل بده."
+  ],
+  "tips": [
+   "نقطه‌ی برخورد در دو سوم فاصله.",
+   "توپ به کمر هدف برسد."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "اورهد پاس",
+  "name_en": "Overhead Pass",
+  "sport": "basketball",
+  "category": "handling",
+  "equipment": "basketball",
+  "difficulty": "beginner",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "پاس بلند بالای سر برای دور کردن توپ.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-overhead-pass",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "anterior_deltoid",
+   "triceps_brachii"
+  ],
+  "muscles_secondary": [
+   "rectus_abdominis"
+  ],
+  "steps": [
+   "توپ را بالای سر با دو دست نگه دار.",
+   "آرنج را کمی خم کن.",
+   "با یک حرکت شلاقی دست‌ها توپ را بفرست."
+  ],
+  "tips": [
+   "قدم جلو بردار.",
+   "کنترل قوس."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "دیفنسیو اسلاید",
+  "name_en": "Defensive Slide",
+  "sport": "basketball",
+  "category": "defense",
+  "equipment": "bodyweight",
+  "difficulty": "beginner",
+  "measure": "interval",
+  "unit": "m",
+  "metrics": [
+   "تکرار",
+   "مسافت",
+   "استراحت"
+  ],
+  "description": "حرکت جانبی در حالت دفاع با پاهای باز.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-defensive-slide",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gluteus_maximus"
+  ],
+  "muscles_secondary": [
+   "gastrocnemius",
+   "hip_flexors"
+  ],
+  "steps": [
+   "زانوها خم، سینه بالا، دست‌ها باز.",
+   "پای عقب را هل بده و یک قدم جانبی بردار.",
+   "پای دیگر را بدون جمع کردن نزدیک کن."
+  ],
+  "tips": [
+   "پاها به هم نخورند.",
+   "پایین بمان."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "دیفنسیو استنس",
+  "name_en": "Defensive Stance Hold",
+  "sport": "basketball",
+  "category": "defense",
+  "equipment": "bodyweight",
+  "difficulty": "beginner",
+  "measure": "time",
+  "unit": "min",
+  "metrics": [
+   "ست",
+   "مدت",
+   "استراحت"
+  ],
+  "description": "نگه داشتن حالت دفاع برای استقامت پا.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-defensive-stance-hold",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gluteus_maximus"
+  ],
+  "muscles_secondary": [
+   "gastrocnemius"
+  ],
+  "steps": [
+   "پاها بازتر از شانه، زانو خم، کمر صاف.",
+   "وزن روی پنجه‌ها.",
+   "دست‌ها آماده."
+  ],
+  "tips": [
+   "باسن پایین.",
+   "پشت صاف."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "کلوزاوت",
+  "name_en": "Closeout",
+  "sport": "basketball",
+  "category": "defense",
+  "equipment": "bodyweight",
+  "difficulty": "intermediate",
+  "measure": "interval",
+  "unit": "m",
+  "metrics": [
+   "تکرار",
+   "مسافت",
+   "استراحت"
+  ],
+  "description": "حرکت سریع به سمت شوت‌زن و برگشت به حالت دفاع.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-closeout",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gastrocnemius"
+  ],
+  "muscles_secondary": [
+   "gluteus_maximus",
+   "hip_flexors"
+  ],
+  "steps": [
+   "از زیر سبد به سمت شوت‌زن اسپرینت کن.",
+   "با قدم‌های کوتاه ترمز کن و دست را بالا بیاور.",
+   "بلافاصله اسلاید جانبی بزن."
+  ],
+  "tips": [
+   "قدم‌های ریز آخر.",
+   "دست بالا برای شوت."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "باکس‌اوت و ریباند",
+  "name_en": "Box-Out and Rebound",
+  "sport": "basketball",
+  "category": "defense",
+  "equipment": "bodyweight",
+  "difficulty": "intermediate",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "گرفتن جای مناسب و پرش برای ریباند.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-box-out-and-rebound",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gluteus_maximus"
+  ],
+  "muscles_secondary": [
+   "gastrocnemius",
+   "anterior_deltoid"
+  ],
+  "steps": [
+   "بدن را بین حریف و سبد بگذار.",
+   "باسن را عقب بده و آرنج‌ها را باز کن.",
+   "بپر و توپ را با دو دست بگیر."
+  ],
+  "tips": [
+   "تماس با باسن و پشت.",
+   "توپ را بالای سر نگه دار."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "لین اجیلیتی",
+  "name_en": "Lane Agility Drill",
+  "sport": "basketball",
+  "category": "agility",
+  "equipment": "cone",
+  "difficulty": "intermediate",
+  "measure": "interval",
+  "unit": "m",
+  "metrics": [
+   "تکرار",
+   "مسافت",
+   "استراحت"
+  ],
+  "description": "حرکت در چهار گوشه‌ی زیر سبد با اسلاید و دویدن.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-lane-agility-drill",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gastrocnemius"
+  ],
+  "muscles_secondary": [
+   "gluteus_maximus",
+   "hip_flexors"
+  ],
+  "steps": [
+   "از گوشه‌ی پایین شروع کن.",
+   "به سمت بالا بدو، جانبی اسلاید کن، عقب بدو.",
+   "تکرار با زمان‌گیری."
+  ],
+  "tips": [
+   "تغییر جهت سریع.",
+   "سر بالا."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "اسپرینت خط‌به‌خط",
+  "name_en": "Line Sprints",
+  "sport": "basketball",
+  "category": "agility",
+  "equipment": "other",
+  "difficulty": "intermediate",
+  "measure": "interval",
+  "unit": "m",
+  "metrics": [
+   "تکرار",
+   "مسافت",
+   "استراحت",
+   "ضربان قلب"
+  ],
+  "description": "دویدن تا خط‌های زمین و برگشت برای آمادگی هوازی.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-line-sprints",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gastrocnemius"
+  ],
+  "muscles_secondary": [
+   "gluteus_maximus",
+   "hamstrings"
+  ],
+  "steps": [
+   "از زیر سبد تا خط پرتاب آزاد بدو و برگرد.",
+   "بعد تا نیمه‌ی زمین و برگشت.",
+   "تا خط مقابل ادامه بده."
+  ],
+  "tips": [
+   "در هر خط کامل ترمز کن.",
+   "ریتم ثابت."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "پرش عمودی",
+  "name_en": "Vertical Jump",
+  "sport": "basketball",
+  "category": "power",
+  "equipment": "bodyweight",
+  "difficulty": "intermediate",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "پرش به بالا با تمام توان.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-vertical-jump",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gluteus_maximus",
+   "gastrocnemius"
+  ],
+  "muscles_secondary": [
+   "hamstrings",
+   "soleus"
+  ],
+  "steps": [
+   "زانو خم کن، دست‌ها را عقب ببر.",
+   "دست‌ها را به بالا تاب بده و با تمام توان بپر.",
+   "نرم فرود بیا."
+  ],
+  "tips": [
+   "ارتفاع را ثبت کن.",
+   "فرود نرم با زانوی خم."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "دپث جامپ",
+  "name_en": "Depth Jump",
+  "sport": "basketball",
+  "category": "power",
+  "equipment": "box",
+  "difficulty": "advanced",
+  "measure": "reps",
+  "unit": "rep",
+  "metrics": [
+   "ست",
+   "تکرار",
+   "استراحت"
+  ],
+  "description": "پرش بعد از فرود از ارتفاع برای قدرت انفجاری.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-depth-jump",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "quadriceps",
+   "gastrocnemius"
+  ],
+  "muscles_secondary": [
+   "gluteus_maximus",
+   "hamstrings"
+  ],
+  "steps": [
+   "روی جعبه بایست و بیرون بیا (نپر).",
+   "با فرود فوراً بپر.",
+   "زمان تماس با زمین را کم نگه دار."
+  ],
+  "tips": [
+   "تماس کوتاه با زمین.",
+   "جعبه ۳۰ تا ۴۵ سانتی."
+  ],
+  "issues": [],
+  "is_new": true
+ },
+ {
+  "name": "لاین هاپ",
+  "name_en": "Line Hops",
+  "sport": "basketball",
+  "category": "power",
+  "equipment": "bodyweight",
+  "difficulty": "beginner",
+  "measure": "time",
+  "unit": "min",
+  "metrics": [
+   "ست",
+   "مدت",
+   "استراحت"
+  ],
+  "description": "پرش‌های کوتاه جانبی و جلو-عقب روی خط.",
+  "image": null,
+  "source": "",
+  "illustration": null,
+  "key": "bb-line-hops",
+  "illustration_poses": [],
+  "illustration_match": "none",
+  "muscles_primary": [
+   "gastrocnemius",
+   "soleus"
+  ],
+  "muscles_secondary": [
+   "quadriceps"
+  ],
+  "steps": [
+   "با دو پا کنار خط بایست.",
+   "با پنجه جانبی بپر و برگرد.",
+   "سرعت را زیاد کن."
+  ],
+  "tips": [
+   "فرود روی پنجه.",
+   "زانوی نرم."
+  ],
+  "issues": [],
   "is_new": true
  }
 ]

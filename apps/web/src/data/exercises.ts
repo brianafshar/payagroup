@@ -23,6 +23,9 @@ export const EX_CATS: Record<string, string> = {
   gymnastics: 'ژیمناستیک',
   olympic: 'وزنه‌برداری المپیک',
   ball: 'تکنیک توپ',
+  shooting: 'شوت',
+  handling: 'دریبل و پاس',
+  defense: 'دفاع',
   agility: 'سرعت و چابکی',
   technique: 'تکنیک و فرم رزمی',
   sparring: 'مبارزه و کیسه',
@@ -42,6 +45,7 @@ export const SPORT_CATS: Record<string, string[]> = {
   triathlon: ['swim', 'swim_drill', 'ride', 'run', 'drill', 'brick'],
   crossfit: ['wod', 'gymnastics', 'olympic'],
   football: ['ball', 'agility'],
+  basketball: ['shooting', 'handling', 'defense', 'agility'],
   martial: ['technique', 'sparring', 'agility'],
   endurance: ['run', 'ride', 'swim'],
 };
@@ -66,6 +70,9 @@ export const EX_EQUIP: Record<string, string> = {
   cardio: 'دستگاه هوازی',
   roller: 'فوم رولر',
   pool: 'استخر',
+  basketball: 'توپ بسکتبال',
+  cone: 'مخروط',
+  other: 'بدون وسیله خاص',
   ...EQUIPMENT_V2,
 };
 export const EX_DIFF: Record<string, string> = { beginner: 'مبتدی', intermediate: 'متوسط', advanced: 'پیشرفته' };
@@ -79,6 +86,7 @@ export const SPORTS: Array<[string, string]> = [
   ['triathlon', 'سه‌گانه'],
   ['crossfit', 'کراس‌فیت'],
   ['football', 'فوتبال'],
+  ['basketball', 'بسکتبال'],
   ['martial', 'هنرهای رزمی'],
   ['endurance', 'استقامتی'],
 ];

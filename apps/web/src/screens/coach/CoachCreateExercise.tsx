@@ -92,6 +92,7 @@ export default class CoachCreateExercise extends Screen {
       crossfit: 'load',
       martial: 'reps',
       football: 'reps',
+      basketball: 'reps',
       running: 'distance',
       swimming: 'distance',
       cycling: 'distance',

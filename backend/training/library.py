@@ -109,6 +109,15 @@ def install(coach) -> int:
         peak, start = _illustration(row)
         photo = _stock(row.get("image"))
         old = have.get(row["name"])
+        if old is None:
+            # The library renamed this exercise: rename the coach's copy instead of adding a duplicate.
+            for alias in row.get("aka") or []:
+                found = have.pop(alias, None)
+                if found is not None and row["name"] not in have:
+                    found.name = row["name"]
+                    found.save(update_fields=["name"])
+                    have[row["name"]] = old = found
+                    break
         if old is not None:
             details = _details(row)
             changed = [k for k, v in details.items() if v and not getattr(old, k)]

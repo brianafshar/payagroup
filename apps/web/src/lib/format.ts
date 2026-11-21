@@ -35,6 +35,10 @@ export function setCalendar(c: string | undefined): void {
   }
 }
 
+export function getCalendar(): CalendarPref {
+  return calendar;
+}
+
 /** A date in the chosen calendar (Jalali by default), e.g. `۵ مهر ۱۴۰۵` or `۲۷ ربیع‌الاول ۱۴۴۸`. */
 export function faDate(d: Date, opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }, cal: CalendarPref = calendar): string {
   return d.toLocaleDateString(LOCALE[cal], opts);

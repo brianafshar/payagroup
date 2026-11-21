@@ -18,6 +18,7 @@ const MEASURES: Record<string, { label: string; unit: string; metrics: string[] 
 const SPORT_MEASURE: Record<string, string> = {
   martial: 'reps',
   football: 'reps',
+  basketball: 'reps',
   running: 'distance',
   swimming: 'distance',
   cycling: 'distance',

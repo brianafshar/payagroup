@@ -31,7 +31,7 @@ def online(settings, monkeypatch):
 
 
 def test_fresh_coach_gets_the_whole_library_with_details(coach):
-    assert library.install(coach) == 663
+    assert library.install(coach) == 695
     squat = Exercise.objects.get(coach=coach, name="اسکوات هالتر")
     assert squat.library_key == "squat" and len(squat.steps) >= 3 and squat.cues and squat.muscles_primary
     assert squat.alternatives["band"] == ["band-squat", "banded-squat"]
@@ -57,7 +57,7 @@ def test_old_coach_only_gets_new_exercises_and_empty_details_filled(coach):
     old_names = {"اسکوات هالتر": "توضیح خود مربی", "پرس سینه هالتر": ""}
     for name, desc in old_names.items():
         Exercise.objects.create(coach=coach, name=name, category="legs", equipment="barbell", description=desc)
-    assert library.install(coach) == 661
+    assert library.install(coach) == 693
     squat = Exercise.objects.get(coach=coach, name="اسکوات هالتر")
     assert squat.description == "توضیح خود مربی"  # the coach's text is kept
     assert squat.steps and squat.library_key == "squat"  # empty fields are filled
@@ -142,3 +142,12 @@ def test_athlete_schedule_has_exercise_pictures(coach, athlete, online):
     [day] = [d for d in Api().as_user(athlete.user).get("/api/me/schedule/").json()["days"] if d["today"]]
     ex = day["exercises"][0]
     assert ex["imageSrc"].endswith("squat-peak.webp") and ex["imageStartSrc"].endswith("squat-start.webp")
+
+
+def test_renamed_library_exercise_renames_the_coachs_copy(coach):
+    old = Exercise.objects.create(coach=coach, name="ابداکشن ران خوابیده به پهلو", category="legs", equipment="bodyweight")
+    library.install(coach)
+    old.refresh_from_db()
+    assert old.name == "ساید لایینگ هیپ ابداکشن"
+    assert Exercise.objects.filter(coach=coach, name="ابداکشن ران خوابیده به پهلو").count() == 0
+    assert Exercise.objects.filter(coach=coach, sport="basketball").count() >= 30
