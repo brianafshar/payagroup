@@ -75,11 +75,14 @@ h3 { margin: 0 0 .5rem; }
 /* ---------- horizontal scroller ---------- */
 .hs { height: 100vh; height: 100dvh; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; overscroll-behavior: contain; }
 .hs::-webkit-scrollbar { display: none; }
-.hs { cursor: grab; transition: opacity .28s ease; }
+.hs { transition: opacity .28s ease; }
 .hs.fading { opacity: 0; }
-.hs.dragging { cursor: grabbing; user-select: none; }
-.hs a, .hs button, .hs summary { cursor: pointer; }
-.hs.dragging a, .hs.dragging * { cursor: grabbing; }
+@media (pointer: fine) and (min-width: 801px) {
+  .hs { cursor: grab; }
+  .hs a, .hs button, .hs summary { cursor: pointer; }
+  .hs.dragging { cursor: grabbing; user-select: none; }
+  .hs.dragging * { cursor: grabbing; pointer-events: none; }
+}
 .hs-track { display: flex; height: 100%; width: max-content; }
 .panel { position: relative; flex: 0 0 auto; min-width: 100vw; height: 100vh; height: 100dvh; padding: 6.5rem clamp(4rem, 9vw, 8rem) 4rem clamp(2rem, 7vw, 7rem); display: flex; flex-direction: column; justify-content: safe center; gap: 1.5rem; overflow-y: auto; scrollbar-width: none; background: var(--bg); border-inline-end: 1px solid var(--line); }
 .panel::-webkit-scrollbar { display: none; }
